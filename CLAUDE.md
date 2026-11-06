@@ -1,0 +1,12 @@
+# CLAUDE.md
+
+This repo is **Ajantasa**, a 48-hour hackathon project for the Fonecta challenge.
+
+**Read `DESIGN.md` before doing anything.** It defines the problem, scope, data model, detection rules, AI usage, API routes, UI and build order.
+
+Key rules:
+- Code detects, AI explains, the human decides. Never let the LLM do date or number comparisons.
+- Build in the milestone order from DESIGN.md section 15. Keep the app runnable after every milestone.
+- Mock data only. No scraping, no real business data.
+- Gemini and ElevenLabs are called only from server-side code, through wrappers in `/lib/ai` and `/lib/voice`, with fallbacks.
+- Do not add features outside DESIGN.md without asking.
