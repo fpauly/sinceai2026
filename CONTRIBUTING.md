@@ -62,7 +62,9 @@ Split every task into **small stages** (about 1–2 hours each, one PR per stage
   npx tsc --noEmit && npm run lint
   npm run dev   # open the pages you touched; POST /api/seed still works
   ```
-- Always **squash merge**, then delete the branch.
+- **GitHub enforces this on `main`** (ruleset `protect-main`): no direct pushes, every change goes through a PR, no force pushes, `main` can't be deleted, squash merge only, and the **CI check (`check`) must pass**. Merged branches are deleted automatically.
+- CI (`.github/workflows/ci.yml`) runs `tsc`, `lint` and `next build` on every PR. A red CI means it is not done, whatever the AI says.
+- Tip: `gh pr create --fill` then `gh pr merge --squash --auto` merges by itself once CI is green.
 - **Own-lane PR** (only your lane's files): merge it yourself once the checks pass.
 - **`shared/*` PR**: needs a quick OK from **any one other person**, not only B. Aim to merge within 15 minutes, because others may be waiting on it.
 - B keeps an eye on `main` and runs the full demo flow after merges. If `main` breaks, fixing it beats new work.
@@ -101,7 +103,7 @@ Don't let an AI rewrite large parts of the code to get past a blocker.
 5. Follow the commit rules in section 3: no co-author lines, no AI footers. Commit or push only when asked.
 6. No destructive git commands (section 1) unless the human explicitly asks.
 7. Never put secrets in code, logs or commits. API keys only live in `.env.local`.
-8. Before saying "done": run `npx tsc --noEmit && npm run lint` and report the real result.
+8. Before saying "done": run `npx tsc --noEmit && npm run lint` (and `npm run build` for bigger changes) and report the real result. After pushing, check CI with `gh pr checks`.
 9. Code detects, AI explains, the human decides. The LLM never compares dates or numbers in our app.
 
 ## 7. Communication
