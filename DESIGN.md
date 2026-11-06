@@ -35,6 +35,7 @@ These come from Fonecta's slides and **override everything below**.
 ### Confirmed with Fonecta
 - **WhatsApp is a valid communication channel** for step 3 (Contact). Our contact preview shows the message as a WhatsApp chat (simulated, section 12); SMS/email are alternatives.
 - **Yext sandbox works** (tested read-only on 2026-11-06), details in section 10b.
+- **The demo is in English.** All UI text, customer messages, voice and the video are in English (`DEMO_LANGUAGE=en`). Finnish messages are still generated (`message.fi`) and shown as "also available in Finnish", but they are not part of the demo.
 
 ### Open questions (waiting for Fonecta, marked **TBD** below)
 1. **Dataset files** provided by Fonecta (format, fields), and whether to replace our mock data with them.
@@ -133,7 +134,7 @@ GEMINI_API_KEY=  GEMINI_MODEL=
 YEXT_API_KEY=  YEXT_ACCOUNT_ID=SinceAI03  YEXT_API_BASE=https://sbx-api.yextapis.com
 ELEVENLABS_API_KEY=  ELEVENLABS_VOICE_ID=
 DEMO_DATE=2026-12-10     # "today" for detection rules, so the demo is deterministic
-DEMO_LANGUAGE=en         # en | fi
+DEMO_LANGUAGE=en         # en | fi. The demo is in English
 ```
 
 ## 7. Data model (MongoDB collections)
@@ -306,7 +307,7 @@ Fonecta's scoring script measures suggestion quality on hidden test data. As soo
 
 - **TTS** (`lib/voice/tts.ts`): turn `suggestion.message[lang]` into audio as an optional Contact channel ("Connect calls you"). Cache the audio so it is generated once.
 - **STT** (`lib/voice/stt.ts`): hold-to-record (MediaRecorder) → API route → ElevenLabs → `intent.ts`.
-- Test Finnish quality early. If it is poor, demo in English and mention Finnish as supported in principle.
+- The demo is in English, so pick a clear English voice. Finnish TTS is optional (only mention it as supported).
 - Buttons always work without voice. Voice is an extra path, never the only path.
 
 ## 10b. Yext usage (step 5, Apply)
@@ -349,7 +350,7 @@ Applying a decision:
 - Optional 🔊 "Connect calls you" (TTS, extra)
 
 ### Owner view `/owner/[businessId]` (mobile-first, ~390px wide, steps 4 and 5)
-- Header: business name, greeting ("Hei Liisa!")
+- Header: business name, greeting ("Hi Liisa!"), all UI text in English
 - A stack of notification cards, one per open suggestion:
   - Title (issue type in plain words), message text
   - **Why:** reason + the data it is based on, confidence badge (high/medium/low); low confidence clearly says "please check"
