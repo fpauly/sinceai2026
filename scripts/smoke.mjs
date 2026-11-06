@@ -37,9 +37,9 @@ async function seed() {
 
 // ---------- M2: detection (rules 1, 2, 4) — TASKS.md lane C acceptance table ----------
 const EXPECTED_ISSUES = [
-  "cafe_aura|missing_holiday_hours|2026-12-24,2026-12-25,2026-12-26",
-  "cafe_aura|cross_platform_conflict|opening_hours.mon",
-  "cafe_aura|stale_field|description",
+  "rye_shine|missing_holiday_hours|2026-12-24,2026-12-25,2026-12-26,2027-01-01,2027-01-06",
+  "rye_shine|cross_platform_conflict|opening_hours.sat",
+  "rye_shine|stale_field|description",
   "parturi_linnankatu|missing_holiday_hours|2026-12-24,2026-12-25,2026-12-26,2027-01-01,2027-01-06",
   "autokorjaamo_skanssi|cross_platform_conflict|phone",
   "kukkakauppa_kauppatori|stale_field|opening_hours",

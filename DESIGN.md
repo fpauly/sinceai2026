@@ -60,7 +60,7 @@ Today, keeping information up to date depends on the owner remembering to log in
 | **Business owner** (primary) | Hear about problems only when it matters; fix them in seconds; stay in control | Message preview (`/contact/[businessId]`) → mobile owner view (`/owner/[businessId]`), no login |
 | **Fonecta support team** (secondary) | See the health of all businesses at a glance | Dashboard (`/dashboard`) |
 
-Demo persona: **Liisa**, owner of **Café Aura** by the Aura river in Turku. Busy, never logs into anything.
+Demo persona: **Liisa**, owner of **Rye & Shine Bakery** on Eerikinkatu in Turku: the real entity in our Yext sandbox (section 10b), so Apply writes real Yext data (and our seed mirrors what Yext holds). Busy, never logs into anything, reads WhatsApp.
 
 ## 4. Core flow (the five steps)
 
@@ -144,14 +144,14 @@ TypeScript types: `types/index.ts` (data) and `types/api.ts` (contracts between 
 ### `businesses`
 ```json
 {
-  "_id": "cafe_aura",
-  "name": "Café Aura",
+  "_id": "rye_shine",
+  "name": "Rye & Shine Bakery",
   "owner_name": "Liisa",
-  "category": "cafe",
+  "category": "bakery",
   "city": "Turku",
-  "preferred_channel": "voice",
+  "preferred_channel": "whatsapp",
   "language": "fi",
-  "yext_entity_id": null
+  "yext_entity_id": "SinceAI03"
 }
 ```
 `yext_entity_id`: the matching entity in our Yext sandbox (TBD how we map them).
@@ -159,8 +159,8 @@ TypeScript types: `types/index.ts` (data) and `types/api.ts` (contracts between 
 ### `listings` (one document per business per source)
 ```json
 {
-  "_id": "cafe_aura:google",
-  "business_id": "cafe_aura",
+  "_id": "rye_shine:google",
+  "business_id": "rye_shine",
   "source": "google",
   "opening_hours": {
     "mon": "08:00-18:00", "tue": "08:00-18:00", "wed": "08:00-18:00",
@@ -168,7 +168,7 @@ TypeScript types: `types/index.ts` (data) and `types/api.ts` (contracts between 
   },
   "holiday_hours": { "2025-12-24": "08:00-14:00" },
   "phone": "+358 2 123 4567",
-  "description": "Cozy café by the river.",
+  "description": "Sourdough and rye bakery on Eerikinkatu.",
   "field_updated_at": {
     "opening_hours": "2024-03-12",
     "holiday_hours": "2025-11-20",
@@ -179,15 +179,15 @@ TypeScript types: `types/index.ts` (data) and `types/api.ts` (contracts between 
 
 ### `reviews`
 ```json
-{ "_id": "...", "business_id": "cafe_aura", "date": "2026-11-30", "rating": 2,
-  "text": "Came on Monday morning and it was closed even though Google said open." }
+{ "_id": "...", "business_id": "rye_shine", "date": "2026-11-30", "rating": 2,
+  "text": "Came on Saturday at 3 pm and the door was locked, although Google said open until 18." }
 ```
 
 ### `issues`
 ```json
 {
   "_id": "...",
-  "business_id": "cafe_aura",
+  "business_id": "rye_shine",
   "type": "missing_holiday_hours",
   "severity": "high",
   "evidence": {
@@ -197,7 +197,7 @@ TypeScript types: `types/index.ts` (data) and `types/api.ts` (contracts between 
   },
   "status": "open",
   "created_at": "2026-12-10T08:00:00Z",
-  "fingerprint": "cafe_aura:missing_holiday_hours:2026-12-24,2026-12-25,2026-12-26"
+  "fingerprint": "rye_shine:missing_holiday_hours:2026-12-24,2026-12-25,2026-12-26"
 }
 ```
 `status`: `open` | `suggested` | `resolved` | `ignored`. The evidence shape per type is in `types/api.ts`; it is also "the data that told Connect" for step 1.
@@ -207,7 +207,7 @@ TypeScript types: `types/index.ts` (data) and `types/api.ts` (contracts between 
 {
   "_id": "...",
   "issue_id": "...",
-  "business_id": "cafe_aura",
+  "business_id": "rye_shine",
   "proposed_change": {
     "field": "holiday_hours",
     "value": { "2026-12-24": "08:00-14:00", "2026-12-25": "closed", "2026-12-26": "closed" }
@@ -231,8 +231,8 @@ TypeScript types: `types/index.ts` (data) and `types/api.ts` (contracts between 
 ### `preferences`
 ```json
 {
-  "business_id": "cafe_aura",
-  "ignored_fingerprints": ["cafe_aura:stale_field:description"],
+  "business_id": "rye_shine",
+  "ignored_fingerprints": ["rye_shine:stale_field:description"],
   "learned": [
     { "issue_type": "missing_holiday_hours", "field": "holiday_hours",
       "proposed": { "2026-12-26": "closed" }, "final": { "2026-12-26": "11:00-16:00" },
@@ -373,7 +373,7 @@ Applying a decision:
 
 | Business | Category | Planted problems |
 |---|---|---|
-| Café Aura | café | Missing Christmas hours (had them last year), Google vs Finder Monday hours conflict, review "closed on Monday", description stale |
+| **Rye & Shine Bakery** (Yext `SinceAI03`) | bakery | Same base hours as Yext (Mon–Sat 10–18, Sun closed). No holiday hours for Christmas–Epiphany (had them last season); own website says Saturday 10–14 (newest) vs Finder/Google 18:00; review "locked on Saturday afternoon"; description stale |
 | Parturi Kampaamo Linnankatu | hair salon | Missing Christmas and New Year hours, **no history at all** (the no-history case) |
 | Autokorjaamo Skanssi | car repair | Phone number conflict between sources |
 | Kukkakauppa Kauppatori | florist | Stale opening hours (2+ years) |
@@ -427,11 +427,11 @@ If time runs short, cut from the bottom.
 ## 16. Demo script (2–3 minutes, also the submission video)
 
 1. **Problem (20 s):** "You walk to a café that says it's open. The door is locked."
-2. **Detect (20 s):** dashboard → "Run daily check" → Café Aura: Christmas hours missing; *the data:* public holiday calendar + last year's hours
+2. **Detect (20 s):** dashboard → "Run daily check" → Rye & Shine Bakery: holiday hours missing; *the data:* public holiday calendar + last season's hours + its Yext entity
 3. **Suggest (20 s):** proposed hours and why exactly those ("same as last year"), confidence high, validated
-4. **Contact (20 s):** Liisa's phone gets a message from Fonecta Connect explaining why, with a no-login link (optional: Connect calls her with the voice message)
-5. **Decide (30 s):** Liisa edits "open at 11 on the 26th", ticks "do this automatically next time", confirms
-6. **Apply (20 s):** written to Yext → "now showing on Google, Apple Maps, Finder…", channels turn green
+4. **Contact (20 s):** Liisa gets a WhatsApp message from Fonecta Connect explaining why, with a no-login link (optional: Connect calls her with the voice message)
+5. **Decide (30 s):** Liisa opens the WhatsApp link, edits "open 11–15 on the 26th", ticks "do this automatically next time", confirms
+6. **Apply (20 s):** written to the Rye & Shine entity in Yext (show it in the Yext sandbox) → "now showing on Google, Apple, Bing, Facebook…", channels turn green
 7. **Learn + control (20 s):** run the check again: the next suggestion uses her edit; the ignored description issue does not come back; a no-history business gets a cautious, low-confidence question instead of a guess
 8. **Close (10 s):** "Liisa doesn't have to remember anything. Connect does it for her." + extensibility: the same loop serves posts and review replies
 

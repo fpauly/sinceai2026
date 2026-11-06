@@ -92,7 +92,8 @@ const fresh = (): Record<TrackedField, string> => ({
 });
 
 export const businesses: Business[] = [
-  { _id: "cafe_aura", name: "Café Aura", owner_name: "Liisa", category: "cafe", city: "Turku", preferred_channel: "voice", language: "fi" },
+  // Demo protagonist: the real entity in our Yext sandbox (DESIGN §10b). Keep its data in sync with Yext.
+  { _id: "rye_shine", name: "Rye & Shine Bakery", owner_name: "Liisa", category: "bakery", city: "Turku", preferred_channel: "whatsapp", language: "fi", yext_entity_id: "SinceAI03" },
   { _id: "parturi_linnankatu", name: "Parturi Kampaamo Linnankatu", owner_name: "Sanna", category: "hair_salon", city: "Turku", preferred_channel: "sms", language: "fi" },
   { _id: "autokorjaamo_skanssi", name: "Autokorjaamo Skanssi", owner_name: "Jari", category: "car_repair", city: "Turku", preferred_channel: "voice", language: "fi" },
   { _id: "kukkakauppa_kauppatori", name: "Kukkakauppa Kauppatori", owner_name: "Aino", category: "florist", city: "Turku", preferred_channel: "app", language: "fi" },
@@ -103,30 +104,31 @@ export const businesses: Business[] = [
 ];
 
 export const listings: Listing[] = [
-  // Café Aura — triggers all four rules:
-  //  1. no hours for Christmas 2026 (had them in 2025)
-  //  2. Google says open on Monday, Finder + website say closed (Finder/website updated more recently)
-  //  3. recent review: "closed on Monday although Google said open"
+  // Rye & Shine Bakery (Yext entity SinceAI03) — the demo story, triggers all four rules.
+  // Base data matches Yext: Mon–Sat 10:00–18:00, Sunday closed, no holiday hours for this season.
+  //  1. no holiday hours for Christmas / New Year / Epiphany (had them last season)
+  //  2. own website says Saturday 10:00–14:00 (changed recently), Finder + Google still say 18:00
+  //  3. recent review: "locked on Saturday afternoon although Google said open"
   //  4. description last updated 2023-05-01
   ...listingsFor(
-    "cafe_aura",
+    "rye_shine",
     {
-      opening_hours: week("08:00-18:00", "10:00-16:00", "closed", { mon: "closed", fri: "08:00-20:00" }),
+      opening_hours: week("10:00-18:00", "10:00-18:00", "closed"),
       holiday_hours: {
-        "2025-12-24": "08:00-14:00",
+        "2025-12-24": "10:00-14:00",
         "2025-12-25": "closed",
         "2025-12-26": "closed",
-        "2027-01-01": "closed",
-        "2027-01-06": "10:00-16:00",
+        "2026-01-01": "closed",
+        "2026-01-06": "closed",
       },
       phone: "+358 2 100 4567",
-      description: "Cozy café by the river.",
-      field_updated_at: { opening_hours: "2026-10-01", holiday_hours: "2026-11-02", description: "2023-05-01" },
+      description: "Sourdough and rye bakery on Eerikinkatu.",
+      field_updated_at: { opening_hours: "2025-12-20", holiday_hours: "2025-12-20", description: "2023-05-01" },
     },
     {
-      google: {
-        opening_hours: { mon: "08:00-18:00" },
-        field_updated_at: { opening_hours: "2025-12-15" },
+      website: {
+        opening_hours: { sat: "10:00-14:00" },
+        field_updated_at: { opening_hours: "2026-10-20" },
       },
     },
   ),
@@ -214,10 +216,10 @@ export const listings: Listing[] = [
 ];
 
 export const reviews: Review[] = [
-  // Café Aura
-  { _id: "rev_cafe_aura_1", business_id: "cafe_aura", date: "2026-11-30", rating: 2, text: "Came on Monday morning and it was closed even though Google said open." },
-  { _id: "rev_cafe_aura_2", business_id: "cafe_aura", date: "2026-11-18", rating: 5, text: "Lovely cinnamon buns and a great view of the river." },
-  { _id: "rev_cafe_aura_3", business_id: "cafe_aura", date: "2026-06-02", rating: 4, text: "Nice terrace in summer." },
+  // Rye & Shine Bakery
+  { _id: "rev_rye_shine_1", business_id: "rye_shine", date: "2026-11-28", rating: 2, text: "Came on Saturday at 3 pm and the door was locked, although Google said open until 18." },
+  { _id: "rev_rye_shine_2", business_id: "rye_shine", date: "2026-11-18", rating: 5, text: "Lovely cardamom buns and the best sourdough on Eerikinkatu." },
+  { _id: "rev_rye_shine_3", business_id: "rye_shine", date: "2026-06-02", rating: 4, text: "Nice place for a quick coffee." },
 
   // Pizzeria Port Arthur — moved signal
   { _id: "rev_pizzeria_1", business_id: "pizzeria_port_arthur", date: "2026-12-01", rating: 2, text: "Walked to the old address and it was empty. A note on the door said they moved to Puolalankatu." },
