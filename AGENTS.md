@@ -8,7 +8,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# Ajantasa – agent instructions (OpenCode and others)
+# Ajantasa – agent instructions (OpenCode, Codex and others)
 
 Read `DESIGN.md` (what we build), `TASKS.md` (lanes, file ownership, timeline) and **`CONTRIBUTING.md` (team rules: branches, commits, conflicts, hard tasks go to Claude Pro lanes, rules for AI agents)** before writing code. CONTRIBUTING.md overrides your defaults.
 Shared types: `types/index.ts` (data model) and `types/api.ts` (contracts between lanes). Use them; don't invent new shapes.

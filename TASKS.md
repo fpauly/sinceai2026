@@ -1,7 +1,7 @@
 # Ajantasa – Team task split
 
 4 people, 4 lanes. Every lane owns its own files, so we rarely touch the same file.
-OpenCode users: `AGENTS.md` and `opencode.json` already load DESIGN.md, this file and CONTRIBUTING.md into every session.
+OpenCode and Codex read `AGENTS.md` automatically (OpenCode also loads DESIGN.md, this file and CONTRIBUTING.md via `opencode.json`). Claude Code reads `CLAUDE.md`.
 
 **Goal (Fonecta, DESIGN §0): the whole five-step chain working: Detect → Suggest → Contact → Decide → Apply (Yext).** A complete chain beats a perfect single step.
 
@@ -9,8 +9,8 @@ OpenCode users: `AGENTS.md` and `opencode.json` already load DESIGN.md, this fil
 |---|---|---|---|---|
 | **A – AI** | Claude Pro #1 | Claude Code | Suggest (M3), Learn (M6), scoring adapter (M7) | Gemini, prompts, fallbacks, customer messages |
 | **B – Apply + integration** | Claude Pro #2 | Claude Code | Apply/Yext (M5), voice (M9), submission | Yext sandbox, Atlas, end-to-end, demo, deliverables |
-| **C – Detect + validation** | OpenCode #1 | OpenCode (free models) | Detect (M2), validation (M3), dashboard (M8), dataset import (M7) | Deterministic code |
-| **D – Contact + Decide** | OpenCode #2 | OpenCode (free models) | Contact + Decide (M4), apply/learn wiring (M5/M6) | Mobile UI, Accept/Edit/Ignore |
+| **C – Detect + validation** | Teammate #3 | OpenCode (free models) or ChatGPT Codex | Detect (M2), validation (M3), dashboard (M8), dataset import (M7) | Deterministic code |
+| **D – Contact + Decide** | Teammate #4 | OpenCode (free models) or ChatGPT Codex | Contact + Decide (M4), apply/learn wiring (M5/M6) | Mobile UI, Accept/Edit/Ignore |
 
 Lanes C and D are deterministic code with clear specs (good for free models). Lanes A and B use external APIs and prompts (hard tasks, CONTRIBUTING.md §5).
 
@@ -25,7 +25,8 @@ Lanes C and D are deterministic code with clear specs (good for free models). La
 1. Accept the GitHub invite, then clone: `git clone git@github.com:fpauly/sinceai2026.git && cd sinceai2026`
 2. **`npm run setup`**: asks your lane and sets up everything (`.env.local`, database, checks). Follow what it prints.
 3. `npm run dev` and open **http://localhost:3000**: the **progress board** shows what the team has built so far.
-4. Open your AI (Claude Code or OpenCode) in this folder and type **`next`**.
+4. Open your AI (Claude Code, OpenCode or Codex) in this folder and type **`next`**.
+   **Codex users:** Codex's sandbox may block network access by default. If `npm install`, `git push` or `gh` fail inside Codex, allow network access when it asks, or enable it in Codex's settings.
 
 The AI builds the next stage of your lane, tests it, opens a PR and tells you what to look at (CONTRIBUTING.md §9).
 **You check it** (progress board, the page it names). Looks right → type **`merge`**. Something wrong → tell the AI what you saw.
@@ -136,7 +137,7 @@ If we fall behind, cut from the bottom: extras → dashboard → learning. **Nev
 
 See **`CONTRIBUTING.md`**: branches, commits, PRs, conflicts, escalation, local testing, and the AI autopilot (§9).
 
-Technical rules for everyone (also OpenCode / free models):
+Technical rules for everyone (also OpenCode / Codex / free models):
 - **Next.js 16** has breaking changes compared with what most AIs were trained on (see `AGENTS.md`). Route `params` is a **Promise** (`const { id } = await ctx.params`). `cacheComponents` is on: pages are `"use client"` components that `fetch('/api/...')`; all DB access lives in route handlers; GET handlers start with `await connection()`.
 - DB access only through `collections()` from `lib/db.ts`, server-side only.
 - Code detects, AI explains, the human decides. The LLM never compares dates or numbers; every suggestion is validated by code.
