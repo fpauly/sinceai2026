@@ -1,16 +1,17 @@
 # Ajantasa – Team task split
 
 4 people, 4 lanes. Every lane owns its own files, so we rarely touch the same file.
+OpenCode users: `AGENTS.md` and `opencode.json` already load DESIGN.md + this file into every session.
 Read `DESIGN.md` first; this file only says **who builds what** and **how we connect**.
 
 | Lane | Who | AI tools | Milestones | Theme |
 |---|---|---|---|---|
 | **A – AI** | Claude Pro #1 | Claude Code | M3, M6 (AI part), M7 (intent) | Gemini wrappers, prompts, schemas, fallbacks |
 | **B – Voice + integration** | Claude Pro #2 | Claude Code | M7, M8, deploy | ElevenLabs, Atlas, merging, end-to-end, demo |
-| **C – Detection + dashboard** | Copilot #1 | Copilot | M2, M5, M6 (wiring) | Deterministic rules, `/dashboard` |
-| **D – Owner view + apply** | Copilot #2 | Copilot | M4 | Mobile owner UI, Accept/Edit/Ignore, sync |
+| **C – Detection + dashboard** | OpenCode #1 | OpenCode (free models) | M2, M5, M6 (wiring) | Deterministic rules, `/dashboard` |
+| **D – Owner view + apply** | OpenCode #2 | OpenCode (free models) | M4 | Mobile owner UI, Accept/Edit/Ignore, sync |
 
-Why this split: lanes C and D are deterministic code with clear specs (well suited to Copilot).
+Why this split: lanes C and D are deterministic code with clear specs (well suited to OpenCode with free models).
 Lanes A and B use external SDKs and prompts, where Claude Code helps most.
 
 The contracts between lanes are in **`types/api.ts`**. Build against those types. If you need to change them, open a small PR and tell everyone.
@@ -95,7 +96,7 @@ If we fall behind, cut from the bottom: M8 → M7 → M6. M1–M5 is the minimum
 - Shared files (`types/*`, `data/seed.ts`, `lib/db.ts`, `package.json`): small separate PR, and say so in chat.
 - Never commit `.env.local` or API keys.
 
-## Rules that apply to everyone (also for Copilot / free AI users)
+## Rules that apply to everyone (also for OpenCode / free-model users)
 
 - **Next.js 16** has breaking changes compared with what most AIs were trained on. Read `AGENTS.md`. In particular:
   - route `params` is a **Promise**: `const { id } = await ctx.params`
