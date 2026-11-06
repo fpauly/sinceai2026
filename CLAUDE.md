@@ -2,7 +2,10 @@
 
 This repo is **Ajantasa**, a 48-hour hackathon project for the Fonecta challenge.
 
-**Read `DESIGN.md` before doing anything.** It defines the problem, scope, data model, detection rules, AI usage, API routes, UI and build order.
+**Read `DESIGN.md`, `TASKS.md` and `CONTRIBUTING.md` before doing anything.**
+- `DESIGN.md`: problem, scope, data model, detection rules, AI usage, API routes, UI and build order.
+- `TASKS.md`: the 4 lanes, file ownership and timeline.
+- `CONTRIBUTING.md`: team rules (branches, commits, conflicts, which tasks go to whom, rules for AI agents). It overrides default behaviour.
 
 Key rules:
 - Code detects, AI explains, the human decides. Never let the LLM do date or number comparisons.
@@ -10,3 +13,5 @@ Key rules:
 - Mock data only. No scraping, no real business data.
 - Gemini and ElevenLabs are called only from server-side code, through wrappers in `/lib/ai` and `/lib/voice`, with fallbacks.
 - Do not add features outside DESIGN.md without asking.
+- Commit messages and PRs: no Co-Authored-By or any AI attribution (CONTRIBUTING.md section 3).
+- Every stage starts on a new branch from freshly pulled `main`; shared-file changes go first in their own `shared/<topic>` PR (CONTRIBUTING.md section 1).

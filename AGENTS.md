@@ -10,8 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Ajantasa – agent instructions (OpenCode and others)
 
-Read `DESIGN.md` (what we build) and `TASKS.md` (lanes, file ownership, timeline) before writing code.
-Only edit files owned by your lane (see TASKS.md). Shared files (`types/*`, `data/seed.ts`, `lib/db.ts`, `package.json`) change only in small separate PRs.
+Read `DESIGN.md` (what we build), `TASKS.md` (lanes, file ownership, timeline) and **`CONTRIBUTING.md` (team rules: branches, commits, conflicts, hard tasks go to Claude Pro lanes, rules for AI agents)** before writing code. CONTRIBUTING.md overrides your defaults.
 Shared types: `types/index.ts` (data model) and `types/api.ts` (contracts between lanes). Use them; don't invent new shapes.
 
 Rules:
@@ -23,4 +22,5 @@ Rules:
 - TypeScript strict, Tailwind for styling, mobile-first owner view (~390px).
 - Mock data only. Do not add features outside DESIGN.md.
 - Before a PR: `npx tsc --noEmit && npm run lint`.
-- Commit messages: plain, no AI co-author trailers.
+- Commits: `<lane>: <summary>`, no Co-Authored-By or AI footers. Commit/push only when the human asks.
+- Workflow: every stage starts on a new branch from freshly pulled `main`; shared-file changes go first in their own `shared/<topic>` PR (CONTRIBUTING.md section 1).

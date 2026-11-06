@@ -1,7 +1,7 @@
 # Ajantasa – Team task split
 
 4 people, 4 lanes. Every lane owns its own files, so we rarely touch the same file.
-OpenCode users: `AGENTS.md` and `opencode.json` already load DESIGN.md + this file into every session.
+OpenCode users: `AGENTS.md` and `opencode.json` already load DESIGN.md, this file and CONTRIBUTING.md into every session.
 Read `DESIGN.md` first; this file only says **who builds what** and **how we connect**.
 
 | Lane | Who | AI tools | Milestones | Theme |
@@ -14,7 +14,19 @@ Read `DESIGN.md` first; this file only says **who builds what** and **how we con
 Why this split: lanes C and D are deterministic code with clear specs (well suited to OpenCode with free models).
 Lanes A and B use external SDKs and prompts, where Claude Code helps most.
 
-The contracts between lanes are in **`types/api.ts`**. Build against those types. If you need to change them, open a small PR and tell everyone.
+The contracts between lanes are in **`types/api.ts`**: API shapes, **issue `evidence` per issue type** (C writes, A and D read), and **`proposed_change` per field** (A writes, D applies). Build against those types. If you need to change them, open a `shared/*` PR and tell everyone.
+
+## Kickoff: the first message to your AI
+
+Replace `<X>` with your lane letter and paste this as the first message in Claude Code / OpenCode:
+
+> I am lane `<X>` in TASKS.md. Read DESIGN.md, TASKS.md, CONTRIBUTING.md and types/api.ts. Then:
+> 1. split lane `<X>` into small stages (1–2 h each, one PR each) and show me the plan,
+> 2. pull main and create a branch for stage 1,
+> 3. implement stage 1, run `npx tsc --noEmit && npm run lint`, and tell me how to verify it.
+> Stop and ask me before touching any shared file or another lane's file.
+
+Setup per person (once): `npm install`, `cp .env.example .env.local`, set `MONGODB_URI` (shared Atlas, or local Docker, see README) and your own `MONGODB_DB=ajantasa_<lane>`, then `npm run dev` and `curl -X POST localhost:3000/api/seed`.
 
 ---
 
@@ -52,7 +64,20 @@ Files you own: `lib/holidays.ts`, `lib/rules/*`, `app/api/detect`, `app/api/busi
 2. `lib/holidays.ts`: the hardcoded holiday list (DESIGN §8).
 3. One file per rule, each a pure `Rule` (`types/api.ts`): `missingHolidayHours.ts`, `crossPlatformConflict.ts`, `staleField.ts`. No DB, no `new Date()`; use `ctx.today`.
 4. `lib/rules/index.ts`: `runDetection(businessId?)` loads the data, runs the rules, skips fingerprints that are ignored (`preferences`) or already `open`/`suggested`, inserts the new issues, and returns `DetectResponse`.
-5. Expected results with the seed data, `DEMO_DATE=2026-12-10`: see the comments in `data/seed.ts`. Leipomo Martti must produce **0** issues. Write a small test script that checks this.
+5. **Acceptance test.** After `POST /api/seed` then `POST /api/detect` with `DEMO_DATE=2026-12-10`, rules 1, 2 and 4 must create exactly these **8 issues**. Evidence shapes and fingerprints are defined in `types/api.ts`.
+
+   | Business | Type | Key evidence |
+   |---|---|---|
+   | cafe_aura | missing_holiday_hours | dates `2026-12-24, 2026-12-25, 2026-12-26`; last_year has `2025-12-24/25/26` |
+   | cafe_aura | cross_platform_conflict | field `opening_hours.mon` (google `08:00-18:00` vs finder/website `closed`) |
+   | cafe_aura | stale_field | field `description` (oldest 2023-05-01) |
+   | parturi_linnankatu | missing_holiday_hours | dates `2026-12-24, 12-25, 12-26, 2027-01-01, 2027-01-06`; last_year `{}` |
+   | autokorjaamo_skanssi | cross_platform_conflict | field `phone` |
+   | kukkakauppa_kauppatori | stale_field | field `opening_hours` (oldest 2024-05-14) |
+   | kirjakauppa_aurajoki | cross_platform_conflict | field `opening_hours.sat` |
+   | kuntosali_itaharju | missing_holiday_hours | dates `2027-01-01` |
+
+   pizzeria_port_arthur and leipomo_martti: **0** issues (pizzeria gets a `review_signal` in M6). Running `/api/detect` a second time must create **0** new issues. "Within the next 30 days" means `today < date <= today + 30`, so 2026-12-06 has already passed and is not flagged.
 6. `GET /api/businesses` → `BusinessesResponse`.
 7. `/dashboard`: table (name, category, issues by severity, last decision), a **Run daily check** button (`/api/detect` then `/api/suggest`), and each row links to `/owner/[id]`.
 8. M6: `reviewSignal.ts`. This one is async and calls lane A's `classifyReviews` on reviews from the last 30 days, so call it from `runDetection` separately rather than as a pure `Rule`.
@@ -90,11 +115,7 @@ If we fall behind, cut from the bottom: M8 → M7 → M6. M1–M5 is the minimum
 
 ## Git workflow
 
-- One branch per task: `a/gemini-wrapper`, `c/rule-1`, `d/owner-cards`, … Keep PRs small, and merge to `main` often (at least every few hours).
-- Before opening a PR: `npx tsc --noEmit && npm run lint`, and check that `npm run dev` still works.
-- B merges. If B is busy, anyone can merge a green PR that only touches their own lane's files.
-- Shared files (`types/*`, `data/seed.ts`, `lib/db.ts`, `package.json`): small separate PR, and say so in chat.
-- Never commit `.env.local` or API keys.
+See **`CONTRIBUTING.md`** (branches, commits, PRs, conflicts, escalation).
 
 ## Rules that apply to everyone (also for OpenCode / free-model users)
 
