@@ -21,6 +21,6 @@ Rules:
 - Gemini/ElevenLabs only via `lib/ai` / `lib/voice` wrappers with fallbacks; never from client components.
 - TypeScript strict, Tailwind for styling, mobile-first owner view (~390px).
 - Mock data only. Do not add features outside DESIGN.md.
-- Before a PR: `npx tsc --noEmit && npm run lint`.
+- Before a push: `npm run check` (pre-push hook runs it; never use `--no-verify`). After API/DB changes: `npm run dev` + `npm run smoke` (CONTRIBUTING.md section 8).
 - Commits: `<lane>: <summary>`, no Co-Authored-By or AI footers. Commit/push only when the human asks.
 - Workflow: every stage starts on a new branch from freshly pulled `main`; shared-file changes go first in their own `shared/<topic>` PR (CONTRIBUTING.md section 1).

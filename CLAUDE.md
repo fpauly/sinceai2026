@@ -15,3 +15,4 @@ Key rules:
 - Do not add features outside DESIGN.md without asking.
 - Commit messages and PRs: no Co-Authored-By or any AI attribution (CONTRIBUTING.md section 3).
 - Every stage starts on a new branch from freshly pulled `main`; shared-file changes go first in their own `shared/<topic>` PR (CONTRIBUTING.md section 1).
+- Test locally before pushing: `npm run check`, and `npm run smoke` against `npm run dev` after API/DB changes (CONTRIBUTING.md section 8). Never `--no-verify`.

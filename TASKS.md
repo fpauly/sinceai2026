@@ -26,7 +26,7 @@ Replace `<X>` with your lane letter and paste this as the first message in Claud
 > 3. implement stage 1, run `npx tsc --noEmit && npm run lint`, and tell me how to verify it.
 > Stop and ask me before touching any shared file or another lane's file.
 
-Setup per person (once): `npm install`, `cp .env.example .env.local`, set `MONGODB_URI` (shared Atlas, or local Docker, see README) and your own `MONGODB_DB=ajantasa_<lane>`, then `npm run dev` and `curl -X POST localhost:3000/api/seed`.
+Setup per person (once): `npm install`, `cp .env.example .env.local`, set `MONGODB_URI` (shared Atlas, or local Docker, see README) and your own `MONGODB_DB=ajantasa_<lane>`, then `npm run dev` and `npm run smoke` (must be green).
 
 ---
 

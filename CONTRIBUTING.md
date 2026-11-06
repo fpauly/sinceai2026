@@ -111,3 +111,18 @@ Don't let an AI rewrite large parts of the code to get past a blocker.
 - Post in the team chat when you **start** a task (lane + branch), when you **touch a shared file**, and when you **merge**.
 - If you're blocked, say so early. Use the escalation rule in section 5.
 - Each person uses their own `MONGODB_DB` name (e.g. `ajantasa_c`) on the shared Atlas cluster, so nobody wipes anyone else's data with `/api/seed`.
+
+## 8. Local testing (before every push)
+
+Three commands; AI agents must run them and report the real output:
+
+| Command | What it does | When |
+|---|---|---|
+| `npm run check` | typecheck + lint + production build | before every push (runs **automatically** via the `pre-push` hook) |
+| `npm run dev` + `npm run smoke` | end-to-end test against the running app and your MongoDB: seed, then every API that exists so far | after every stage that touches an API route or the DB |
+| open the page in a browser | look at the UI you changed (390px wide for the owner view) | after every UI stage |
+
+- The `pre-push` hook is enabled automatically by `npm install` (`prepare` script sets `core.hooksPath=.githooks`). **Never bypass it with `git push --no-verify`.**
+- `npm run smoke` skips routes that don't exist yet, so it is green at every milestone. When your lane adds a route, add its checks to `scripts/smoke.mjs` (shared file → `shared/*` PR, or include it in your stage PR if the lane owner agrees).
+- `npm run smoke` calls `/api/seed`, which wipes the DB named in your `.env.local`. Use your own `MONGODB_DB`.
+- CI can't run `smoke` (no database), so "smoke passed" in the PR description is the human/AI's job.
