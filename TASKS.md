@@ -26,6 +26,8 @@ Replace `<X>` with your lane letter and paste this as the first message in Claud
 > 3. implement stage 1, run `npx tsc --noEmit && npm run lint`, and tell me how to verify it.
 > Stop and ask me before touching any shared file or another lane's file.
 
+**Progress board:** open `http://localhost:3000/`. It detects automatically which routes and pages exist and what is in the DB, so your items turn green as soon as your stage works. After every merge, check it on `main`.
+
 Setup per person (once): `npm install`, `cp .env.example .env.local` and follow the comments in it (which keys your lane needs, where to get them, your own `MONGODB_DB=ajantasa_<lane>`), then `npm run dev` and `npm run smoke` (must be green). Keys and the Atlas URI are shared only in the team chat, never in git.
 
 ---
