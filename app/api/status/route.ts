@@ -9,7 +9,7 @@ export async function GET() {
   const dbName = process.env.MONGODB_DB || "ajantasa";
   try {
     const c = await collections();
-    const [businesses, listings, reviews, issueTypes, issueStatuses, suggestionDecisions, prefs] =
+    const [businesses, listings, reviews, issueTypes, issueStatuses, suggestionDecisions, prefs, validated, applied, appliedYext] =
       await Promise.all([
         c.businesses.countDocuments(),
         c.listings.countDocuments(),
@@ -17,10 +17,17 @@ export async function GET() {
         c.issues.aggregate<{ _id: string; n: number }>([{ $group: { _id: "$type", n: { $sum: 1 } } }]).toArray(),
         c.issues.aggregate<{ _id: string; n: number }>([{ $group: { _id: "$status", n: { $sum: 1 } } }]).toArray(),
         c.suggestions.aggregate<{ _id: string | null; n: number }>([{ $group: { _id: "$decision", n: { $sum: 1 } } }]).toArray(),
-        c.preferences.aggregate<{ n: number }>([
-          { $project: { n: { $size: { $ifNull: ["$ignored_fingerprints", []] } } } },
-          { $group: { _id: null, n: { $sum: "$n" } } },
+        c.preferences.aggregate<{ ignored: number; learned: number; standing: number }>([
+          { $project: {
+            ignored: { $size: { $ifNull: ["$ignored_fingerprints", []] } },
+            learned: { $size: { $ifNull: ["$learned", []] } },
+            standing: { $size: { $ifNull: ["$standing_permissions", []] } },
+          } },
+          { $group: { _id: null, ignored: { $sum: "$ignored" }, learned: { $sum: "$learned" }, standing: { $sum: "$standing" } } },
         ]).toArray(),
+        c.suggestions.countDocuments({ validation: { $exists: true } }),
+        c.suggestions.countDocuments({ applied: { $type: "object" } }),
+        c.suggestions.countDocuments({ "applied.yext": true }),
       ]);
 
     const toMap = (rows: { _id: string | null; n: number }[]) =>
@@ -42,8 +49,13 @@ export async function GET() {
         total: suggestionsTotal,
         decided: suggestionsTotal - (byDecision.none ?? 0),
         by_decision: byDecision,
+        validated,
+        applied,
+        applied_yext: appliedYext,
       },
-      ignored_fingerprints: prefs[0]?.n ?? 0,
+      ignored_fingerprints: prefs[0]?.ignored ?? 0,
+      learned: prefs[0]?.learned ?? 0,
+      standing_permissions: prefs[0]?.standing ?? 0,
     });
   } catch (err) {
     return Response.json({

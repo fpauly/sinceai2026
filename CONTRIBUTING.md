@@ -40,7 +40,7 @@ Split every task into **small stages** (about 1–2 hours each, one PR per stage
   - change them **first, alone, in a `shared/<topic>` PR** (section 1, step 3). Never bundle them into a feature PR.
   - post in the team chat when you open it, so it gets merged fast
   - never change the meaning of an existing type in `types/api.ts`; add new fields as optional
-- **New npm dependency:** ask the team first, then add it in its own PR. On a `package-lock.json` conflict, take `main`'s version and run `npm install` again. Don't hand-merge the lockfile.
+- **New npm dependency:** ask the team first, then add it in its own PR. **No GPL/AGPL licences** (Fonecta rule); check with `npm view <pkg> license`. On a `package-lock.json` conflict, take `main`'s version and run `npm install` again. Don't hand-merge the lockfile.
 - Don't reformat, rename or move files you don't own, and don't run a formatter over the whole repo.
 
 ## 3. Commits
@@ -96,11 +96,11 @@ Don't let an AI rewrite large parts of the code to get past a blocker.
 
 ## 6. Rules for AI agents (all tools)
 
-1. Read `DESIGN.md`, `TASKS.md` and this file before writing code. Ask the human which lane they are in if it isn't clear.
+1. Read `DESIGN.md`, `TASKS.md` and this file before writing code. The human's lane is `AJANTASA_LANE` in `.env.local`; if it is missing, ask them to run `npm run setup`.
 2. Follow the stage workflow in section 1: before any work, create a new branch from a freshly pulled `main`. Plan the task as small stages and tell the human the plan. Stay inside your lane's files. If a stage needs a shared file, propose a separate `shared/<topic>` branch and PR for just that change first. If it needs another lane's file, stop and tell the human.
 3. If the task is on the "hard" list (section 5) and you are working for lane C or D, say so and suggest handing it to lane A or B.
 4. Don't add dependencies, change shared types or add features outside `DESIGN.md` without the human approving it.
-5. Follow the commit rules in section 3: no co-author lines, no AI footers. Commit or push only when asked.
+5. Follow the commit rules in section 3: no co-author lines, no AI footers. Commit, push and open PRs only when asked; `next` (section 9) counts as asking for one stage. **Merge only when the human says `merge` for that PR.**
 6. No destructive git commands (section 1) unless the human explicitly asks.
 7. Never put secrets in code, logs or commits. API keys only live in `.env.local`.
 8. Before saying "done": run `npx tsc --noEmit && npm run lint` (and `npm run build` for bigger changes) and report the real result. After pushing, check CI with `gh pr checks`.
@@ -126,3 +126,28 @@ Three commands; AI agents must run them and report the real output:
 - `npm run smoke` skips routes that don't exist yet, so it is green at every milestone. When your lane adds a route, add its checks to `scripts/smoke.mjs` (shared file → `shared/*` PR, or include it in your stage PR if the lane owner agrees).
 - `npm run smoke` calls `/api/seed`, which wipes the DB named in your `.env.local`. Use your own `MONGODB_DB`.
 - CI can't run `smoke` (no database), so "smoke passed" in the PR description is the human/AI's job.
+
+## 9. Autopilot: `next` and `merge`
+
+Many of us just direct the AI. Two words drive the whole workflow:
+
+### `next` (also `start`, `continue`, `继续`, `下一步`): build one stage, stop at the PR
+1. **Lane.** Read `AJANTASA_LANE` from `.env.local`. If missing, tell the human to run `npm run setup` and stop.
+2. **Clean state.** `git status`. If there is unfinished work on a stage branch, finish that stage first (step 6). Never discard the human's changes.
+3. **Sync.** `git switch main && git pull`.
+4. **Pick the stage.** The first stage of your lane in `TASKS.md` that is not merged yet (`gh pr list --state all --search "head:<branch>"`, or check its files exist). If its **Needs** aren't merged, or it is **TBD**, say so and take the next stage that isn't blocked.
+5. **Announce** in 2–3 plain sentences: stage id, what you'll build, which files. If it is **[shared]** or needs a file outside your lane, ask first; otherwise continue.
+6. **Build.** `git switch -c <branch from TASKS.md>`; implement only this stage.
+7. **Test.** `npm run check`. If it touches an API or the DB: `npm run dev` in the background, then `npm run smoke`. Fix until green. Never weaken a test or the smoke script to pass.
+8. **Open the PR.** Commit (`<lane>: <summary>`, no AI footers) → `git push -u origin <branch>` → `gh pr create --fill` → `gh pr checks --watch`.
+9. **Hand over and stop.** Tell the human in plain language: what is new, **exactly what to look at** (progress board item, page URL, button to click, what they should see), the PR link and CI status. Then wait.
+
+### `merge`: only after the human has looked at it
+1. CI must be green (`gh pr checks`). If not, say so and don't merge.
+2. If the PR touches **shared files**, a teammate must have given an OK in the PR or chat; if unsure, ask.
+3. `gh pr merge --squash --delete-branch`, then `git switch main && git pull`.
+4. Say what is now on `main` and which stage comes next.
+
+The AI never merges without the human saying `merge` for that PR.
+
+**Stuck?** Same error 3 times, or about 30 minutes without progress: stop. Write a short message the human can paste into the team chat (stage, branch, error, what you tried), and suggest asking lane A or B (section 5).

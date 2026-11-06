@@ -32,6 +32,7 @@ export interface Business {
   city: string;
   preferred_channel: Channel;
   language: Language;
+  yext_entity_id?: string | null; // entity in our Yext sandbox (mapping TBD)
 }
 
 export type TrackedField = "opening_hours" | "holiday_hours" | "description";
@@ -76,8 +77,8 @@ export interface Issue {
 }
 
 export type Confidence = "high" | "medium" | "low";
-export type Decision = "accepted" | "edited" | "ignored";
-export type DecidedVia = "tap" | "voice";
+export type Decision = "accepted" | "edited" | "ignored" | "auto"; // auto = standing permission
+export type DecidedVia = "tap" | "voice" | "standing_permission";
 
 export interface ProposedChange {
   field: string; // e.g. "holiday_hours", "opening_hours", "phone", "description"
@@ -92,15 +93,50 @@ export interface Suggestion {
   reason: string;
   confidence: Confidence;
   message: Record<Language, string>;
+  source?: "gemini" | "fallback";
+  validation?: ValidationResult;
   audio_url: string | null;
   decision: Decision | null;
   decided_via: DecidedVia | null;
   decided_at: string | null;
+  applied?: AppliedResult | null; // set after step 5 (Apply)
+}
+
+/** Result of lib/validate.ts (DESIGN 9.4). */
+export interface ValidationResult {
+  ok: boolean;
+  problems: string[];
+}
+
+/** What happened when a change was applied (DESIGN 10b). */
+export interface AppliedResult {
+  yext: boolean; // true = written to the Yext sandbox
+  published_to: string[]; // where the owner is told it shows, e.g. ["Google", "Apple Maps", "Finder"]
+  error?: string;
+  at: string; // ISO datetime
+}
+
+/** One owner decision, remembered for the next suggestion (DESIGN 7, Learning). */
+export interface LearnedDecision {
+  issue_type: IssueType;
+  field: string;
+  proposed: unknown;
+  final: unknown; // what was applied; null when ignored
+  decision: Decision;
+  at: string;
+}
+
+/** "Do this automatically next time" (DESIGN 11). */
+export interface StandingPermission {
+  issue_type: IssueType;
+  field: string;
 }
 
 export interface Preferences {
   _id: string; // = business_id
   business_id: string;
   ignored_fingerprints: string[];
+  learned?: LearnedDecision[];
+  standing_permissions?: StandingPermission[];
   notes: string[];
 }
