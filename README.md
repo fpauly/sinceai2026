@@ -9,6 +9,8 @@ cp .env.example .env.local   # fill in MONGODB_URI (Atlas) etc.
 npm install
 npm run dev
 curl -X POST http://localhost:3000/api/seed   # or use "Reset demo data" on /
+npm run smoke                                 # end-to-end check (app must be running)
+npm run check                                 # typecheck + lint + build (also runs on git push)
 ```
 
 No Atlas yet? A local MongoDB works too:
