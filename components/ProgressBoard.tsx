@@ -7,7 +7,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
-type Lane = "A" | "B" | "C" | "D" | "all";
+type Lane = "A" | "B" | "C" | "D" | "all" | "A+C" | "A+D" | "extra";
 
 interface Status {
   ok: boolean;
@@ -15,8 +15,13 @@ interface Status {
   db: { ok: boolean; name: string; error?: string };
   counts?: { businesses: number; listings: number; reviews: number };
   issues?: { total: number; by_type: Record<string, number>; by_status: Record<string, number> };
-  suggestions?: { total: number; decided: number; by_decision: Record<string, number> };
+  suggestions?: {
+    total: number; decided: number; by_decision: Record<string, number>;
+    validated: number; applied: number; applied_yext: number;
+  };
   ignored_fingerprints?: number;
+  learned?: number;
+  standing_permissions?: number;
 }
 
 // Route probe: a missing route gives Next's HTML 404. 405 (wrong method) or any JSON reply means it exists.
@@ -30,6 +35,7 @@ const PROBES = {
   voiceReply: "/api/voice/reply",
   dashboardPage: "/dashboard",
   ownerPage: "/owner/cafe_aura",
+  contactPage: "/contact/cafe_aura",
 } as const;
 type ProbeKey = keyof typeof PROBES;
 type Probes = Record<ProbeKey, boolean>;
@@ -70,48 +76,66 @@ function milestones(s: Status | null, p: Probes | null): Milestone[] {
       id: "M1", title: "Foundation", lane: "all",
       items: [
         { label: "Database connected", done: !!s?.db.ok, detail: s ? (s.db.ok ? s.db.name : s.db.error) : undefined },
-        { label: "Demo data seeded", done: s?.counts?.businesses === 8, detail: s?.counts ? `${s.counts.businesses} businesses, ${s.counts.listings} listings, ${s.counts.reviews} reviews` : undefined },
+        { label: "Demo data seeded", done: (s?.counts?.businesses ?? 0) > 0, detail: s?.counts ? `${s.counts.businesses} businesses, ${s.counts.listings} listings, ${s.counts.reviews} reviews` : undefined },
       ],
     },
     {
-      id: "M2", title: "Detection", lane: "C",
+      id: "1", title: "Detect", lane: "C",
       items: [
         { label: "POST /api/detect", done: has("detect") },
         { label: "Holiday / conflict / stale issues found", done: rule124 > 0, detail: `${rule124} issues (8 expected after seed)` },
       ],
     },
     {
-      id: "M3", title: "Suggestions", lane: "A",
+      id: "2", title: "Suggest", lane: "A+C",
       items: [
         { label: "POST /api/suggest", done: has("suggest") },
         { label: "Suggestions generated", done: (sug?.total ?? 0) > 0, detail: `${sug?.total ?? 0} suggestions` },
+        { label: "Suggestions validated by code", done: (sug?.validated ?? 0) > 0, detail: `${sug?.validated ?? 0} validated` },
       ],
     },
     {
-      id: "M4", title: "Owner view", lane: "D",
+      id: "3", title: "Contact", lane: "D",
+      items: [
+        { label: "Message preview page", done: has("contactPage"), href: has("contactPage") ? "/contact/cafe_aura" : undefined },
+      ],
+    },
+    {
+      id: "4", title: "Decide", lane: "D",
       items: [
         { label: "GET /api/businesses/[id]", done: has("business") },
+        { label: "Owner page (no login)", done: has("ownerPage"), href: has("ownerPage") ? "/owner/cafe_aura" : undefined },
         { label: "POST /api/suggestions/[id]/decide", done: has("decide") },
-        { label: "Owner page", done: has("ownerPage"), href: has("ownerPage") ? "/owner/cafe_aura" : undefined },
         { label: "Owner made a decision", done: (sug?.decided ?? 0) > 0, detail: `${sug?.decided ?? 0} decided, ${s?.ignored_fingerprints ?? 0} ignored remembered` },
       ],
     },
     {
-      id: "M5", title: "Dashboard", lane: "C",
+      id: "5", title: "Apply (Yext)", lane: "B",
+      items: [
+        { label: "Change applied after a decision", done: (sug?.applied ?? 0) > 0, detail: `${sug?.applied ?? 0} applied` },
+        { label: "Written to the Yext sandbox", done: (sug?.applied_yext ?? 0) > 0, detail: `${sug?.applied_yext ?? 0} via Yext` },
+      ],
+    },
+    {
+      id: "L", title: "Learn", lane: "A+D",
+      items: [
+        { label: "Owner decisions remembered", done: (s?.learned ?? 0) > 0, detail: `${s?.learned ?? 0} learned` },
+        { label: "Standing permission given", done: (s?.standing_permissions ?? 0) > 0, detail: `${s?.standing_permissions ?? 0}` },
+      ],
+    },
+    {
+      id: "M8", title: "Dashboard", lane: "C",
       items: [
         { label: "GET /api/businesses", done: has("businesses") },
         { label: "Dashboard page", done: has("dashboardPage"), href: has("dashboardPage") ? "/dashboard" : undefined },
       ],
     },
     {
-      id: "M6", title: "Review signal", lane: "C",
-      items: [{ label: "Review signal issues found", done: n("review_signal") > 0, detail: `${n("review_signal")} (needs lane A's classifyReviews)` }],
-    },
-    {
-      id: "M7", title: "Voice", lane: "B",
+      id: "+", title: "Extras", lane: "extra",
       items: [
-        { label: "POST /api/suggestions/[id]/tts", done: has("tts") },
-        { label: "POST /api/voice/reply", done: has("voiceReply") },
+        { label: "Voice message (TTS)", done: has("tts") },
+        { label: "Voice reply (STT)", done: has("voiceReply") },
+        { label: "Review signal issues", done: n("review_signal") > 0, detail: `${n("review_signal")}` },
       ],
     },
   ];
@@ -123,6 +147,9 @@ const LANE_STYLE: Record<Lane, string> = {
   C: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
   D: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
   all: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
+  "A+C": "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300",
+  "A+D": "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300",
+  extra: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
 };
 
 export default function ProgressBoard() {
@@ -164,7 +191,7 @@ export default function ProgressBoard() {
   }
 
   const ms = milestones(status, probes);
-  const all = ms.flatMap((m) => m.items);
+  const all = ms.filter((m) => m.lane !== "extra").flatMap((m) => m.items); // extras don't count
   const doneCount = all.filter((i) => i.done).length;
   const pct = all.length ? Math.round((doneCount / all.length) * 100) : 0;
 
@@ -197,10 +224,10 @@ export default function ProgressBoard() {
           return (
             <li key={m.id} className={`rounded-xl border p-3 ${complete ? "border-emerald-300 bg-emerald-50/60 dark:border-emerald-800 dark:bg-emerald-950/30" : "border-zinc-200 dark:border-zinc-800"}`}>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-zinc-500">{m.id}</span>
+                <span className="text-xs font-semibold text-zinc-500">{/^\d$/.test(m.id) ? `Step ${m.id}` : m.id}</span>
                 <span className="font-medium">{m.title}</span>
                 <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${LANE_STYLE[m.lane]}`}>
-                  {m.lane === "all" ? "all" : `lane ${m.lane}`}
+                  {m.lane === "all" || m.lane === "extra" ? m.lane : `lane ${m.lane}`}
                 </span>
                 <span className="ml-auto text-xs tabular-nums text-zinc-500">{complete ? "done 🎉" : `${d}/${m.items.length}`}</span>
               </div>

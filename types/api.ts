@@ -16,6 +16,7 @@ import type {
   Source,
   Suggestion,
   TrackedField,
+  ValidationResult,
 } from "@/types";
 
 // ---------- Issue evidence (written by lane C, read by lane A and D) ----------
@@ -143,16 +144,38 @@ export interface OwnerViewResponse {
 
 // POST /api/suggestions/[id]/decide
 export interface DecideRequest {
-  decision: Decision;
+  decision: Exclude<Decision, "auto">;
   edited_value?: unknown; // required when decision === "edited"
-  via: DecidedVia;
+  via: Exclude<DecidedVia, "standing_permission">;
+  standing_permission?: boolean; // "do this automatically next time"
 }
 
 export interface DecideResponse {
   ok: true;
-  suggestion: Suggestion;
-  synced_sources: Source[]; // listings that were updated; [] when ignored
+  suggestion: Suggestion; // includes `applied` (Yext result + published_to)
+  synced_sources: Source[]; // our listings that were updated; [] when ignored
 }
+
+// ---------- Validation (DESIGN 9.4, lib/validate.ts) ----------
+
+/** Pure, deterministic. Used by /api/suggest on every draft (Gemini or fallback). */
+export type ValidateSuggestion = (
+  draft: SuggestionDraft,
+  issue: Issue,
+  listings: Listing[],
+) => ValidationResult;
+
+// ---------- Yext (DESIGN 10b, lib/yext/index.ts, lane B) ----------
+
+/** Lane D's lib/apply.ts calls this; it never throws. */
+export type PublishChange = (
+  business: Business,
+  change: TypedProposedChange,
+) => Promise<YextPublishResult>;
+
+export type YextPublishResult =
+  | { yext: true; published_to: string[] }
+  | { yext: false; published_to: string[]; error: string };
 
 // ---------- Dashboard (lane C) ----------
 

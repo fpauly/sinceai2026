@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# photos/screenshots dropped in the repo root (not for git)
+/*.jpg
+/*.jpeg
+/*.png
+/*.heic
