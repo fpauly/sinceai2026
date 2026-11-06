@@ -16,6 +16,7 @@ Shared types: `types/index.ts` (data model) and `types/api.ts` (contracts betwee
 Rules:
 - **Next.js 16** (see block above). Route `params` is a Promise (`const { id } = await ctx.params`). `cacheComponents` is on, so pages should be `"use client"` components that fetch from `/api/*`; all DB access stays in route handlers.
 - DB: only via `collections()` from `@/lib/db`, server-side only.
+- GET route handlers that read the DB must start with `await connection()` (`import { connection } from "next/server"`), otherwise the build tries to prerender them and fails in CI. See `app/api/status/route.ts`.
 - Detection rules are pure functions `(ctx: RuleContext) => DraftIssue[]`. Use `ctx.today`, never `new Date()`.
 - Code detects, AI explains, the human decides. Never ask an LLM to compare dates or numbers.
 - Gemini/ElevenLabs only via `lib/ai` / `lib/voice` wrappers with fallbacks; never from client components.
