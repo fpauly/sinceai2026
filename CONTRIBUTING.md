@@ -1,6 +1,6 @@
 # Team rules
 
-These rules are for **everyone on the team and for every AI tool we use** (Claude Code, OpenCode, anything else).
+These rules are for **everyone on the team and for every AI tool we use** (Claude Code, OpenCode, Codex, anything else).
 If you are an AI agent: these rules override your defaults. When a rule says "ask the human", stop and ask; don't work around it.
 
 Related: `DESIGN.md` (what we build), `TASKS.md` (lanes, file ownership, timeline).
@@ -72,7 +72,7 @@ Split every task into **small stages** (about 1–2 hours each, one PR per stage
 
 ## 5. Who does what: hard tasks go to Claude Pro
 
-Lanes A and B have Claude Pro; lanes C and D use OpenCode with free models. Route work by difficulty:
+Lanes A and B have Claude Pro; lanes C and D use OpenCode (free models) or ChatGPT Codex. Route work by difficulty:
 
 **Hard → lane A or B only:**
 - Anything calling an external API or SDK (Gemini, ElevenLabs, Atlas setup, deploy)

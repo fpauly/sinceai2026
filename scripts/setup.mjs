@@ -128,7 +128,7 @@ async function main() {
 Next:
   1. npm run dev        then open http://localhost:3000  (progress board)
   2. npm run smoke      (in a second terminal; should be green)
-  3. Open your AI in this folder (Claude Code: \`claude\`, OpenCode: \`opencode\`) and type:  next
+  3. Open your AI in this folder (Claude Code: \`claude\`, OpenCode: \`opencode\`, Codex: \`codex\`) and type:  next
 `);
   rl.close();
 }
