@@ -29,13 +29,13 @@ const PROBES = {
   detect: "/api/detect",
   suggest: "/api/suggest",
   businesses: "/api/businesses",
-  business: "/api/businesses/cafe_aura",
+  business: "/api/businesses/rye_shine",
   decide: "/api/suggestions/_probe/decide",
   tts: "/api/suggestions/_probe/tts",
   voiceReply: "/api/voice/reply",
   dashboardPage: "/dashboard",
-  ownerPage: "/owner/cafe_aura",
-  contactPage: "/contact/cafe_aura",
+  ownerPage: "/owner/rye_shine",
+  contactPage: "/contact/rye_shine",
 } as const;
 type ProbeKey = keyof typeof PROBES;
 type Probes = Record<ProbeKey, boolean>;
@@ -97,14 +97,14 @@ function milestones(s: Status | null, p: Probes | null): Milestone[] {
     {
       id: "3", title: "Contact", lane: "D",
       items: [
-        { label: "Message preview page", done: has("contactPage"), href: has("contactPage") ? "/contact/cafe_aura" : undefined },
+        { label: "Message preview page", done: has("contactPage"), href: has("contactPage") ? "/contact/rye_shine" : undefined },
       ],
     },
     {
       id: "4", title: "Decide", lane: "D",
       items: [
         { label: "GET /api/businesses/[id]", done: has("business") },
-        { label: "Owner page (no login)", done: has("ownerPage"), href: has("ownerPage") ? "/owner/cafe_aura" : undefined },
+        { label: "Owner page (no login)", done: has("ownerPage"), href: has("ownerPage") ? "/owner/rye_shine" : undefined },
         { label: "POST /api/suggestions/[id]/decide", done: has("decide") },
         { label: "Owner made a decision", done: (sug?.decided ?? 0) > 0, detail: `${sug?.decided ?? 0} decided, ${s?.ignored_fingerprints ?? 0} ignored remembered` },
       ],

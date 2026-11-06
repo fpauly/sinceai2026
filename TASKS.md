@@ -46,11 +46,11 @@ Files you own: `lib/ai/*`, `app/api/suggest/route.ts`, the scoring adapter (TBD)
 | **A1** [shared] | `a/gemini-sdk` | Add the official Google Gen AI JS SDK to `package.json` (check the current docs for the package name; licence must not be GPL/AGPL). Nothing else. **Merge in the first hour; B's dependency PRs wait for it.** | – | PR merged |
 | **A2** | `a/fallback-suggest` | `lib/ai/fallback.ts`: `fallbackSuggestion(business, issue, listings, prefs)` → `SuggestionDraft`, one template per issue type, EN + FI, in Fonecta Connect's voice. The proposal comes from evidence only (copy last year's holiday hours; most recently updated source for a conflict; majority value for phone). **No history** → the category's common pattern, confidence `low`, message phrased as a question. `POST /api/suggest[?businessId=]`: for each `open` issue, create a `Suggestion` (`source: "fallback"`), set the issue to `suggested`, and return `SuggestResponse`. If C3 has landed, run `validateSuggestion` and store `validation`. **Target ~H4.** | – | Board M3 "POST /api/suggest" green; after C1, "Suggestions generated" green |
 | **A3** | `a/gemini-wrapper` | `lib/ai/gemini.ts`: the single wrapper. It reads `GEMINI_API_KEY`/`GEMINI_MODEL`, requests JSON output, validates with zod, has a timeout, retries once, then throws. | A1 | A valid JSON call works; an empty key throws cleanly |
-| **A4** | `a/gemini-suggest` | `lib/ai/suggest.ts`: Gemini first (prompt rules DESIGN §9.1), then `validateSuggestion`; if invalid or on error → fallback. Store `source` + `validation`. | A2, A3, C3 | Café Aura gets valid, readable EN + FI suggestions that name their data; works with the key empty |
+| **A4** | `a/gemini-suggest` | `lib/ai/suggest.ts`: Gemini first (prompt rules DESIGN §9.1), then `validateSuggestion`; if invalid or on error → fallback. Store `source` + `validation`. | A2, A3, C3 | Rye & Shine gets valid, readable EN + FI suggestions that name their data; works with the key empty |
 | **A5** | `a/learning` | Feed `preferences.learned` + `standing_permissions` into the prompt and the fallback (use the owner's last edit). In `/api/suggest`: a **valid** suggestion that matches a standing permission is applied right away via D's `applyDecision` (`decision: "auto"`). | A4, D5 | Edit Boxing Day to 11:00 → reset issues → next suggestion proposes 11:00; with standing permission it auto-applies |
 | **A6** TBD | `a/scoring-adapter` | Adapter for Fonecta's scoring script (DESIGN §9.5). | format known, C6 | Their sample input → our output in their format |
 | **A7** | `a/docs-messages` | `docs/customer-messages.md` (final messages as text, exported from real suggestions) + `docs/no-history.md`. | A4 | Files exist and match the demo |
-| A8 (extra) | `a/review-classifier` | `lib/ai/reviews.ts` `classifyReviews` (DESIGN §9.2) with fallback `{signal:false}`. | A3 | Café Aura and Pizzeria → signal |
+| A8 (extra) | `a/review-classifier` | `lib/ai/reviews.ts` `classifyReviews` (DESIGN §9.2) with fallback `{signal:false}`. | A3 | Rye & Shine and Pizzeria → signal |
 | A9 (extra) | `a/intent` | `lib/ai/intent.ts` `parseIntent` (DESIGN §9.3) with fallback `unclear`. | A3 | "yes" / "ignore it" / "yes but 11 on the 26th" parse correctly |
 
 ### Lane B – Apply (Yext) + integration lead
@@ -61,7 +61,7 @@ Files you own: `lib/yext/*`, `lib/voice/*`, `app/api/suggestions/[id]/tts`, `app
 |---|---|---|---|---|
 | **B1** (no code) | – | **H0:** create the free MongoDB Atlas cluster, allow network access, post the URI in the team chat. Get the Gemini key. **Ask Fonecta (Discord, or Joki Sat 9–12) about the Yext sandbox, the dataset and the scoring script**, and post the answers. | – | Board M1 green against Atlas; answers in chat |
 | **B2** | `b/yext-client` | `lib/yext/index.ts` `publishChange` (stub already exists; keep its signature): write holiday hours / opening hours to the entity in our Yext sandbox, with a timeout and never throwing. `published_to` = where it shows. A small script `scripts/yext-check.mjs` reads one entity to prove access. | B1 (access confirmed, DESIGN §10b) | A real change is visible in the Yext sandbox UI |
-| **B3** | `b/yext-mapping` | Map our businesses to Yext entities (`yext_entity_id`): create the demo entity (Café Aura) in the sandbox, or map to existing test entities. | B2 | Accepting Café Aura's suggestion updates its Yext entity; board M5 green |
+| **B3** | `b/yext-reset` | Map our businesses to Yext entities (`yext_entity_id`): Rye & Shine Bakery is already mapped (`yext_entity_id: "SinceAI03"` in the seed). Add a reset script `scripts/yext-reset.mjs` that restores the entity to its original state (DESIGN §10b) before the demo. | B2 | Accepting Rye & Shine's suggestion updates the Yext entity; reset restores it; board step 5 green |
 | **B4** | `b/submission-readme` | README: how to run, data sources, **libraries and licences** (`npx license-checker --summary`), architecture (the loop and extensibility), links to the docs. | M5 | README covers DESIGN §18 |
 | **B5** | `b/deploy` | Vercel deploy with Atlas, plus a demo reset. | M5 | Judges can open the URL |
 | B6 (extra) [shared] | `b/elevenlabs-sdk` | Add the ElevenLabs JS SDK to `package.json` only. | A1 | PR merged |
@@ -85,15 +85,15 @@ Files you own: `lib/holidays.ts`, `lib/rules/*`, `lib/validate.ts`, `app/api/det
 | **C6** TBD | `c/dataset-import` | Importer for Fonecta's dataset files → our collections (seed stays as a fallback). Adjust the rules if fields differ. | format known | Their data loads; rules run on it |
 | **C7** | `c/dashboard` | `GET /api/businesses` (`await connection()`) + `/dashboard` (`"use client"`): table, **Run daily check** (`/api/detect` then `/api/suggest`), rows link to `/contact/[id]`. | C1 | Board M8 complete |
 | C8 (extra) | `c/live-holidays` | Bonus: holidays from a live public source instead of the hardcoded list (keep the list as a fallback); write what we learned in `docs/data-sources.md`. | C1 | Detection still passes smoke |
-| C9 (extra) | `c/review-signal` | `lib/rules/reviewSignal.ts` (async): last 30 days of reviews → A's `classifyReviews`. | A8 | Café Aura + Pizzeria get `review_signal` |
+| C9 (extra) | `c/review-signal` | `lib/rules/reviewSignal.ts` (async): last 30 days of reviews → A's `classifyReviews`. | A8 | Rye & Shine + Pizzeria get `review_signal` |
 
 **C acceptance test** (checked automatically by `npm run smoke`). After `POST /api/seed` then `POST /api/detect` with `DEMO_DATE=2026-12-10`, rules 1, 2 and 4 must create exactly these **8 issues**. Evidence shapes and fingerprints are in `types/api.ts`.
 
 | Business | Type | Key evidence |
 |---|---|---|
-| cafe_aura | missing_holiday_hours | dates `2026-12-24, 2026-12-25, 2026-12-26`; last_year has `2025-12-24/25/26` |
-| cafe_aura | cross_platform_conflict | field `opening_hours.mon` (google `08:00-18:00` vs finder/website `closed`) |
-| cafe_aura | stale_field | field `description` (oldest 2023-05-01) |
+| rye_shine | missing_holiday_hours | dates `2026-12-24, 12-25, 12-26, 2027-01-01, 2027-01-06`; last_year has `2025-12-24/25/26, 2026-01-01, 2026-01-06` |
+| rye_shine | cross_platform_conflict | field `opening_hours.sat` (website `10:00-14:00`, updated 2026-10-20, vs finder/google `10:00-18:00`) |
+| rye_shine | stale_field | field `description` (oldest 2023-05-01) |
 | parturi_linnankatu | missing_holiday_hours | dates `2026-12-24, 12-25, 12-26, 2027-01-01, 2027-01-06`; last_year `{}` (**no-history case**) |
 | autokorjaamo_skanssi | cross_platform_conflict | field `phone` |
 | kukkakauppa_kauppatori | stale_field | field `opening_hours` (oldest 2024-05-14) |
@@ -109,7 +109,7 @@ Files you own: `lib/apply.ts`, `app/api/businesses/[id]`, `app/api/suggestions/[
 | Stage | Branch | What | Needs | Done when |
 |---|---|---|---|---|
 | **D1** | `d/owner-ui-mock` | `/owner/[businessId]` (`"use client"`, ~390px) with **hardcoded mock data** typed as `OwnerViewResponse` in `app/owner/[businessId]/mock.ts`: greeting ("Hei Liisa!"), `NotificationCard` stack (title, message, **why + the data**, confidence badge with "please check" when low, before → after, ✅ ✏️ ❌ that only log for now, "Do this automatically next time" checkbox), empty state "Everything is up to date ✅". | – | Board "Owner page" green; looks right at phone width |
-| **D2** | `d/owner-api` | `GET /api/businesses/[id]` → `OwnerViewResponse` (`await connection()`; undecided suggestions + their issue). The page uses it instead of the mock. | D1 (real data after A2 + C1) | After seed → detect → suggest, Café Aura shows real cards; Leipomo shows the empty state |
+| **D2** | `d/owner-api` | `GET /api/businesses/[id]` → `OwnerViewResponse` (`await connection()`; undecided suggestions + their issue). The page uses it instead of the mock. | D1 (real data after A2 + C1) | After seed → detect → suggest, Rye & Shine shows real cards; Leipomo shows the empty state |
 | **D3** | `d/apply-decide` | `lib/apply.ts` `applyDecision(...)` + `POST /api/suggestions/[id]/decide` (DESIGN §11): accepted/edited → `publishChange` (from `lib/yext`, a stub until B2) + merge into all 3 listings + `field_updated_at` + issue `resolved` + store `applied`. Ignored → issue `ignored` + fingerprint remembered. Wire ✅ and ❌. Export `applyDecision` so A5 can reuse it. | D2 | Board M4 decide green; ignored issue does not come back |
 | **D4** | `d/contact-preview` | `/contact/[businessId]`: phone-shaped frame with the simulated **WhatsApp chat** from Fonecta Connect (SMS/email optional) (what, **why**, the data), and a no-login link "Review in 10 seconds →" to `/owner/[id]`. | D2 | Board "Contact page" green |
 | **D5** | `d/edit-learn` | ✏️ Edit with a final confirm tap → `decision: "edited"`. In `applyDecision`: append `LearnedDecision` to `preferences.learned`; if the checkbox was ticked, add a `StandingPermission`. The confirm step is reusable for voice (B8). | D3 | Edit holiday hours → confirm → listings updated, `learned` has the entry |
