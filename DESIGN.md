@@ -38,7 +38,7 @@ These come from Fonecta's slides and **override everything below**.
 - **The demo is in English.** All UI text, customer messages, voice and the video are in English (`DEMO_LANGUAGE=en`). Finnish messages are still generated (`message.fi`) and shown as "also available in Finnish", but they are not part of the demo.
 
 ### Open questions (waiting for Fonecta, marked **TBD** below)
-1. **Dataset files** provided by Fonecta (format, fields), and whether to replace our mock data with them.
+1. **Dataset files** provided by Fonecta (format, fields), and whether to replace our mock data with them. **Expected on 2026-11-06 at ~19:30.** Then: update this doc, `types/`, and stages C6 / A6.
 2. **Scoring script**: how it calls us (HTTP, function, file) and the exact input/output format for suggestions.
 3. ~~Yext sandbox access~~ → answered, see section 10b.
 
