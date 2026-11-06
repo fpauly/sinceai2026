@@ -16,7 +16,7 @@ Lanes C and D are deterministic code with clear specs (good for free models). La
 
 **Contracts** between lanes are in **`types/api.ts`** and **`types/index.ts`**: API shapes, issue `evidence` per type (C → A, D), `proposed_change` per field (A → D), `ValidateSuggestion` (C → A), `PublishChange` / `YextPublishResult` (B → D), `LearnedDecision` / `StandingPermission` (D writes, A reads).
 
-**TBD (waiting for Fonecta, DESIGN §0):** dataset format, scoring script format, Yext sandbox access. Stages marked **TBD** start when we know more; everything else can start now.
+**TBD (waiting for Fonecta, DESIGN §0):** dataset format, scoring script format. **Yext sandbox: confirmed** (DESIGN §10b). **WhatsApp is a valid Contact channel.** Stages marked **TBD** start when we know more; everything else can start now.
 
 ---
 
@@ -60,7 +60,7 @@ Files you own: `lib/yext/*`, `lib/voice/*`, `app/api/suggestions/[id]/tts`, `app
 | Stage | Branch | What | Needs | Done when |
 |---|---|---|---|---|
 | **B1** (no code) | – | **H0:** create the free MongoDB Atlas cluster, allow network access, post the URI in the team chat. Get the Gemini key. **Ask Fonecta (Discord, or Joki Sat 9–12) about the Yext sandbox, the dataset and the scoring script**, and post the answers. | – | Board M1 green against Atlas; answers in chat |
-| **B2** | `b/yext-client` | `lib/yext/index.ts` `publishChange` (stub already exists; keep its signature): write holiday hours / opening hours to the entity in our Yext sandbox, with a timeout and never throwing. `published_to` = where it shows. A small script `scripts/yext-check.mjs` reads one entity to prove access. | Yext access (TBD) | A real change is visible in the Yext sandbox UI |
+| **B2** | `b/yext-client` | `lib/yext/index.ts` `publishChange` (stub already exists; keep its signature): write holiday hours / opening hours to the entity in our Yext sandbox, with a timeout and never throwing. `published_to` = where it shows. A small script `scripts/yext-check.mjs` reads one entity to prove access. | B1 (access confirmed, DESIGN §10b) | A real change is visible in the Yext sandbox UI |
 | **B3** | `b/yext-mapping` | Map our businesses to Yext entities (`yext_entity_id`): create the demo entity (Café Aura) in the sandbox, or map to existing test entities. | B2 | Accepting Café Aura's suggestion updates its Yext entity; board M5 green |
 | **B4** | `b/submission-readme` | README: how to run, data sources, **libraries and licences** (`npx license-checker --summary`), architecture (the loop and extensibility), links to the docs. | M5 | README covers DESIGN §18 |
 | **B5** | `b/deploy` | Vercel deploy with Atlas, plus a demo reset. | M5 | Judges can open the URL |
@@ -111,7 +111,7 @@ Files you own: `lib/apply.ts`, `app/api/businesses/[id]`, `app/api/suggestions/[
 | **D1** | `d/owner-ui-mock` | `/owner/[businessId]` (`"use client"`, ~390px) with **hardcoded mock data** typed as `OwnerViewResponse` in `app/owner/[businessId]/mock.ts`: greeting ("Hei Liisa!"), `NotificationCard` stack (title, message, **why + the data**, confidence badge with "please check" when low, before → after, ✅ ✏️ ❌ that only log for now, "Do this automatically next time" checkbox), empty state "Everything is up to date ✅". | – | Board "Owner page" green; looks right at phone width |
 | **D2** | `d/owner-api` | `GET /api/businesses/[id]` → `OwnerViewResponse` (`await connection()`; undecided suggestions + their issue). The page uses it instead of the mock. | D1 (real data after A2 + C1) | After seed → detect → suggest, Café Aura shows real cards; Leipomo shows the empty state |
 | **D3** | `d/apply-decide` | `lib/apply.ts` `applyDecision(...)` + `POST /api/suggestions/[id]/decide` (DESIGN §11): accepted/edited → `publishChange` (from `lib/yext`, a stub until B2) + merge into all 3 listings + `field_updated_at` + issue `resolved` + store `applied`. Ignored → issue `ignored` + fingerprint remembered. Wire ✅ and ❌. Export `applyDecision` so A5 can reuse it. | D2 | Board M4 decide green; ignored issue does not come back |
-| **D4** | `d/contact-preview` | `/contact/[businessId]`: phone-shaped frame with the simulated SMS/email from Fonecta Connect (what, **why**, the data), and a no-login link "Review in 10 seconds →" to `/owner/[id]`. | D2 | Board "Contact page" green |
+| **D4** | `d/contact-preview` | `/contact/[businessId]`: phone-shaped frame with the simulated **WhatsApp chat** from Fonecta Connect (SMS/email optional) (what, **why**, the data), and a no-login link "Review in 10 seconds →" to `/owner/[id]`. | D2 | Board "Contact page" green |
 | **D5** | `d/edit-learn` | ✏️ Edit with a final confirm tap → `decision: "edited"`. In `applyDecision`: append `LearnedDecision` to `preferences.learned`; if the checkbox was ticked, add a `StandingPermission`. The confirm step is reusable for voice (B8). | D3 | Edit holiday hours → confirm → listings updated, `learned` has the entry |
 | **D6** | `d/where-it-shows` | `ChannelSyncRow`: after a decision show **"Published via Yext to: …"** from `applied.published_to`, channels turning green one by one, with an honest message when Yext was not reached. Leave a slot for `<VoiceButton>`. | D3 | Looks good in the demo flow |
 

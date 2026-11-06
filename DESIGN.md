@@ -32,10 +32,14 @@ These come from Fonecta's slides and **override everything below**.
 **Submit:** see section 18. **Licences:** no GPL/AGPL components without Fonecta's written approval.
 **Help:** Fonecta Q&A point at Joki on Saturday 9–12, the Fonecta channel on the Since AI Discord, no Q&A on Sunday.
 
+### Confirmed with Fonecta
+- **WhatsApp is a valid communication channel** for step 3 (Contact). Our contact preview shows the message as a WhatsApp chat (simulated, section 12); SMS/email are alternatives.
+- **Yext sandbox works** (tested read-only on 2026-11-06), details in section 10b.
+
 ### Open questions (waiting for Fonecta, marked **TBD** below)
 1. **Dataset files** provided by Fonecta (format, fields), and whether to replace our mock data with them.
 2. **Scoring script**: how it calls us (HTTP, function, file) and the exact input/output format for suggestions.
-3. **Yext sandbox access**: API key, account, and whether test entities already exist.
+3. ~~Yext sandbox access~~ → answered, see section 10b.
 
 Until these are answered, we build on our own mock data and keep the data shapes easy to adapt (one importer, one scoring adapter).
 
@@ -64,7 +68,7 @@ Demo persona: **Liisa**, owner of **Café Aura** by the Aura river in Turku. Bus
 1. DETECT    Rule-based engine scans each business → Issues, each with the data that triggered it
 2. SUGGEST   Gemini turns each Issue into a Suggestion (change + reason + confidence + message)
              → VALIDATE: deterministic code checks the proposal; if it fails → fallback template / low confidence
-3. CONTACT   Connect sends a message (simulated SMS/email; optional voice via ElevenLabs) that explains why,
+3. CONTACT   Connect sends a message (simulated WhatsApp; SMS/email as alternatives; optional voice via ElevenLabs) that explains why,
              with a no-login link to the owner view
 4. DECIDE    Owner: Accept / Edit / Ignore with one tap (or voice). Optional "do this automatically next time"
 5. APPLY     Accepted change is written to the Yext sandbox (+ our listings in MongoDB);
@@ -86,7 +90,7 @@ Demo persona: **Liisa**, owner of **Café Aura** by the Aura river in Turku. Bus
 - Detection rules (section 8), each recording the data that triggered it
 - Gemini suggestions with structured JSON, plus a **validation layer** and fallback templates
 - **Customer with no history:** sensible, clearly low-confidence suggestion that asks the owner instead of guessing (section 9.1)
-- **Contact:** a message preview (simulated SMS/email) in Connect's voice that explains why, with a no-login link
+- **Contact:** a message preview (simulated **WhatsApp** chat; SMS/email as alternatives) in Connect's voice that explains why, with a no-login link
 - Owner view with Accept / Edit / Ignore
 - **Apply to the Yext sandbox** (section 10b) and show where the change will appear
 - **Learning:** remember edits and ignores, use them in the next suggestion; **standing permission** per change type
@@ -100,7 +104,7 @@ Demo persona: **Liisa**, owner of **Café Aura** by the Aura river in Turku. Bus
 
 ### Out of scope (do NOT build)
 - Real scraping or real APIs of Finder or Google (Yext is our one real write target)
-- Real SMS, push notifications or phone calls (simulated in the UI)
+- Real WhatsApp/SMS sending, push notifications or phone calls (simulated in the UI; WhatsApp Business API needs Meta approval)
 - Authentication / user accounts (the no-login link is the owner's access)
 - Any real business data (privacy: mock or Fonecta-provided data only)
 
@@ -126,7 +130,7 @@ See `.env.example` (it explains which lane needs what). Main keys:
 AJANTASA_LANE=           # A | B | C | D, set by npm run setup
 MONGODB_URI=  MONGODB_DB=
 GEMINI_API_KEY=  GEMINI_MODEL=
-YEXT_API_KEY=  YEXT_ACCOUNT_ID=  YEXT_API_BASE=     # TBD, sandbox details from Fonecta
+YEXT_API_KEY=  YEXT_ACCOUNT_ID=SinceAI03  YEXT_API_BASE=https://sbx-api.yextapis.com
 ELEVENLABS_API_KEY=  ELEVENLABS_VOICE_ID=
 DEMO_DATE=2026-12-10     # "today" for detection rules, so the demo is deterministic
 DEMO_LANGUAGE=en         # en | fi
@@ -310,7 +314,13 @@ Fonecta's scoring script measures suggestion quality on hidden test data. As soo
 - `lib/yext/index.ts` is the only place that talks to Yext. `publishChange(business, change)` writes the accepted change (`hours` / holiday hours) to the business's entity in **our Yext sandbox** and returns `{ yext: true, published_to: [...] }` or `{ yext: false, error }` (`types/api.ts` `YextPublishResult`).
 - With timeout, error handling and a clear fallback: if Yext is not configured or fails, the change is still saved in MongoDB and the UI says Yext was not reached. The demo must not crash.
 - `published_to` is the list of places the owner is told the change will show (Google, Apple Maps, Finder, …), based on Yext's publishers for the entity where available.
-- Sandbox base URL, auth and entity mapping: **TBD** (waiting for Fonecta).
+- **Sandbox (confirmed 2026-11-06, read-only test):**
+  - Base URL `https://sbx-api.yextapis.com/v2/accounts/me/…`, auth `?api_key=…&v=YYYYMMDD`. The key only works on the sandbox, not on `api.yextapis.com`. Key in `.env.local` only (team chat, never git).
+  - Account `SinceAI03`; one entity: **Rye & Shine Bakery**, entity id `SinceAI03`, type `location`, language `fi`, Eerikinkatu 7, 20100 Turku, Fonecta category `L2815B`.
+  - Current `hours`: Mon–Sat 10:00–18:00, Sunday closed. **No holiday hours set.** No phone or description.
+  - Yext hours format: `{"monday":{"openIntervals":[{"start":"10:00","end":"18:00"}]},"sunday":{"isClosed":true}}`. `lib/yext` converts to/from our `"mon":"10:00-18:00"` format.
+  - Publishers supporting Finnish locations (for `published_to`): Google Business Profile, Apple, Bing, Facebook, Foursquare, HERE, TomTom, MapQuest, Booking.com, Tupalo, ShowMeLocal, Navmii, Where To?, First Party. The sandbox has 0 live listings, which is expected.
+  - Writing changes the shared sandbox entity: before the demo, reset it to the state above.
 
 ## 11. API routes (Next.js route handlers)
 
@@ -335,7 +345,7 @@ Applying a decision:
 ## 12. UI
 
 ### Contact preview `/contact/[businessId]` (step 3)
-- A phone-shaped frame showing the simulated SMS (and email) from **Fonecta Connect**: what is needed, why (the data), and a no-login link "Review in 10 seconds →" to the owner view
+- A phone-shaped frame showing the simulated **WhatsApp chat** from **Fonecta Connect** (WhatsApp is a valid channel per Fonecta): what is needed, why (the data), and a no-login link "Review in 10 seconds →" to the owner view. Optional tabs for SMS / email.
 - Optional 🔊 "Connect calls you" (TTS, extra)
 
 ### Owner view `/owner/[businessId]` (mobile-first, ~390px wide, steps 4 and 5)
