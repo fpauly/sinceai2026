@@ -12,7 +12,7 @@ export type Source = "finder" | "google" | "website";
 export const SOURCES: readonly Source[] = ["finder", "google", "website"];
 
 export type Language = "en" | "fi";
-export type Channel = "voice" | "sms" | "app";
+export type Channel = "whatsapp" | "voice" | "sms" | "app";
 
 export type Category =
   | "cafe"
