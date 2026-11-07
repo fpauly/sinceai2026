@@ -5,7 +5,8 @@
 // Steps whose API route does not exist yet (404) are SKIPPED, so this works at every milestone.
 // Each lane extends this file with checks for its own routes (shared file: use a shared/* PR).
 // WARNING: it calls /api/seed, which wipes the database named in your .env.local. The v2 block
-// runs last and re-seeds the v1 demo data, so it leaves the database in the demo state.
+// runs last and re-seeds the Fonecta demo data, so it leaves the database in the demo state.
+// The v1 seed is retired from the demo (V2): its detection checks only run with DEMO_DATE=2026-12-10.
 
 const BASE = process.env.SMOKE_URL ?? "http://localhost:3000";
 let failed = 0;
@@ -27,10 +28,10 @@ async function call(method, path) {
 
 // ---------- M1: seed ----------
 async function seed() {
-  console.log("M1 seed");
-  const r = await call("POST", "/api/seed");
+  console.log("M1 seed (v1, retired from the demo)");
+  const r = await call("POST", "/api/seed?source=seed");
   if (r.missing) return bad("/api/seed missing");
-  check(r.status === 200 && r.json?.ok, `POST /api/seed → 200 ok (got ${r.status})`);
+  check(r.status === 200 && r.json?.ok, `POST /api/seed?source=seed → 200 ok (got ${r.status})`);
   const c = r.json?.counts ?? {};
   check(c.businesses === 8 && c.listings === 24 && c.reviews === 12,
     `seed counts 8/24/12 (got ${c.businesses}/${c.listings}/${c.reviews})`);
@@ -55,7 +56,10 @@ function issueKey(i) {
 }
 
 async function detect() {
-  console.log("M2 detect");
+  console.log("M2 detect (v1 rules)");
+  const status = await call("GET", "/api/status");
+  const today = status.json?.demo_date;
+  if (today !== "2026-12-10") return skip(`v1 rules are retired from the demo run (DEMO_DATE is ${today}; they need 2026-12-10)`);
   const r = await call("POST", "/api/detect");
   if (r.missing) return skip("/api/detect not implemented yet");
   check(r.status === 200 && r.json?.ok, `POST /api/detect → 200 ok (got ${r.status})`);
@@ -144,7 +148,7 @@ async function v2() {
   const again = await call("POST", "/api/detect");
   check((again.json?.created ?? []).length === 0, "second v2 /api/detect creates 0 new issues");
 
-  // Leave the database on the v1 demo data (DESIGN 0 "v2": the seed is still the demo until V2).
+  // Leave the database on the demo data: Fonecta's dataset since V2.
   await call("POST", "/api/seed");
 }
 
