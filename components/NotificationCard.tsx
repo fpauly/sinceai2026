@@ -37,8 +37,8 @@ function display(value: unknown): string {
 }
 
 /** A preview of this special date, not a live Google listing or publication status. */
-function CustomerHoursPreview({ businessName, date, before, after }: {
-  businessName?: string; date: string; before: string; after: string;
+function CustomerHoursPreview({ businessName, date, before, after, hasProfile }: {
+  businessName?: string; date: string; before: string; after: string; hasProfile: boolean;
 }) {
   const hoursText = (value: string) => normalizeHours(value) === "closed" ? "Closed" : `Open ${showHours(value, "Closed")}`;
   return <section aria-label="What customers will see" className="mt-4 rounded-xl border border-zinc-200 bg-white p-3">
@@ -47,7 +47,7 @@ function CustomerHoursPreview({ businessName, date, before, after }: {
     {businessName && <p className="mt-2 break-words text-sm font-medium">{businessName}</p>}
     <p className="mt-1 text-xs text-zinc-500">{label(date)}</p>
     <div className="mt-3 grid grid-cols-2 gap-2 text-sm leading-6">
-      <div className="min-w-0 rounded-lg bg-zinc-50 p-2"><p className="text-xs text-zinc-500">Google shows now</p><p className="mt-1 break-words">{hoursText(before)}</p></div>
+      <div className="min-w-0 rounded-lg bg-zinc-50 p-2"><p className="text-xs text-zinc-500">{hasProfile ? "Latest saved profile" : "Google hours at detection"}</p><p className="mt-1 break-words">{hoursText(before)}</p></div>
       <div className="min-w-0 rounded-lg bg-emerald-50 p-2"><p className="text-xs text-emerald-800">After your approval</p><p className="mt-1 break-words font-medium text-emerald-900">{hoursText(after)}</p></div>
     </div>
     <p className="mt-2 text-xs leading-5 text-zinc-500">Preview only. Nothing is published until you confirm.</p>
@@ -132,7 +132,9 @@ export default function NotificationCard({ suggestion, listings, profile, busine
 
   const previewDate = suggestion.issue.type === "special_day_hours" && typeof suggestion.issue.evidence.date === "string"
     ? suggestion.issue.evidence.date : null;
-  const previewBefore = suggestion.issue.evidence.displayed_hours;
+  const previewBefore = profile && previewDate
+    ? displayedHours(profile, previewDate).hours
+    : suggestion.issue.evidence.displayed_hours;
   const previewValues = editMode === "confirm" ? draft : change.value;
   const previewAfter = previewDate && previewValues && typeof previewValues === "object"
     ? (previewValues as Record<string, unknown>)[previewDate] : undefined;
@@ -233,7 +235,7 @@ export default function NotificationCard({ suggestion, listings, profile, busine
           </div>
         ))}
       </div>
-      {showPreview && <CustomerHoursPreview businessName={businessName} date={previewDate} before={previewBefore as string} after={previewAfter as string} />}
+      {showPreview && <CustomerHoursPreview businessName={businessName} date={previewDate} before={previewBefore as string} after={previewAfter as string} hasProfile={!!profile} />}
       {checkingPending && <p role="status" className="mt-4 text-sm">Checking for an unfinished decision…</p>}
       {recoveryError && !checkingPending && <div className="mt-4 text-sm"><p role="alert">Could not check your previous decision. Please retry before making changes.</p><button type="button" onClick={() => { setCheckingPending(true); setRecoveryAttempt((n) => n + 1); }} className="mt-2 min-h-11 rounded-lg border border-zinc-300 px-3">Retry check</button></div>}
       {pendingRequest && !checkingPending && !recoveryError && <section aria-label="Unfinished decision" className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-6">
