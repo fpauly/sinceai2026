@@ -246,3 +246,43 @@ export function specialDaySuggestion(business: Business, issue: Issue): Suggesti
     message: { en: message(business, ev, "en"), [lang]: message(business, ev, lang) },
   };
 }
+
+// ---------- follow-ups (after the owner answers) ----------
+
+export type FollowUpKind = "approved" | "edited" | "declined" | "auto";
+
+/** The short reply Connect sends after a decision on one special day, in English or the owner's
+ *  language. `hours` is what was published (the proposal, or the owner's edit). Code only: no LLM. */
+export function followUp(business: Business, issue: Issue, kind: FollowUpKind, lang: "en" | OwnerLang, hours?: Hours): string {
+  const ev = issue.evidence as unknown as SpecialDayHoursEvidence;
+  const name = firstName(business);
+  const what = `${dayName(ev, lang)} ${dateText(ev.date, lang)} ${state(hours ?? ev.proposed_hours, lang)}`;
+  const when = `${dayName(ev, lang)} ${dateText(ev.date, lang)}`;
+  const texts: Record<FollowUpKind, Record<"en" | OwnerLang, string>> = {
+    approved: {
+      en: `Thanks ${name}, done: ${what} now shows on Google and your other listings.`,
+      fi: `Kiitos ${name}, tehty: ${what} näkyy nyt Googlessa ja muissa palveluissa.`,
+      sv: `Tack ${name}, klart: ${what} syns nu på Google och i era andra tjänster.`,
+      nb: `Takk ${name}, ferdig: ${what} vises nå på Google og i de andre tjenestene deres.`,
+    },
+    edited: {
+      en: `Thanks ${name}, your change is saved: ${what}. It now shows on Google and your other listings.`,
+      fi: `Kiitos ${name}, muutoksesi on tallennettu: ${what}. Se näkyy nyt Googlessa ja muissa palveluissa.`,
+      sv: `Tack ${name}, din ändring är sparad: ${what}. Den syns nu på Google och i era andra tjänster.`,
+      nb: `Takk ${name}, endringen er lagret: ${what}. Den vises nå på Google og i de andre tjenestene deres.`,
+    },
+    declined: {
+      en: `OK ${name}, we won't change your hours for ${when} and won't ask about it again.`,
+      fi: `Selvä ${name}, emme muuta aukioloaikoja (${when}) emmekä kysy tästä uudelleen.`,
+      sv: `Okej ${name}, vi ändrar inte öppettiderna (${when}) och frågar inte om det igen.`,
+      nb: `Greit ${name}, vi endrer ikke åpningstidene (${when}) og spør ikke om det igjen.`,
+    },
+    auto: {
+      en: `Hi ${name}, as you asked, we set ${what}. It now shows on Google and your other listings; reply if it should be different.`,
+      fi: `Hei ${name}, kuten pyysitte, merkitsimme: ${what}. Se näkyy nyt Googlessa ja muissa palveluissa; vastaa tähän, jos haluatte muuttaa sitä.`,
+      sv: `Hej ${name}, som ni bad om har vi lagt in: ${what}. Det syns nu på Google och i era andra tjänster; svara om det ska vara annorlunda.`,
+      nb: `Hei ${name}, som dere ba om har vi lagt inn: ${what}. Det vises nå på Google og i de andre tjenestene deres; svar hvis det skal være annerledes.`,
+    },
+  };
+  return texts[kind][lang];
+}

@@ -15,6 +15,7 @@ It uses only data entered before "today" (6 Nov 2026; 6 Nov 2025 for the back-te
 | # | Basis | Rule | Confidence |
 |---|---|---|---|
 | 0 | closed for good | Google/Apple/Bing users marked the place closed, or a review in the last 150 days says "closed down", and the listing is still open → **FLAG**, no message to the owner | – |
+| 0b | – | The owner already set this date in Connect (approved, edited, or applied by standing permission) → **NO_ACTION**: their decision stands (app only; the scorer has no Connect decisions) | – |
 | 1 | `OWNER_EDIT` | The owner edited this calendar day before, in Connect → their hours | high |
 | 2 | `SHOPPING_CENTRE` | The centre has entered hours for the date **and** the store normally keeps the centre's hours on that weekday → the centre's hours | high |
 | 3 | `LAST_YEAR` | What the owner entered for the same day last season; if nothing, the season before | high / medium |
