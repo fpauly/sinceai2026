@@ -19,7 +19,7 @@
 //
 // Output: deterministic (sorted, no timestamps), so re-running it produces no diff.
 
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parquetMetadataAsync, parquetReadObjects } from "hyparquet";
@@ -293,6 +293,83 @@ const calendarDays = readCsv("calendar_special_days.csv", 9).map((row) => {
   };
 });
 
+// ---------- source: live public holidays (C8, the bonus live source) ----------
+
+// Nager.Date (MIT): official public holidays per country and year. We use it for the official
+// public-holiday part of the calendar only; eves, observances, commercial days, local events and
+// school breaks still come from the dataset. DEMO_DATE still defines the window, so detection stays
+// deterministic; if the API is unreachable, the dataset rows are used unchanged.
+const LIVE_HOLIDAY_COUNTRIES = ["FI", "SE", "NO"];
+const LIVE_HOLIDAY_YEARS = [2026, 2027]; // the demo window (7 Nov 2026 – 6 Jan 2027)
+const LIVE_HOLIDAY_CACHE = join(DATASET, ".cache");
+
+async function fetchLiveHolidays(year, country) {
+  const cached = join(LIVE_HOLIDAY_CACHE, `nager-${year}-${country}.json`);
+  if (existsSync(cached)) return JSON.parse(readFileSync(cached, "utf8"));
+  let lastError;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/${country}`, {
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const rows = await res.json();
+      mkdirSync(LIVE_HOLIDAY_CACHE, { recursive: true });
+      writeFileSync(cached, JSON.stringify(rows));
+      return rows;
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  console.warn(`live holidays: ${country} ${year} unavailable (${lastError.message}); using the dataset`);
+  return null;
+}
+
+/** Confirm the calendar's public holidays from the live API, and correct the flag where it differs. */
+async function confirmPublicHolidays(days) {
+  const live = new Map(); // "CC:date" -> { local, en }
+  let countryYears = 0;
+  for (const country of LIVE_HOLIDAY_COUNTRIES) {
+    for (const year of LIVE_HOLIDAY_YEARS) {
+      const rows = await fetchLiveHolidays(year, country);
+      if (!rows) continue;
+      countryYears += 1;
+      for (const row of rows) live.set(`${country}:${row.date}`, { local: row.localName, en: row.name });
+    }
+  }
+
+  let confirmed = 0;
+  let corrected = 0;
+  for (const day of days) {
+    if (!LIVE_HOLIDAY_YEARS.includes(Number(day.date.slice(0, 4)))) continue;
+    const match = live.get(`${day.country}:${day.date}`);
+    if (match) {
+      confirmed += 1;
+      day.official_public_holiday = true;
+      if (match.local) day.name_local = match.local;
+      if (match.en) day.name_en = match.en;
+    } else if (day.official_public_holiday) {
+      // The dataset calls it official, the live source does not (e.g. Christmas Eve in Finland).
+      day.official_public_holiday = false;
+      corrected += 1;
+    }
+  }
+
+  if (live.size > 0) {
+    const calendarKeys = new Set(days.map((day) => `${day.country}:${day.date}`));
+    const missing = [...live.keys()].filter((key) => !calendarKeys.has(key));
+    if (missing.length > 0) {
+      console.warn(`live holidays: ${missing.length} live dates are not in the calendar (${missing.join(", ")})`);
+    }
+    console.log(
+      `live holidays: ${countryYears} country-years checked, ${confirmed} dates confirmed, ${corrected} corrected, ${missing.length} missing from the calendar`,
+    );
+  }
+  return { countryYears, confirmed, corrected };
+}
+
+const liveHolidays = await confirmPublicHolidays(calendarDays);
+
 // Event nights and school breaks (C15): the scorers' targets say which business has one on which
 // date, and local_events.json gives the event its name. These rows apply to that business only.
 const businessesById = new Map(businesses.map((business) => [business._id, business]));
@@ -488,6 +565,8 @@ const counts = {
   reviews: reviews.length,
   publisher_suggestions: publisherSuggestions.length,
   search_views: searchViewCount,
+  live_holidays: liveHolidays.confirmed,
+  live_holidays_corrected: liveHolidays.corrected,
 };
 
 const extract = {

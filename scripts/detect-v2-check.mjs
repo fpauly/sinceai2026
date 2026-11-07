@@ -119,14 +119,27 @@ check(
   "arena nights copy the owner's latest event-night hours (15:00-03:00)",
 );
 const schoolBreak = of("FI-D0005", "special_day_hours").filter((draft) => draft.evidence.day_key === "SCHOOL_BREAK");
+check(schoolBreak.length === 3, `FI-D0005 gets 3 school-break suggestions (got ${schoolBreak.length})`);
 check(
-  schoolBreak.length >= 1 && schoolBreak.every((draft) => draft.evidence.proposed_hours === "closed"),
-  `FI-D0005 gets closed school-break suggestions (got ${schoolBreak.length})`,
+  schoolBreak.every(
+    (draft) =>
+      draft.evidence.basis === "LAST_YEAR" && draft.evidence.basis_detail?.last_year?.date === "2024-01-03",
+  ),
+  "school breaks use the owner's entry from the same school break (Jan 2024)",
 );
 check(
   of("FI-D0001", "special_day_hours").every((draft) => draft.evidence.day_key !== "EVENT"),
   "FI-D0001 does not see another business's arena nights",
 );
+
+// C8: the official public holidays in the committed extract were confirmed by the live API.
+check(demo.counts.live_holidays > 0, `live API confirmed ${demo.counts.live_holidays} public holidays`);
+check(
+  demo.counts.live_holidays_corrected === 0,
+  `the live source agreed with the dataset (${demo.counts.live_holidays_corrected} corrections)`,
+);
+const finnishChristmas = demo.special_days.find((day) => day._id === "FI:2026-12-25");
+check(finnishChristmas?.official_public_holiday === true, "FI:2026-12-25 is an official public holiday");
 
 // Every suggestion must carry usable evidence: one date in the window, valid hours, a basis.
 const windowEnd = "2027-01-06";

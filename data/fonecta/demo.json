@@ -13,7 +13,9 @@
     "peers": 421,
     "reviews": 245,
     "publisher_suggestions": 40,
-    "search_views": 366
+    "search_views": 366,
+    "live_holidays": 49,
+    "live_holidays_corrected": 0
   },
   "businesses": [
     {
@@ -15926,7 +15928,7 @@
       "day_key": "EASTER_MONDAY",
       "day_type": "PUBLIC_HOLIDAY",
       "day_class": "SOFT",
-      "name_local": "2. pääsiäispäivä",
+      "name_local": "Toinen pääsiäispäivä",
       "name_en": "Easter Monday",
       "official_public_holiday": true
     },
@@ -15986,7 +15988,7 @@
       "day_key": "PENTECOST",
       "day_type": "PUBLIC_HOLIDAY",
       "day_class": "SOFT",
-      "name_local": "Helluntai",
+      "name_local": "Helluntaipäivä",
       "name_en": "Pentecost",
       "official_public_holiday": true
     },
@@ -16107,7 +16109,7 @@
       "day_type": "PUBLIC_HOLIDAY",
       "day_class": "SOFT",
       "name_local": "Tapaninpäivä",
-      "name_en": "Boxing Day",
+      "name_en": "St. Stephen's Day",
       "official_public_holiday": true
     },
     {
@@ -16838,8 +16840,8 @@
       "day_key": "MAY_DAY",
       "day_type": "PUBLIC_HOLIDAY",
       "day_class": "SOFT",
-      "name_local": "Arbeidernes dag",
-      "name_en": "May Day",
+      "name_local": "Første mai",
+      "name_en": "Labour Day",
       "official_public_holiday": true
     },
     {
@@ -16862,8 +16864,8 @@
       "day_key": "NATIONAL_DAY",
       "day_type": "PUBLIC_HOLIDAY",
       "day_class": "SOFT",
-      "name_local": "Grunnlovsdag (17. mai)",
-      "name_en": "National Day",
+      "name_local": "Syttende mai",
+      "name_en": "Constitution Day",
       "official_public_holiday": true
     },
     {
@@ -16948,7 +16950,7 @@
       "day_class": "EVE_MAJOR",
       "name_local": "Julaften",
       "name_en": "Christmas Eve",
-      "official_public_holiday": false
+      "official_public_holiday": true
     },
     {
       "_id": "NO:2026-12-25",
@@ -16971,7 +16973,7 @@
       "day_type": "PUBLIC_HOLIDAY",
       "day_class": "SOFT",
       "name_local": "Andre juledag",
-      "name_en": "Boxing Day",
+      "name_en": "St. Stephen's Day",
       "official_public_holiday": true
     },
     {
@@ -17847,7 +17849,7 @@
       "day_type": "PUBLIC_HOLIDAY",
       "day_class": "SOFT",
       "name_local": "Första maj",
-      "name_en": "May Day",
+      "name_en": "International Workers' Day",
       "official_public_holiday": true
     },
     {
@@ -17907,7 +17909,7 @@
       "day_type": "PUBLIC_HOLIDAY",
       "day_class": "SOFT",
       "name_local": "Sveriges nationaldag",
-      "name_en": "National Day",
+      "name_en": "National Day of Sweden",
       "official_public_holiday": true
     },
     {
@@ -17920,7 +17922,7 @@
       "day_class": "EVE_MAJOR",
       "name_local": "Midsommarafton",
       "name_en": "Midsummer Eve",
-      "official_public_holiday": false
+      "official_public_holiday": true
     },
     {
       "_id": "SE:2026-06-20",
@@ -18004,7 +18006,7 @@
       "day_class": "EVE_MAJOR",
       "name_local": "Julafton",
       "name_en": "Christmas Eve",
-      "official_public_holiday": false
+      "official_public_holiday": true
     },
     {
       "_id": "SE:2026-12-25",
@@ -18027,7 +18029,7 @@
       "day_type": "PUBLIC_HOLIDAY",
       "day_class": "SOFT",
       "name_local": "Annandag jul",
-      "name_en": "Boxing Day",
+      "name_en": "St. Stephen's Day",
       "official_public_holiday": true
     },
     {
@@ -18076,7 +18078,7 @@
       "day_class": "EVE_MINOR",
       "name_local": "Nyårsafton",
       "name_en": "New Year's Eve",
-      "official_public_holiday": false
+      "official_public_holiday": true
     },
     {
       "_id": "SE:2027-01-01",
