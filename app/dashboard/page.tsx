@@ -15,9 +15,9 @@ type LoadState =
   | { status: "error"; message: string };
 
 const SEVERITY_STYLE: Record<Severity, string> = {
-  high: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  medium: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  low: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
+  high: "bg-red-100 text-red-800",
+  medium: "bg-amber-100 text-amber-800",
+  low: "bg-zinc-100 text-zinc-700",
 };
 
 const DECISION_LABEL: Record<string, string> = {
@@ -91,7 +91,7 @@ export default function DashboardPage() {
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
       <header>
         <h1 className="text-3xl font-semibold tracking-tight">Fonecta dashboard</h1>
-        <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+        <p className="mt-1 text-zinc-600">
           One row per business. Run the daily check to detect what is out of date and write the suggestions.
           Staff-only flags (for example a business that has closed for good) are listed as “needs a person” and are never sent to the owner.
         </p>
@@ -101,14 +101,14 @@ export default function DashboardPage() {
         <button
           onClick={runDailyCheck}
           disabled={busy}
-          className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {busy ? "Running daily check…" : "Run daily check"}
         </button>
         <button
           onClick={() => void load()}
           disabled={busy}
-          className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 disabled:opacity-40 dark:border-zinc-700 dark:hover:bg-zinc-900"
+          className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 disabled:opacity-40"
         >
           Reload
         </button>
@@ -120,25 +120,25 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {log && <p className="-mt-2 text-sm text-zinc-600 dark:text-zinc-400">{log}</p>}
+      {log && <p className="-mt-2 text-sm text-zinc-600">{log}</p>}
 
       {state.status === "loading" && <p role="status" className="text-zinc-500">Loading businesses…</p>}
       {state.status === "error" && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
+        <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
           Could not load the businesses: {state.message}
         </p>
       )}
 
       {state.status === "ready" && rows.length === 0 && (
-        <p className="rounded-lg border border-zinc-200 p-3 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
+        <p className="rounded-lg border border-zinc-200 p-3 text-sm text-zinc-600">
           No businesses yet. Seed the demo data with <code className="font-mono">POST /api/seed</code>.
         </p>
       )}
 
       {state.status === "ready" && rows.length > 0 && (
-        <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
+        <div className="overflow-x-auto rounded-xl border border-zinc-200">
           <table className="w-full min-w-[800px] text-sm">
-            <thead className="bg-zinc-50 text-left text-xs uppercase tracking-wide text-zinc-500 dark:bg-zinc-900">
+            <thead className="bg-zinc-50 text-left text-xs uppercase tracking-wide text-zinc-500">
               <tr>
                 <th className="p-3 font-medium">Business</th>
                 <th className="p-3 font-medium">Open issues</th>
@@ -151,7 +151,7 @@ export default function DashboardPage() {
               {rows.map((row) => {
                 const open = row.open_issues.high + row.open_issues.medium + row.open_issues.low;
                 return (
-                  <tr key={row.business._id} className="border-t border-zinc-200 align-top dark:border-zinc-800">
+                  <tr key={row.business._id} className="border-t border-zinc-200 align-top">
                     <td className="p-3">
                       <Link
                         href={`/owner/${row.business._id}`}
@@ -165,7 +165,7 @@ export default function DashboardPage() {
                     </td>
                     <td className="p-3">
                       {open === 0 ? (
-                        <span className="text-emerald-600 dark:text-emerald-400">Up to date ✓</span>
+                        <span className="text-emerald-600">Up to date ✓</span>
                       ) : (
                         <span className="flex flex-wrap gap-1">
                           {(["high", "medium", "low"] as const)
@@ -183,7 +183,7 @@ export default function DashboardPage() {
                     </td>
                     <td className="p-3">
                       {row.needs_human ? (
-                        <span className="rounded bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-950 dark:text-red-300">
+                        <span className="rounded bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-800">
                           {row.needs_human.count} ·{" "}
                           {row.needs_human.reasons.map((reason) => reason.replace(/_/g, " ")).join(", ")}
                         </span>

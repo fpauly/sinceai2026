@@ -7,7 +7,7 @@ import type { AppliedResult, Business } from "@/types";
 /** Yext confirms the write; publisher visibility below is only a time-based estimate. */
 export default function ChannelSyncRow({ applied, business, receivedAt, changeLabel, children }: {
   applied: AppliedResult | null | undefined;
-  business: Pick<Business, "publishers">;
+  business: Pick<Business, "publishers" | "name" | "yext_entity_id">;
   changeLabel?: string;
   receivedAt: number; // Client timestamp when the successful decision response arrived.
   children?: ReactNode; // Slot for the optional VoiceButton.
@@ -37,6 +37,7 @@ export default function ChannelSyncRow({ applied, business, receivedAt, changeLa
     <p role="status" className="mt-2 break-words">{confirmed
       ? names.length ? `Published via Yext to: ${names.join(", ")}.` : "Yext confirmed the write. No publication channels were returned."
       : "Your changes are saved. Publication to your online channels is not confirmed."}</p>
+    {!confirmed && !business.yext_entity_id && <p className="mt-2 text-xs leading-5 text-zinc-600">{business.name} is not connected to Yext in this demo. In Connect, this step publishes via Yext, as it does for Kahvila Aurora.</p>}
 
     {confirmed && names.length > 0 && <>
       <p className="mt-3 text-xs leading-5 text-zinc-500">Channels update at different speeds. Green means the typical update time has passed; it does not confirm the change is already visible.</p>
