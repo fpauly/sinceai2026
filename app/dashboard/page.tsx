@@ -5,7 +5,6 @@
 // Rows link to the owner view (mobile, no login); the contact preview arrives with lane D.
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import type { Severity } from "@/types";
 import type { BusinessesResponse } from "@/types/api";
 
@@ -92,7 +91,7 @@ export default function DashboardPage() {
       <header>
         <h1 className="text-3xl font-semibold tracking-tight">Fonecta dashboard</h1>
         <p className="mt-1 text-zinc-600">
-          One row per business. Run the daily check to detect what is out of date and write the suggestions.
+          One row per business. Run the daily check to detect what is out of date and write the suggestions. Opening a business gives you a private copy, so your answers never change the shared demo.
           Staff-only flags (for example a business that has closed for good) are listed as “needs a person” and are never sent to the owner.
         </p>
       </header>
@@ -153,12 +152,12 @@ export default function DashboardPage() {
                 return (
                   <tr key={row.business._id} className="border-t border-zinc-200 align-top">
                     <td className="p-3">
-                      <Link
-                        href={`/owner/${row.business._id}`}
+                      <a
+                        href={`/try?b=${encodeURIComponent(row.business._id)}&to=owner`}
                         className="font-medium underline underline-offset-2"
                       >
                         {row.business.name}
-                      </Link>
+                      </a>
                       <div className="text-xs text-zinc-500">
                         {categoryLabel(row.business.category)} · {row.business.city}
                       </div>
@@ -205,9 +204,9 @@ export default function DashboardPage() {
                       )}
                     </td>
                     <td className="p-3 text-right">
-                      <Link href={`/owner/${row.business._id}`} className="text-sm underline underline-offset-2">
+                      <a href={`/try?b=${encodeURIComponent(row.business._id)}&to=owner`} className="text-sm underline underline-offset-2">
                         Review →
-                      </Link>
+                      </a>
                     </td>
                   </tr>
                 );

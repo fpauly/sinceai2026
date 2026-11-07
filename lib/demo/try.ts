@@ -12,7 +12,9 @@ import type { Issue, Preferences, Suggestion } from "@/types";
 
 export const COPY_PREFIX = "try-";
 export const isDemoCopy = (businessId: string) => businessId.startsWith(COPY_PREFIX);
-export const TRY_TEMPLATES = ["FI-D0010", "FI-D0001"] as const; // Pub Kulma (WhatsApp), Kahvila Aurora (SMS)
+export const DEFAULT_TEMPLATE = "FI-D0010"; // Pub Kulma (WhatsApp, voice replies): the QR code in the video
+/** Any business of Fonecta's demo cast can be copied (#107); never a copy. */
+export const isDemoTemplate = (id: string) => !isDemoCopy(id) && fonectaDemo.businesses.some((b) => b._id === id);
 const LIFETIME_MS = 6 * 60 * 60 * 1000;
 const COLLECTIONS = ["businesses", "profiles", "holiday_history", "issues", "suggestions", "preferences"] as const;
 
@@ -22,20 +24,25 @@ function ensureTtl() {
   return ttlReady;
 }
 
-export type DemoCopy = { ok: true; businessId: string } | { ok: false; error: string };
+/** copied: false means there is nothing to change (no suggestion waiting), so the original page opens. */
+export type DemoCopy = { ok: true; businessId: string; copied: boolean } | { ok: false; error: string };
 
 /** Copies a template business with its waiting suggestions, reset to their original proposals. */
-export async function createDemoCopy(templateId: (typeof TRY_TEMPLATES)[number]): Promise<DemoCopy> {
+export async function createDemoCopy(templateId: string): Promise<DemoCopy> {
   const business = fonectaDemo.businesses.find((b) => b._id === templateId);
   const profile = fonectaDemo.profiles.find((p) => p.business_id === templateId);
   if (!business || !profile) return { ok: false, error: "This demo business is not available." };
 
   const db = await getDb();
   await ensureTtl();
-  const issues = await db.collection<Issue>("issues").find({ business_id: templateId, type: "special_day_hours" }).toArray();
-  if (issues.length === 0) return { ok: false, error: "The demo is being prepared. Please try again in a minute." };
-  const suggestions = await db.collection<Suggestion>("suggestions").find({ business_id: templateId, issue_id: { $in: issues.map((i) => i._id) } }).toArray();
-  if (suggestions.length === 0) return { ok: false, error: "The demo is being prepared. Please try again in a minute." };
+  const allIssues = await db.collection<Issue>("issues").find({ business_id: templateId, type: "special_day_hours" }).toArray();
+  const allSuggestions = await db.collection<Suggestion>("suggestions").find({ business_id: templateId, issue_id: { $in: allIssues.map((i) => i._id) } }).toArray();
+  if (allIssues.length > 0 && allSuggestions.length === 0) return { ok: false, error: "The demo is being prepared. Please try again in a minute." };
+  // changes applied by standing permission stay as they are; only suggestions an owner answers are copied
+  const suggestions = allSuggestions.filter((s) => s.decision !== "auto");
+  const issues = allIssues.filter((i) => suggestions.some((s) => s.issue_id === i._id));
+  // nothing waiting by design (already right, closed for good, or all applied automatically): nothing to protect
+  if (suggestions.length === 0) return { ok: true, businessId: templateId, copied: false };
 
   const templatePrefs = await db.collection<Preferences>("preferences").findOne({ business_id: templateId });
 
@@ -75,5 +82,5 @@ export async function createDemoCopy(templateId: (typeof TRY_TEMPLATES)[number])
     const docs = copies[name] as Record<string, unknown>[];
     if (docs.length) await db.collection(name).insertMany(docs as never[]);
   }
-  return { ok: true, businessId: id };
+  return { ok: true, businessId: id, copied: true };
 }
