@@ -53,7 +53,11 @@ function checkEditScope(issue: Issue, change: TypedProposedChange, original: Sug
   const keys = typeof change.value === "object" ? Object.keys(change.value).sort() : [];
   let field: string | undefined;
   let allowedKeys: string[] | undefined;
-  if (issue.type === "missing_holiday_hours") {
+  if (issue.type === "special_day_hours") {
+    field = "holiday_hours";
+    if (!date.safeParse(evidence.date).success) throw new DecisionError("The issue has no valid special-day date to edit", 400);
+    allowedKeys = [evidence.date as string];
+  } else if (issue.type === "missing_holiday_hours") {
     field = "holiday_hours";
     if (!Array.isArray(evidence.dates) || !evidence.dates.length || !evidence.dates.every((v) => date.safeParse(v).success)) {
       throw new DecisionError("The issue has no valid holiday dates to edit", 400);
@@ -105,10 +109,11 @@ export async function applyDecision(id: string, input: DecideRequest, opts: { au
   if (previous && !isDeepStrictEqual(previous.request, request)) {
     throw new DecisionError("A previous decision needs to finish. Retry the same decision.", 409);
   }
-  const [business, issue, listings] = await Promise.all([
+  const [business, issue, listings, profile] = await Promise.all([
     c.businesses.findOne({ _id: suggestion.business_id }),
     c.issues.findOne({ _id: suggestion.issue_id, business_id: suggestion.business_id }),
     c.listings.find({ business_id: suggestion.business_id }).toArray(),
+    c.profiles.findOne({ business_id: suggestion.business_id }),
   ]);
   if (!business || !issue) throw new DecisionError("Business or issue not found", 404);
   if (!previous && issue.status !== "open" && issue.status !== "suggested") throw new DecisionError("This issue is no longer open", 409);
@@ -121,7 +126,8 @@ export async function applyDecision(id: string, input: DecideRequest, opts: { au
     });
     if (!result.success) throw new DecisionError("The change has invalid fields or values", 400);
     change = result.data;
-    if (listings.length === 0) throw new DecisionError("No listings found for this business", 409);
+    if (profile && change.field !== "holiday_hours" && change.field !== "opening_hours") throw new DecisionError("Only hours can be changed on a published profile", 400);
+    if (!profile && listings.length === 0) throw new DecisionError("No listings found for this business", 409);
     if (request.decision === "accepted") {
       const validation = validateSuggestion(suggestion, issue, listings);
       if (!validation.ok) throw new DecisionError("This suggestion needs correction before it can be accepted", 400);
@@ -159,6 +165,11 @@ export async function applyDecision(id: string, input: DecideRequest, opts: { au
       if (change.field === "opening_hours" || change.field === "holiday_hours") {
         for (const [key, value] of Object.entries(change.value)) fields[`${change.field}.${key}`] = value;
       } else fields[change.field] = change.value;
+      if (profile) {
+        const profileFields = Object.fromEntries(Object.entries(fields).map(([key, value]) => [key.replace(/^opening_hours\./, "regular_hours."), value]));
+        const saved = await c.profiles.updateOne({ _id: profile._id }, { $set: { ...profileFields, updated_at: at } });
+        if (!saved.matchedCount) throw new DecisionError("Published profile no longer exists. Reload the page.", 409);
+      }
       if (change.field !== "phone") fields[`field_updated_at.${change.field}`] = at.slice(0, 10);
       await c.listings.updateMany({ business_id: business._id }, { $set: fields });
       if (progress.publication) applied = progress.publication;

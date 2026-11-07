@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { isValidHours, normalizeHours, showHours } from "@/lib/hours";
-import type { IssueType, Listing } from "@/types";
+import { displayedHours, isValidHours, normalizeHours, showHours } from "@/lib/hours";
+import { OwnerMessage } from "@/app/owner/contact-details";
+import type { IssueType, Language, Listing, Profile } from "@/types";
 import type { ApiError, DecideRequest, DecideResponse, SuggestionWithIssue } from "@/types/api";
 
 const titles: Record<IssueType, string> = {
@@ -57,9 +58,11 @@ export function EditConfirmation({ proposedValue, finalValue, standingPermission
   );
 }
 
-export default function NotificationCard({ suggestion, listings, onDecidedAction }: {
+export default function NotificationCard({ suggestion, listings, profile, language = "en", onDecidedAction }: {
   suggestion: SuggestionWithIssue;
   listings: Listing[];
+  profile?: Profile | null;
+  language?: Language;
   onDecidedAction: (result: DecideResponse) => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -172,7 +175,7 @@ export default function NotificationCard({ suggestion, listings, onDecidedAction
         {suggestion.confidence === "low" ? "Low confidence · please check" : `${suggestion.confidence === "high" ? "High" : "Medium"} confidence`}
       </span>
       <h2 className="mt-3 text-xl font-semibold tracking-tight">{titles[suggestion.issue.type]}</h2>
-      <p className="mt-2 text-sm leading-6 text-zinc-700">{suggestion.message.en}</p>
+      <OwnerMessage message={suggestion.message} language={language} />
       <div className="mt-4 rounded-xl bg-zinc-50 p-3">
         <h3 className="text-sm font-semibold">Why this change?</h3>
         <p className="mt-1 text-sm leading-6 text-zinc-600">{suggestion.reason}</p>
@@ -191,6 +194,7 @@ export default function NotificationCard({ suggestion, listings, onDecidedAction
             <h3 className="mb-2 font-medium">{label(key)}</h3>
             <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-2">
               <div className="min-w-0 break-words"><p className="mb-1 text-xs text-zinc-500">Before</p>
+                {profile && <p className="text-xs leading-5 text-zinc-600">Published hours: {display(change.field === "holiday_hours" ? displayedHours(profile, key).hours : Object.entries(profile.regular_hours).find(([day]) => day === key)?.[1])}</p>}
                 {listings.map((listing) => <p key={listing._id} className="text-xs leading-5 text-zinc-600">{label(listing.source)}: {display(current(listing, key))}</p>)}
               </div>
               <span aria-hidden="true" className="pt-5 text-zinc-400">→</span>
@@ -251,7 +255,6 @@ export default function NotificationCard({ suggestion, listings, onDecidedAction
       </div>}
       {busy && <p role="status" className="mt-2 text-xs text-zinc-600">Saving your decision…</p>}
       {error && <p role="alert" className="mt-2 text-sm text-red-700">{error}</p>}
-      <details className="mt-3 text-xs text-zinc-500"><summary className="cursor-pointer py-1">Also available in Finnish</summary><p lang="fi" className="mt-1 leading-5">{suggestion.message.fi}</p></details>
     </article>
   );
 }
