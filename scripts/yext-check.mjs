@@ -27,11 +27,11 @@ if (!res.ok) {
   process.exit(1);
 }
 
-const { name, hours = {}, mainPhone, description } = body.response;
+const { name, address, hours = {}, mainPhone, description } = body.response;
 const { holidayHours = [], ...week } = hours;
 const show = (h) => (h.isClosed ? "closed" : (h.openIntervals ?? []).map((i) => `${i.start}-${i.end}`).join(", "));
 
-console.log(`Connected to Yext. Entity ${entityId}: ${name}`);
+console.log(`Connected to Yext. Entity ${entityId}: ${name}, ${address?.line1}, ${address?.city}`);
 console.log("\nOpening hours");
 for (const [day, h] of Object.entries(week)) console.log(`  ${day.padEnd(10)} ${show(h)}`);
 console.log("\nHoliday hours");
