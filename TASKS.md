@@ -25,7 +25,7 @@ Lanes C and D are deterministic code with clear specs (good for free models). La
 1. Accept the GitHub invite, then clone: `git clone git@github.com:fpauly/sinceai2026.git && cd sinceai2026`
 2. **`npm run setup`**: asks your lane and sets up everything (`.env.local`, database, checks). Follow what it prints.
 3. Unzip Fonecta's dataset to `FONECTA/FONECTA_CONNECT_SUGGESTS_2026/` in your clone (download link in the team chat; never commit it).
-4. `npm run dev` and open **http://localhost:3000**: the **progress board** shows what the team has built so far.
+4. `npm run dev` and open **http://localhost:3000/team**: the **progress board** shows what the team has built so far (the home page `/` is the public demo entry).
 5. Open your AI (Claude Code, OpenCode or Codex) in this folder and type **`next`**.
    **Codex users:** Codex's sandbox may block network access by default. If `npm install`, `git push` or `gh` fail inside Codex, allow network access when it asks, or enable it in Codex's settings.
 

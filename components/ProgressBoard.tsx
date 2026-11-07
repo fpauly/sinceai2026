@@ -1,6 +1,6 @@
 "use client";
 
-// Live progress board for the team (home page). Everything here is detected automatically:
+// Live progress board for the team (/team, not linked from the app). Everything here is detected automatically:
 // it probes whether routes/pages exist and reads DB counts from /api/status.
 // Lanes don't need to edit this file; their work turns items green when it lands on main.
 

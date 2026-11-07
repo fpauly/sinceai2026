@@ -430,7 +430,8 @@ Applying a decision:
 - Button "Run daily check" → calls `/api/detect` then `/api/suggest`
 - Click a business → opens its contact preview / owner view
 
-### Progress board `/` (team tool and demo controls)
+### Home `/` (public demo entry) and progress board `/team` (team tool, not linked)
+- `/`: three ways into the demo: Pub Kulma's WhatsApp chat (reply by text or voice), Kahvila Aurora's SMS, and Fonecta's dashboard.
 - Live checklist of the milestones, "Reset demo", "Run detection", "Generate suggestions"
 
 ## 13. Mock data (`data/seed.ts`)
@@ -454,7 +455,8 @@ Names are fictional. Use realistic but fake phone numbers.
 
 ```
 /app
-  /page.tsx                   progress board
+  /page.tsx                   public home (demo entry)
+  /team/page.tsx              progress board (team tool)
   /dashboard/page.tsx
   /contact/[businessId]/page.tsx
   /owner/[businessId]/page.tsx

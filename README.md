@@ -15,10 +15,10 @@ You need Node 22.18+ (we use 24; scripts run `lib/` TypeScript directly) and Mon
 ```bash
 npm install
 cp .env.example .env.local    # fill in MONGODB_URI (and the optional keys below)
-npm run dev                   # http://localhost:3000 (progress board and demo controls)
+npm run dev                   # http://localhost:3000 (the demo; team controls at /team)
 ```
 
-Team members can run `npm run setup` instead, which writes `.env.local` for their lane. Then on the progress board press **Load Fonecta cast**, **Run detection** and **Generate suggestions**, or:
+Team members can run `npm run setup` instead, which writes `.env.local` for their lane. Then on the team board (`/team`) press **Load Fonecta cast**, **Run detection** and **Generate suggestions**, or:
 
 ```bash
 curl -X POST localhost:3000/api/seed      # loads Fonecta's demo cast (data/fonecta/demo.json, committed)
