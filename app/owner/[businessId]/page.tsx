@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import NotificationCard from "@/components/NotificationCard";
-import type { OwnerViewResponse } from "@/types/api";
+import type { DecideResponse, OwnerViewResponse } from "@/types/api";
 
 type LoadState =
   | { status: "loading" }
@@ -20,6 +20,20 @@ function OwnerView() {
 function BusinessView({ businessId }: { businessId: string }) {
   const [state, setState] = useState<LoadState>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  function decided(result: DecideResponse) {
+    const applied = result.suggestion.applied;
+    setNotice(result.suggestion.decision === "ignored"
+      ? "Suggestion ignored. We will remember your choice."
+      : applied?.yext
+        ? `Change saved and published via Yext to: ${applied.published_to.join(", ")}.`
+        : "Change saved to your demo listings. Yext was not reached; external publication is not confirmed.");
+    setState((current) => current.status === "ready" ? {
+      status: "ready", data: { ...current.data, suggestions: current.data.suggestions.filter((item) => item._id !== result.suggestion._id) },
+    } : current);
+    setAttempt((value) => value + 1);
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -62,10 +76,10 @@ function BusinessView({ businessId }: { businessId: string }) {
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">Hi {data.business.owner_name}!</h1>
         <p className="mt-2 text-sm leading-6 text-zinc-600">{data.suggestions.length ? "A few details need your attention. You decide what changes." : "Your business information is looking good."}</p>
       </header>
-      <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">Demo preview · Suggestions loaded from demo data. Decision buttons are not connected yet.</div>
+      {notice && <p role="status" className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm leading-6 text-emerald-900">{notice}</p>}
       {data.suggestions.length ? (
         <section aria-label="Suggestions to review" className="space-y-4">
-          {data.suggestions.map((suggestion) => <NotificationCard key={suggestion._id} suggestion={suggestion} listings={data.listings} />)}
+          {data.suggestions.map((suggestion) => <NotificationCard key={suggestion._id} suggestion={suggestion} listings={data.listings} onDecidedAction={decided} />)}
         </section>
       ) : (
         <section className="rounded-2xl border border-emerald-200 bg-white px-4 py-10 text-center"><h2 className="text-xl font-semibold">Everything is up to date ✅</h2><p className="mt-2 text-sm leading-6 text-zinc-600">There is nothing to review right now.</p></section>

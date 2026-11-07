@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { IssueType, Listing } from "@/types";
-import type { SuggestionWithIssue } from "@/types/api";
+import type { ApiError, DecideResponse, SuggestionWithIssue } from "@/types/api";
 
 const titles: Record<IssueType, string> = {
   missing_holiday_hours: "Set your holiday hours",
@@ -32,8 +32,14 @@ function display(value: unknown): string {
   return String(value);
 }
 
-export default function NotificationCard({ suggestion, listings }: { suggestion: SuggestionWithIssue; listings: Listing[] }) {
-  const [standingPermission, setStandingPermission] = useState(false);
+export default function NotificationCard({ suggestion, listings, onDecidedAction }: {
+  suggestion: SuggestionWithIssue;
+  listings: Listing[];
+  onDecidedAction: (result: DecideResponse) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const submitting = useRef(false);
   const { proposed_change: change } = suggestion;
   const rows: [string, unknown][] = typeof change.value === "object" && change.value !== null
     ? Object.entries(change.value) : [[change.field, change.value]];
@@ -44,6 +50,27 @@ export default function NotificationCard({ suggestion, listings }: { suggestion:
     if (change.field === "phone") return listing.phone;
     if (change.field === "description") return listing.description;
     return undefined;
+  }
+
+  async function decide(decision: "accepted" | "ignored") {
+    if (submitting.current) return;
+    submitting.current = true;
+    setBusy(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/suggestions/${encodeURIComponent(suggestion._id)}/decide`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ decision, via: "tap" }),
+      });
+      const result: DecideResponse | ApiError = await response.json();
+      if (!response.ok || !result.ok) throw new Error(!result.ok ? result.error : "Could not save your decision");
+      onDecidedAction(result);
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : "Could not save your decision. Please reload to check its status.");
+    } finally {
+      submitting.current = false;
+      setBusy(false);
+    }
   }
 
   return (
@@ -80,18 +107,20 @@ export default function NotificationCard({ suggestion, listings }: { suggestion:
         ))}
       </div>
       <label className="mt-4 flex cursor-pointer items-start gap-2 text-sm leading-5 text-zinc-600">
-        <input type="checkbox" checked={standingPermission} onChange={(event) => setStandingPermission(event.target.checked)} className="mt-0.5 size-4 shrink-0 accent-emerald-700" />
+        <input type="checkbox" disabled title="Available in a later demo stage" className="mt-0.5 size-4 shrink-0 accent-emerald-700" />
         Do this automatically next time
       </label>
       <div className="mt-4 grid grid-cols-3 gap-2">
         {([ ["accepted", "✓ Accept"], ["edited", "✎ Edit"], ["ignored", "× Ignore"] ] as const).map(([decision, text]) => (
-          <button key={decision} type="button" onClick={() => console.info("[D1 preview]", { suggestionId: suggestion._id, decision, standing_permission: standingPermission })}
-            className={`min-h-11 rounded-xl px-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 ${decision === "accepted" ? "bg-emerald-700 text-white hover:bg-emerald-800" : "border border-zinc-300 text-zinc-700 hover:bg-zinc-50"}`}>
+          <button key={decision} type="button" disabled={busy || decision === "edited"} onClick={() => { if (decision !== "edited") void decide(decision); }}
+            className={`min-h-11 rounded-xl px-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 ${decision === "accepted" ? "bg-emerald-700 text-white hover:bg-emerald-800" : "border border-zinc-300 text-zinc-700 hover:bg-zinc-50"}`}>
             {text}
           </button>
         ))}
       </div>
-      <p className="mt-2 text-xs text-zinc-500">Preview only. Actions are not saved yet.</p>
+      {busy && <p role="status" className="mt-2 text-xs text-zinc-600">Saving your decision…</p>}
+      {error && <p role="alert" className="mt-2 text-sm text-red-700">{error}</p>}
+      <p className="mt-2 text-xs text-zinc-500">Editing and automatic permission will be available in a later demo stage.</p>
       <details className="mt-3 text-xs text-zinc-500"><summary className="cursor-pointer py-1">Also available in Finnish</summary><p lang="fi" className="mt-1 leading-5">{suggestion.message.fi}</p></details>
     </article>
   );
