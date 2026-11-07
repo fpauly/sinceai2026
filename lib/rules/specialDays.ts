@@ -68,6 +68,7 @@ export const specialDays: Rule = (ctx: RuleContext): DraftIssue[] => {
 
     if (prediction.action === "SUGGEST" && prediction.hours) {
       const shown = displayedHours(profile, day.date);
+      const expectedViews = business.search_views_by_day_key?.[day.day_key];
       drafts.push({
         business_id: business._id,
         type: "special_day_hours",
@@ -83,6 +84,7 @@ export const specialDays: Rule = (ctx: RuleContext): DraftIssue[] => {
           basis: prediction.basis ?? "REGULAR",
           basis_detail: prediction.detail ?? {},
           confidence: prediction.confidence ?? "medium",
+          ...(expectedViews !== undefined ? { expected_search_views: expectedViews } : {}),
         },
         fingerprint: `${business._id}:special_day_hours:${day.date}`,
       });

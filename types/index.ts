@@ -48,6 +48,7 @@ export interface Business {
   connect_since?: string; // "YYYY-MM-DD"; a recent date means little or no history
   contact?: Contact; // customer_contacts.csv
   publishers?: Publisher[]; // listings.json: where the hours show (step 5 confirmation)
+  search_views_by_day_key?: Partial<Record<DayKey, number>>; // C14: Google search views on the same special day last season
 }
 
 // ---------- v2: Fonecta dataset ----------

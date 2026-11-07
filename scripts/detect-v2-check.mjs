@@ -100,6 +100,14 @@ check(of("FI-D0011", "special_day_hours").length === 0, "FI-D0011 gets no owner 
 check(of("FI-D0001", "special_day_hours").length > 0, "FI-D0001 gets at least one special-day suggestion");
 check(of("FI-D0017", "special_day_hours").length > 0, "FI-D0017 (no history) gets at least one special-day suggestion");
 
+// C14: the suggestion carries what was at stake on that day last season, from the parquet.
+const auroraEve = of("FI-D0001", "special_day_hours").find((draft) => draft.evidence.date === "2026-12-24");
+check(!!auroraEve, "FI-D0001 has a Christmas Eve suggestion");
+check(
+  typeof auroraEve?.evidence?.expected_search_views === "number" && auroraEve.evidence.expected_search_views > 0,
+  `FI-D0001's Christmas Eve evidence carries last year's Google search views (got ${auroraEve?.evidence?.expected_search_views})`,
+);
+
 // Every suggestion must carry usable evidence: one date in the window, valid hours, a basis.
 const windowEnd = "2027-01-06";
 let evidenceProblems = 0;
