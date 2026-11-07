@@ -53,10 +53,14 @@ What made the difference:
 - **The owner's habit on the other big holidays** (closed on every one they entered last season → closed on the one they never entered): +0.2 to +0.3 on both seasons, with more harmful suggestions. Not worth a new kind of message.
 - **Copying hours from a nearby day** (New Year's Eve from Christmas Eve, Epiphany Eve from New Year's Eve, the days between Christmas and New Year from New Year's Eve): lost points on both seasons, by 50–220 points per day type.
   Short days differ from each other even for the same business; only the same day's history works.
+- **Google user edits for hours** (`publisher_suggestions.json`): where we say nothing and the business has no history for that day, propose the hours a Google user suggested for the same day in one of the last two seasons.
+  About +0.66 on both seasons (2026: 179 new suggestions, 73 of them harmful; 2025: 109 new, 37 harmful), so harmful 263 → about 336 on 2026.
+  These edits were never confirmed: all of them are EXPIRED (nobody handled them) or REJECTED (the owner or Google turned them down).
+  A small gain is not worth telling owners to set hours that someone already rejected, so we kept them out. No demo business was affected either way.
 
 ### Where the remaining points are
 About 1,600 dev rows still need a change we don't suggest, and almost all of them have no usable history.
-Next candidates: complaint reviews about specific dates, Google user edits for hours, the 2025 pilot log (owner edits and rejections), and events or school breaks for restaurants and family venues.
+Next candidates: complaint reviews about specific dates, the 2025 pilot log (owner edits and rejections), and events or school breaks for restaurants and family venues.
 
 ## Run it
 
