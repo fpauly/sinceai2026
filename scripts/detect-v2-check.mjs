@@ -108,6 +108,26 @@ check(
   `FI-D0001's Christmas Eve evidence carries last year's Google search views (got ${auroraEve?.evidence?.expected_search_views})`,
 );
 
+// C15: event nights and school breaks are business-specific special days.
+const arena = of("FI-D0010", "special_day_hours").filter((draft) => draft.evidence.day_key === "EVENT");
+check(arena.length >= 1, `FI-D0010 gets arena-night suggestions (got ${arena.length})`);
+check(
+  arena.some(
+    (draft) =>
+      draft.evidence.basis === "LAST_YEAR" && draft.evidence.basis_detail?.last_year?.hours === "15:00-03:00",
+  ),
+  "arena nights copy the owner's latest event-night hours (15:00-03:00)",
+);
+const schoolBreak = of("FI-D0005", "special_day_hours").filter((draft) => draft.evidence.day_key === "SCHOOL_BREAK");
+check(
+  schoolBreak.length >= 1 && schoolBreak.every((draft) => draft.evidence.proposed_hours === "closed"),
+  `FI-D0005 gets closed school-break suggestions (got ${schoolBreak.length})`,
+);
+check(
+  of("FI-D0001", "special_day_hours").every((draft) => draft.evidence.day_key !== "EVENT"),
+  "FI-D0001 does not see another business's arena nights",
+);
+
 // Every suggestion must carry usable evidence: one date in the window, valid hours, a basis.
 const windowEnd = "2027-01-06";
 let evidenceProblems = 0;

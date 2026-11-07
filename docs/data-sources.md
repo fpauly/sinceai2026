@@ -228,6 +228,11 @@ to it). What it changes for us:
   2025 for Christmas Eve 2026) and stores them as `Business.search_views_by_day_key`; detection
   copies the number into `evidence.expected_search_views`. For `FI-D0001` Christmas Eve that is 29
   search views last year — the number lane A's message may quote, with the code as its source.
+- **Event nights and school breaks are business-specific.** `targets_2026.csv` says which demo
+  business has an `EVENT` or `SCHOOL_BREAK` day on which date (`local_events.json` gives the event
+  its name in the owner's language). Those 25 rows become `SpecialDay` rows with a `business_id`, so
+  only that business sees them: `FI-D0010` Pub Kulma gets 9 arena nights (hours copied from its last
+  event night, 15:00–03:00) and `FI-D0005` Suksivuokraamo Kuura gets 3 school-break closures.
 - **What does not change:** the mock Turku businesses stay the scripted demo (`DESIGN.md` §13) until
   the V2 switch, and `DEMO_DATE` still drives detection, so the demo stays deterministic while the
   importer and the scoring adapter work off the real files.

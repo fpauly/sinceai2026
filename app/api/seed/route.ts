@@ -115,6 +115,7 @@ async function seedFonecta() {
       profiles: demo.profiles.length,
       holiday_history: demo.holiday_history.length,
       special_days: demo.special_days.length,
+      event_days: demo.special_days.filter((day) => day.business_id).length,
       peers: demo.peers.length,
       reviews: demo.reviews.length,
       publisher_suggestions: demo.publisher_suggestions.length,

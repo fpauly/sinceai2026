@@ -45,7 +45,11 @@ export const specialDays: Rule = (ctx: RuleContext): DraftIssue[] => {
   if (!profile || business.is_shopping_centre) return [];
 
   const days = (ctx.special_days ?? []).filter(
-    (day) => day.country === business.country && day.date > today && day.date <= addDays(today, WINDOW_DAYS),
+    (day) =>
+      day.country === business.country &&
+      (!day.business_id || day.business_id === business._id) && // country calendar, or this business's event day
+      day.date > today &&
+      day.date <= addDays(today, WINDOW_DAYS),
   );
   if (days.length === 0) return [];
 

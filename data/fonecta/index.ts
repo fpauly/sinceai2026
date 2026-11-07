@@ -22,6 +22,7 @@ export interface FonectaDemo {
     profiles: number;
     holiday_history: number;
     special_days: number;
+    event_days: number;
     peers: number;
     reviews: number;
     publisher_suggestions: number;
