@@ -1,12 +1,12 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
-import type { Collection } from "mongodb";
+import type { Collection, UpdateFilter } from "mongodb";
 import { z } from "zod";
 import { collections } from "@/lib/db";
 import { validateSuggestion } from "@/lib/validate";
 import { publishChange } from "@/lib/yext";
-import type { AppliedResult, Issue, Suggestion } from "@/types";
+import type { AppliedResult, Issue, LearnedDecision, Preferences, Suggestion } from "@/types";
 import type { DecideRequest, DecideResponse, TypedProposedChange } from "@/types/api";
 
 export class DecisionError extends Error {
@@ -22,8 +22,8 @@ export const decisionRequestSchema = z.object({
   if (value.decision === "edited" && value.edited_value === undefined) {
     ctx.addIssue({ code: "custom", message: "An edited value is required" });
   }
-  if (value.standing_permission) {
-    ctx.addIssue({ code: "custom", message: "Automatic permission is not available yet" });
+  if (value.standing_permission && value.decision === "ignored") {
+    ctx.addIssue({ code: "custom", message: "Ignoring a suggestion cannot grant automatic permission" });
   }
 });
 
@@ -153,12 +153,7 @@ export async function applyDecision(id: string, input: DecideRequest): Promise<D
   try {
     // Local writes are idempotent, so an interrupted attempt can safely resume.
     let applied: AppliedResult | null = null;
-    if (request.decision === "ignored") {
-      await c.preferences.updateOne({ _id: business._id }, {
-        $setOnInsert: { business_id: business._id, notes: [] },
-        $addToSet: { ignored_fingerprints: issue.fingerprint },
-      }, { upsert: true });
-    } else if (change) {
+    if (change) {
       const fields: Record<string, string> = {};
       if (change.field === "opening_hours" || change.field === "holiday_hours") {
         for (const [key, value] of Object.entries(change.value)) fields[`${change.field}.${key}`] = value;
@@ -177,6 +172,23 @@ export async function applyDecision(id: string, input: DecideRequest): Promise<D
       }
       await checkpoint({ "_decision.publication": applied });
     }
+    // The original proposal is still stored until the final save below. A stable timestamp
+    // and $addToSet make learning and permission writes safe to replay after a failure.
+    const learned: LearnedDecision = {
+      issue_type: issue.type, field: suggestion.proposed_change.field,
+      proposed: suggestion.proposed_change.value, final: change?.value ?? null,
+      decision: request.decision, at,
+    };
+    const additions: NonNullable<UpdateFilter<Preferences>["$addToSet"]> = {
+      learned,
+      ...(request.decision === "ignored" ? { ignored_fingerprints: issue.fingerprint } : {}),
+      ...(request.standing_permission && change ? { standing_permissions: { issue_type: issue.type, field: change.field } } : {}),
+    };
+    await c.preferences.updateOne({ _id: business._id }, {
+      $setOnInsert: { business_id: business._id, notes: [],
+        ...(request.decision !== "ignored" ? { ignored_fingerprints: [] } : {}) },
+      $addToSet: additions,
+    }, { upsert: true });
     await c.issues.updateOne({ _id: issue._id }, { $set: { status: request.decision === "ignored" ? "ignored" : "resolved" } });
     const updated: Suggestion = { ...stored, decision: request.decision, decided_via: request.via, decided_at: at, applied,
       ...(change ? { proposed_change: change } : {}) };

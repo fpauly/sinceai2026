@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { IssueType, Listing } from "@/types";
-import type { ApiError, DecideResponse, SuggestionWithIssue } from "@/types/api";
+import type { ApiError, DecideRequest, DecideResponse, SuggestionWithIssue } from "@/types/api";
 
 const titles: Record<IssueType, string> = {
   missing_holiday_hours: "Set your holiday hours",
@@ -32,6 +32,28 @@ function display(value: unknown): string {
   return String(value);
 }
 
+/** Reusable final confirmation, including for a future voice-parsed edit. */
+export function EditConfirmation({ proposedValue, finalValue, standingPermission, busy, onConfirmAction, onBackAction }: {
+  proposedValue: unknown; finalValue: unknown; standingPermission: boolean; busy: boolean;
+  onConfirmAction: () => void; onBackAction: () => void;
+}) {
+  return (
+    <section aria-label="Confirm your changes" className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+      <h3 className="font-semibold">Confirm your changes</h3>
+      <dl className="mt-3 space-y-3 break-words text-sm leading-6">
+        <div><dt className="text-xs text-zinc-500">Original suggestion</dt><dd>{display(proposedValue)}</dd></div>
+        <div><dt className="text-xs text-zinc-500">Your final choice</dt><dd className="font-medium text-emerald-900">{display(finalValue)}</dd></div>
+      </dl>
+      {standingPermission && <p className="mt-3 text-xs leading-5 text-emerald-900">You are also giving permission to apply this type of change automatically next time.</p>}
+      <p className="mt-3 text-xs leading-5 text-zinc-600">Nothing is saved until you confirm.</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button type="button" disabled={busy} onClick={onBackAction} className="min-h-11 rounded-lg border border-zinc-300 px-3 text-sm disabled:opacity-50">Back to editing</button>
+        <button type="button" disabled={busy} onClick={onConfirmAction} className="min-h-11 rounded-lg bg-emerald-700 px-3 text-sm font-medium text-white disabled:opacity-50">Confirm and save</button>
+      </div>
+    </section>
+  );
+}
+
 export default function NotificationCard({ suggestion, listings, onDecidedAction }: {
   suggestion: SuggestionWithIssue;
   listings: Listing[];
@@ -39,10 +61,36 @@ export default function NotificationCard({ suggestion, listings, onDecidedAction
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [standingPermission, setStandingPermission] = useState(false);
+  const [editMode, setEditMode] = useState<"view" | "edit" | "confirm">("view");
+  const [draft, setDraft] = useState<Record<string, string>>({});
+  const [pendingRequest, setPendingRequest] = useState<DecideRequest | null>(null);
+  const [checkingPending, setCheckingPending] = useState(true);
+  const [recoveryError, setRecoveryError] = useState(false);
+  const [recoveryAttempt, setRecoveryAttempt] = useState(0);
+  const previousHours = useRef<Record<string, string>>({});
   const submitting = useRef(false);
   const { proposed_change: change } = suggestion;
   const rows: [string, unknown][] = typeof change.value === "object" && change.value !== null
     ? Object.entries(change.value) : [[change.field, change.value]];
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function recover() {
+      try {
+        const response = await fetch(`/api/suggestions/${encodeURIComponent(suggestion._id)}/decide`, { cache: "no-store", signal: controller.signal });
+        if (!response.ok) throw new Error("Recovery check failed");
+        const request: DecideRequest | null = response.status === 204 ? null : await response.json();
+        if (!controller.signal.aborted) { setPendingRequest(request); setRecoveryError(false); }
+      } catch {
+        if (!controller.signal.aborted) setRecoveryError(true);
+      } finally {
+        if (!controller.signal.aborted) setCheckingPending(false);
+      }
+    }
+    void recover();
+    return () => controller.abort();
+  }, [suggestion._id, recoveryAttempt]);
 
   function current(listing: Listing, key: string): unknown {
     if (change.field === "holiday_hours") return listing.holiday_hours[key];
@@ -52,7 +100,46 @@ export default function NotificationCard({ suggestion, listings, onDecidedAction
     return undefined;
   }
 
-  async function decide(decision: "accepted" | "ignored") {
+  const hoursField = change.field === "opening_hours" || change.field === "holiday_hours";
+  const finalValue = hoursField ? draft : draft[change.field] ?? "";
+  const recoveryBlocked = checkingPending || recoveryError || pendingRequest !== null;
+
+  function startEdit() {
+    setDraft(Object.fromEntries(rows.map(([key, value]) => [key, typeof value === "string" ? value : ""])));
+    previousHours.current = Object.fromEntries(rows.filter(([, value]) => typeof value === "string" && value !== "closed")) as Record<string, string>;
+    setError(null);
+    setEditMode("edit");
+  }
+
+  function toggleClosed(key: string, closed: boolean) {
+    if (closed) previousHours.current[key] = draft[key] ?? "";
+    setDraft((current) => ({ ...current, [key]: closed ? "closed" : previousHours.current[key] ?? "" }));
+  }
+
+  function reviewEdit() {
+    if (hoursField) {
+      const validHours = (value: string) => value === "closed" ||
+        (/^([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-3]):[0-5]\d$/.test(value) && value.slice(0, 5) < value.slice(6));
+      if (!Object.keys(draft).length || !Object.values(draft).every(validHours)) {
+        setError("Choose valid opening and closing times, with closing after opening, or mark the day closed.");
+        return;
+      }
+    } else if (!String(finalValue).trim()) {
+      setError("Please enter a value before continuing.");
+      return;
+    }
+    setError(null);
+    setEditMode("confirm");
+  }
+
+  async function decide(decision: DecideRequest["decision"]) {
+    await sendDecision({ decision, via: "tap",
+      ...(decision === "edited" ? { edited_value: finalValue } : {}),
+      standing_permission: decision !== "ignored" && standingPermission,
+    });
+  }
+
+  async function sendDecision(request: DecideRequest) {
     if (submitting.current) return;
     submitting.current = true;
     setBusy(true);
@@ -60,13 +147,15 @@ export default function NotificationCard({ suggestion, listings, onDecidedAction
     try {
       const response = await fetch(`/api/suggestions/${encodeURIComponent(suggestion._id)}/decide`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ decision, via: "tap" }),
+        body: JSON.stringify(request),
       });
       const result: DecideResponse | ApiError = await response.json();
       if (!response.ok || !result.ok) throw new Error(!result.ok ? result.error : "Could not save your decision");
       onDecidedAction(result);
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : "Could not save your decision. Please reload to check its status.");
+      setCheckingPending(true);
+      setRecoveryAttempt((value) => value + 1);
     } finally {
       submitting.current = false;
       setBusy(false);
@@ -106,21 +195,51 @@ export default function NotificationCard({ suggestion, listings, onDecidedAction
           </div>
         ))}
       </div>
+      {checkingPending && <p role="status" className="mt-4 text-sm">Checking for an unfinished decision…</p>}
+      {recoveryError && !checkingPending && <div className="mt-4 text-sm"><p role="alert">Could not check your previous decision. Please retry before making changes.</p><button type="button" onClick={() => { setCheckingPending(true); setRecoveryAttempt((n) => n + 1); }} className="mt-2 min-h-11 rounded-lg border border-zinc-300 px-3">Retry check</button></div>}
+      {pendingRequest && !checkingPending && !recoveryError && <section aria-label="Unfinished decision" className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-6">
+        <h3 className="font-semibold">Finish saving your previous decision</h3>
+        <p className="mt-2">Your previous {pendingRequest.decision === "edited" ? "edit" : pendingRequest.decision === "ignored" ? "ignore decision" : "acceptance"} may already be partly saved. Continue with the same confirmed choice.</p>
+        {pendingRequest.decision !== "ignored" && <p className="mt-2 break-words font-medium">{display(pendingRequest.decision === "edited" ? pendingRequest.edited_value : change.value)}</p>}
+        {pendingRequest.standing_permission && <p className="mt-2">Your original choice included automatic permission for this type of change.</p>}
+        <button type="button" disabled={busy} onClick={() => { void sendDecision(pendingRequest); }} className="mt-3 min-h-11 rounded-lg bg-emerald-700 px-3 font-medium text-white disabled:opacity-50">Finish saving</button>
+        <p className="mt-2 text-xs">If another request is still running, wait a minute and try again.</p>
+      </section>}
+      {!recoveryBlocked && editMode === "edit" && <form onSubmit={(event) => { event.preventDefault(); reviewEdit(); }} className="mt-4 space-y-4 rounded-xl border border-zinc-200 p-3">
+        <h3 className="font-semibold">Edit your details</h3>
+        {rows.map(([key]) => hoursField ? (
+          <fieldset key={key} disabled={busy} className="min-w-0 space-y-2">
+            <legend className="text-sm font-medium">{label(key)}</legend>
+            <label className="flex min-h-9 items-center gap-2 text-sm"><input type="checkbox" checked={draft[key] === "closed"} onChange={(event) => toggleClosed(key, event.target.checked)} className="size-4 accent-emerald-700" />Closed</label>
+            {draft[key] !== "closed" && <div className="grid min-w-0 grid-cols-2 gap-2">
+              <label className="min-w-0 text-xs text-zinc-600">Opens<input type="time" required value={draft[key]?.split("-")[0] ?? ""} onChange={(event) => setDraft((current) => ({ ...current, [key]: `${event.target.value}-${current[key]?.split("-")[1] ?? ""}` }))} className="mt-1 block min-h-11 w-full min-w-0 rounded-lg border border-zinc-300 bg-white px-2 text-sm text-zinc-900" /></label>
+              <label className="min-w-0 text-xs text-zinc-600">Closes<input type="time" required value={draft[key]?.split("-")[1] ?? ""} onChange={(event) => setDraft((current) => ({ ...current, [key]: `${current[key]?.split("-")[0] ?? ""}-${event.target.value}` }))} className="mt-1 block min-h-11 w-full min-w-0 rounded-lg border border-zinc-300 bg-white px-2 text-sm text-zinc-900" /></label>
+            </div>}
+          </fieldset>
+        ) : (
+          <label key={key} className="block text-sm font-medium">{label(key)}
+            {change.field === "description" ? <textarea required rows={4} value={draft[key] ?? ""} onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))} className="mt-2 block w-full rounded-lg border border-zinc-300 p-2 font-normal" />
+              : <input type="tel" required value={draft[key] ?? ""} onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))} className="mt-2 block min-h-11 w-full rounded-lg border border-zinc-300 p-2 font-normal" />}
+          </label>
+        ))}
+        <div className="flex flex-wrap gap-2"><button type="button" disabled={busy} onClick={() => { setEditMode("view"); setError(null); }} className="min-h-11 rounded-lg border border-zinc-300 px-3 text-sm">Cancel</button><button type="submit" disabled={busy} className="min-h-11 rounded-lg bg-emerald-700 px-3 text-sm font-medium text-white">Review changes</button></div>
+      </form>}
+      {!recoveryBlocked && editMode === "confirm" && <EditConfirmation proposedValue={change.value} finalValue={finalValue} standingPermission={standingPermission} busy={busy} onConfirmAction={() => { void decide("edited"); }} onBackAction={() => { setEditMode("edit"); setError(null); }} />}
       <label className="mt-4 flex cursor-pointer items-start gap-2 text-sm leading-5 text-zinc-600">
-        <input type="checkbox" disabled title="Available in a later demo stage" className="mt-0.5 size-4 shrink-0 accent-emerald-700" />
+        <input type="checkbox" checked={pendingRequest ? !!pendingRequest.standing_permission : standingPermission} disabled={busy || recoveryBlocked || editMode === "confirm"} onChange={(event) => setStandingPermission(event.target.checked)} className="mt-0.5 size-4 shrink-0 accent-emerald-700" />
         Do this automatically next time
       </label>
-      <div className="mt-4 grid grid-cols-3 gap-2">
+      <p className="mt-1 text-xs leading-5 text-zinc-500">Permission applies to this type of change when you accept or confirm an edit. Ignoring never grants permission.</p>
+      {!recoveryBlocked && editMode === "view" && <div className="mt-4 grid grid-cols-3 gap-2">
         {([ ["accepted", "✓ Accept"], ["edited", "✎ Edit"], ["ignored", "× Ignore"] ] as const).map(([decision, text]) => (
-          <button key={decision} type="button" disabled={busy || decision === "edited"} onClick={() => { if (decision !== "edited") void decide(decision); }}
+          <button key={decision} type="button" disabled={busy} onClick={() => { if (decision === "edited") startEdit(); else void decide(decision); }}
             className={`min-h-11 rounded-xl px-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 ${decision === "accepted" ? "bg-emerald-700 text-white hover:bg-emerald-800" : "border border-zinc-300 text-zinc-700 hover:bg-zinc-50"}`}>
             {text}
           </button>
         ))}
-      </div>
+      </div>}
       {busy && <p role="status" className="mt-2 text-xs text-zinc-600">Saving your decision…</p>}
       {error && <p role="alert" className="mt-2 text-sm text-red-700">{error}</p>}
-      <p className="mt-2 text-xs text-zinc-500">Editing and automatic permission will be available in a later demo stage.</p>
       <details className="mt-3 text-xs text-zinc-500"><summary className="cursor-pointer py-1">Also available in Finnish</summary><p lang="fi" className="mt-1 leading-5">{suggestion.message.fi}</p></details>
     </article>
   );
