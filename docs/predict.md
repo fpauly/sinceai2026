@@ -18,6 +18,7 @@ It uses only data entered before "today" (6 Nov 2026; 6 Nov 2025 for the back-te
 | 1 | `OWNER_EDIT` | The owner edited this calendar day before, in Connect → their hours | high |
 | 2 | `SHOPPING_CENTRE` | The centre has entered hours for the date **and** the store normally keeps the centre's hours on that weekday → the centre's hours | high |
 | 3 | `LAST_YEAR` | What the owner entered for the same day last season; if nothing, the season before | high / medium |
+| 3b | `LAST_YEAR` | **Event nights and school breaks** (different dates every year): the owner's latest entry for that kind of day, same weekday preferred (for example the autumn break, or the last arena night) | medium |
 | 4 | `PEERS` | No history: when ≥ 70 % of similar businesses (same type, country, city size) that entered something were closed, and ≥ 15 % of all of them entered "closed" → **closed** | low |
 
 The result is a suggestion only when it differs from what Google shows now. Otherwise it is NO_ACTION.
@@ -27,15 +28,16 @@ The result is a suggestion only when it differs from what Google shows now. Othe
 | | Score | Exact precision | Recall | Harmful |
 |---|---|---|---|---|
 | Fonecta baseline, 2026 season | 54.5 | 0.90 | 0.59 | 224 |
-| **Ours, 2026 season** | **61.6** | 0.89 | 0.67 | 255 |
+| **Ours, 2026 season** | **62.1** | 0.89 | 0.68 | 263 |
 | Fonecta baseline, 2025 back-test | 53.2 | 0.90 | 0.58 | 249 |
-| **Ours, 2025 back-test** | **60.4** | 0.89 | 0.66 | 290 |
+| **Ours, 2025 back-test** | **61.0** | 0.88 | 0.66 | 296 |
 
-Search views protected (2026): 65.7 % (baseline 57.2 %). Closed-door views prevented: 76.0 % (baseline 69.2 %).
+Search views protected (2026): 66.6 % (baseline 57.2 %). Closed-door views prevented: 76.0 % (baseline 69.2 %).
 
 What made the difference:
 - **The season before last** (+6.6 on 2026). Many owners enter holiday hours every other year, and their habits repeat. The baseline looks only one season back.
 - **Shopping centre only when the store keeps the centre's hours** (+0.5, fewer harmful). Some stores in a centre close earlier than the centre does.
+- **Event nights and school breaks from the owner's latest entry of that kind** (+0.6 on both seasons; about 70 % of these suggestions are exact). On event nights most businesses keep their regular hours, so we only suggest when the owner has entered event hours before.
 - **Matching last season by the history's own day key, not by the calendar file** (2025 back-test only). The calendar file starts in 2024, so the baseline cannot find the December 2023 entries; ours can. All of these entries were entered before the snapshot.
 
 ### Tried, did not help (kept out)
@@ -70,6 +72,8 @@ Node prints a harmless `MODULE_TYPELESS_PACKAGE_JSON` warning: it runs `lib/` (T
 |---|---|
 | FI-D0001 Kahvila Aurora | 4 suggestions from last year (Christmas Eve 07:30–13:00; closed on Christmas Day and New Year's Day; Epiphany 10:00–16:00 from the season before) |
 | FI-D0004 Muoti Lyhty | 23–26 Dec from its shopping centre (Kauppakeskus Revontuli); NYE, New Year's Day and Epiphany from last year |
+| FI-D0010 Pub Kulma | arena nights: 15:00–03:00 (14:00–05:00 on Saturdays), the hours the owner entered for earlier event nights |
+| FI-D0014 Leikkimaa Onni | no earlier school-break entry, so no suggestion for the break (we don't guess) |
 | FI-D0011 Pizzeria Torni | flagged on every date (closed for good), no message |
 | FI-D0013 Hammasklinikka Kallio, NO-D0015 Trening Nordlys | nothing (already right) |
 | FI-D0017 Kahvila Kipinä | no history: closed on Christmas Day and New Year's Day, from peers, confidence **low** |
