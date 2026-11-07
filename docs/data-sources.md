@@ -1,238 +1,232 @@
 # Data sources behind Ajantasa
 
-Ajantasa (a Fonecta Connect feature) only works if Connect knows two things: **what the business
-says about itself on each channel**, and **what is about to change around it**. This doc lists the
-sources we rely on, what each one contributes, and — honestly — what we could not get in 48 hours.
+Ajantasa is a feature of **Fonecta Connect**. It has to know two things to be useful: **what each
+channel currently says about a business**, and **what is about to change around it**. Then it
+proposes the hours, the owner approves, and the change is published.
 
-Owned by lane C (with input from lane A, `DESIGN.md` §18). The demo runs on mock data
-(`data/seed.ts`), so for each source we say what the production version would read instead.
+Since V2 the app runs on **Fonecta's dataset** ("Connect Suggests – Customer Approves · Nordic
+opening-hours simulator v1.1", synthetic, code MIT / data CC BY 4.0). The importer
+(`scripts/import-fonecta.mjs`) turns the relevant files into `data/fonecta/demo.json` (committed, so
+CI works without the 82 MB zip) and `/api/seed` loads it into MongoDB. For every source below we say
+what it answers, how the demo uses it, what production Connect would read instead, and where it
+falls short.
 
-| # | Source | Used by | Demo implementation | Production source |
-|---|---|---|---|---|
-| 1 | Finnish public holiday calendar | rule 1 (`missing_holiday_hours`) | hardcoded list, `lib/holidays.ts` | official calendar / Yext holiday hours / live API (C8) |
-| 2 | Last year's holiday hours | rule 1 evidence + the proposal | `listings.holiday_hours`, seeded | Connect/Yext entity history |
-| 3 | Cross-channel listings (Finder, Google, website) | rules 2 and 4 (conflicts, staleness) | 3 mock `listings` per business | Yext publishers / Google Business Profile / Connect's own channels |
-| 4 | Recent customer reviews | rule 3 (`review_signal`, extra) | 12 mock reviews, classified by Gemini | Google/Finder review APIs |
-| 5 | Owner decisions | learning + standing permissions | `preferences` collection | Connect CRM / Yext |
-
-A useful cross-cut: rules 2 and 4 need **when** a field was last updated
-(`listings.field_updated_at`). That metadata is the hardest thing to get in production — see §6.
-
----
-
-## 1. Finnish public holiday calendar
-
-**Answers:** "is a public holiday coming up in the next 30 days?" — the trigger for step 1 of the
-demo, and the reason a customer can find a locked door.
-
-**In the demo:** `lib/holidays.ts` hardcodes six holidays covering the demo window
-(Independence Day 2026-12-06, Christmas Eve/Day/Boxing Day 2026-12-24/25/26, New Year's Day
-2027-01-01, Epiphany 2027-01-06) with English and Finnish names. The window is
-`today < date <= today + 30 days`, where `today` is `DEMO_DATE` (`2026-12-10`), so the demo is
-deterministic and never depends on the venue's network.
-
-**In production:** Connect already stores holiday hours per location (Yext has a
-`holidayHours` field). The calendar itself can come from:
-
-- an official Finnish calendar (Digi- ja väestötietovirasto publishes public holidays; the data is
-  also in the open `date-holidays` / Nager.Date style datasets), or
-- Yext's own suggested holiday hours where the publisher offers them, or
-- a curated calendar maintained by Connect (six dates a year — cheap and safe).
-
-**What did not work / limits:** we did not verify a free, machine-readable, licence-compatible
-source during the hackathon, so we did not ship a live fetch; hardcoding six dates was the safe
-choice for a deterministic demo. C8 (extra) is the stage that replaces the list with a live source
-and records what happened.
+| # | Source | Answers | Demo file(s) |
+|---|---|---|---|
+| 1 | Special-day calendar, local events, school breaks | "is a special day coming up, and what does it do to hours?" | `calendar_special_days.csv`, `targets_2026.csv`, `local_events.json` |
+| 2 | The business's profile and entrance history | "what does the listing say now, and what did this owner do last season?" | `entities.json`, `holiday_hours_history.jsonl`, `regular_hours_history.jsonl` |
+| 3 | Shopping centre hours | "my neighbour already published the centre's holiday hours" | entities with `c_entityRole`, `API_INTEGRATION` history |
+| 4 | Peer benchmarks | "what do similar businesses do on this day?" — the no-history case | `peer_benchmarks.csv`, `c_segment`, `cities.csv` |
+| 5 | Google search views | "what is at stake if the door is locked?" | `analytics_daily.parquet` (read with `hyparquet`) |
+| 6 | Reviews and publisher user edits | "did customers say this place is closed for good?" | `reviews.json`, `publisher_suggestions.json` |
+| 7 | Owner decisions | "what did the owner choose last time?" — learning and permission | `pilot_decision_log_2025.csv`, `customer_contacts.csv`, our `preferences` |
+| 8 | Publisher listings | "where will the change show, and how fast?" | `listings.json` |
 
 ---
 
-## 2. Last year's holiday hours
+## 1. Special-day calendar, local events, school breaks
 
-**Answers:** "what did this business do last Christmas?" — the evidence that turns a guess into a
-high-confidence proposal ("same as last year"), and the difference between the Rye & Shine demo and
-the no-history case (Parturi Kampaamo Linnankatu).
+**Answers:** the trigger of the whole loop. For every business and every special day in the scored
+window (7 Nov 2026 – 6 Jan 2027), Connect must decide *suggest new hours*, *no action*, or *flag a
+human*. The calendar also says what kind of day it is (public holiday, eve, observance, commercial
+day, day between holidays) and whether it is an official public holiday.
 
-**In the demo:** each mock listing carries `holiday_hours` for the previous season
-(e.g. `2025-12-24: "10:00-14:00"`). Rule 1 reads the same month-day one year earlier, from the
-listing whose `holiday_hours` was updated most recently, and stores it as
-`evidence.last_year` (`{}` when there is none). The proposal copies it; `lib/validate.ts` checks the
-owner is only offered the dates that are actually missing.
+**In the demo:** `calendar_special_days.csv` has 244 rows for FI/SE/NO (2024–2027) with `day_key`,
+`day_class`, `day_type`, local and English names, and the official-holiday flag. The importer keeps
+it as `special_days`. `targets_2026.csv` adds business-specific `EVENT` and `SCHOOL_BREAK` rows (25
+for the demo cast); `local_events.json` (2,010 events, fi/sv/nb/en names) names the events, so
+`FI-D0010` Pub Kulma gets its nine arena nights and `FI-D0005` Suksivuokraamo Kuura its three school
+break days. Business-specific rows carry `business_id`, so no other business sees them.
 
-**In production:** the business's own past hours, from
+Detection never compares dates with an LLM: `lib/predict` is pure code, the window starts at
+`DEMO_DATE`, and the LLM only writes messages later.
 
-- the Yext entity's history for that location (holiday hours set last season), or
-- Connect's change log (what we published last year), or
-- the owner's previous decisions stored in `preferences.learned`.
+**In production:** Connect already receives holiday-hours suggestions from Yext publishers and can
+maintain a Nordic calendar centrally; local events can come from city event APIs (FI/SE/NO), and
+school breaks from the national education calendars. The dataset's `docs/LIVE_SOURCES.md` describes
+the same idea.
 
-**What did not work / limits:** our Yext sandbox entity (Rye & Shine, `SinceAI03`) has **no holiday
-hours set at all**, so reading real history from Yext was not possible; the seed mirrors what Yext
-holds for regular hours only. A production system also has to handle "last year's hours are wrong
-this year" — which is exactly what the owner's edit + `learned` entry exists for.
-
----
-
-## 3. Cross-channel listings (Finder, Google, the business website)
-
-**Answers:** "do the channels disagree?" (rule 2) and "has this field been untouched for over a
-year?" (rule 4) — the two signals that produce a proposal even when no holiday is coming.
-
-**In the demo:** three listings per business (`finder`, `google`, `website`) with opening hours,
-holiday hours, phone, description and `field_updated_at`. The seed plants the story: Rye & Shine's
-own website says Saturday `10:00-14:00` (updated 2026-10-20) while Finder and Google still say
-`10:00-18:00`; Autokorjaamo Skanssi's Google phone number differs; Kukkakauppa Kauppatori's opening
-hours have not changed since 2024-05-14. Evidence lists every value with its source and update date,
-so lane A can prefer the newest source and say why.
-
-**In production:** Connect is the aggregation point — Yext publishers (Google Business Profile,
-Apple, Bing, Facebook, Foursquare, HERE, TomTom, …) and Finder itself. In practice:
-
-- **our own channels (Finder, website)** are the easy part; Connect controls them;
-- **publisher channels (Google, Apple, …)** can be read through Yext's publisher status or the
-  Google Business Profile API;
-- **the business's own website** would need either the site's structured data (`schema.org`
-  `OpeningHoursSpecification`) or an integration/CMS plugin — or we simply use it as a *hint*
-  ("your website changed, shall we propagate it?"), which is what the demo suggests.
-
-**What did not work / limits:** we did **not** scrape Finder or Google (out of scope per
-`DESIGN.md` §5, and fragile/unfriendly). Yext's sandbox has **0 live listings** on our entity, so
-`published_to` (where the owner is told the change shows) is derived from Yext's set of publishers
-that support Finnish locations, not from live listings. Real per-source values therefore come from
-our seed, not from the APIs.
+**Did not work / limits:** the dataset is synthetic and fixed to the 2026 season; there is no live
+feed in the demo yet. The **C8 bonus** replaces the public-holiday part with a live API while keeping
+the dataset and a hardcoded fallback (see the end of this document).
 
 ---
 
-## 4. Recent customer reviews
+## 2. The business's profile and its exception history
 
-**Answers:** "did a customer just tell us the listing is wrong?" (rule 3, extra) — e.g. Rye &
-Shine's "came on Saturday at 3 pm and the door was locked, although Google said open until 18", or
-Pizzeria Port Arthur's "walked to the old address, a note said they moved".
+**Answers:** what the published profile says today (regular week + exceptions already entered), and
+what this owner entered for the same kind of day in previous seasons — the strongest basis for a
+proposal ("same as last year").
 
-**In the demo:** 12 mock reviews with dates and ratings. Rule 3 (extra, C9) takes the last 30 days,
-and `lib/ai/reviews.ts` (A8) asks Gemini to classify the text into
-`closed_when_open | wrong_phone | moved | other` with a one-sentence summary and the review ids it
-used. Gemini only reads text — dates are filtered in code, and a classification without valid
-evidence is discarded (`NO_SIGNAL`).
+**In the demo:** `entities.json` (3,032 businesses, FI/SE/NO) gives the Yext-shaped profile:
+`hours.monday … sunday`, `hours.holidayHours[]`, `closed`, `hours.reopenDate`, `c_segment`,
+`c_connectCustomerSince`, contact and publishers. `holiday_hours_history.jsonl` has every exception
+since Dec 2023 with `entered_at` and **how it was entered**: `OWNER_UI`, `CONNECT_SUGGESTION` (the
+2025 pilot), `FONECTA_SUPPORT`, `API_INTEGRATION` (centres). `regular_hours_history.jsonl` resolves
+`isRegularHours` entries against the week that was in force at the time. The importer stores profiles
+(`regular_hours`, `holiday_hours`) and the history rows (1,102 for the demo cast).
 
-**In production:** Google Business Profile reviews API (with the location owner's OAuth), Finder
-reviews via Connect, and Facebook recommendations. The same pipeline would also serve review replies
-(the extensibility story in `DESIGN.md` §0).
+`lib/predict` only uses entries entered **before** `DEMO_DATE`, so the same code can run a 2025
+back-test honestly.
 
-**What did not work / limits:** no real review API access within the hackathon, so the reviews are
-written by us; without a `GEMINI_API_KEY` the classifier returns `NO_SIGNAL` and the rule produces
-nothing (the demo still works, it just has no review issue).
+**In production:** the Yext entity plus Connect's own change log. This is the data Connect already
+has; the proposal is "copy what the owner did, then let them fix it".
 
----
-
-## 5. Owner decisions (learning)
-
-**Answers:** "what did the owner do last time?" — used to improve the next suggestion and to honour
-standing permissions.
-
-**In the demo:** `preferences.learned` (proposed vs final value, decision, timestamp) and
-`preferences.standing_permissions` (`{ issue_type, field }`) are the target of lane D's
-`applyDecision`; `preferences.ignored_fingerprints` is already written there and stops a declined
-issue from coming back (`runDetection` skips those fingerprints). At the time of writing the
-`ignored_fingerprints` path is live; the `learned` / `standing_permissions` entries land with D5
-(learning), and lane A reads them when building the prompt/fallback.
-
-**In production:** Connect's customer record + the Yext entity's change history. This is the only
-source that is *ours* — no third party can provide it, which is why the learning loop is the
-defensible part of the product.
-
-**What did not work / limits:** in the demo one owner decision is enough to change the next
-suggestion, so "learning" is easy to over-claim. With real data we would need enough volume per
-business and change type before a learned preference is trusted, and we would need to expire stale
-preferences (a business may change its Christmas pattern).
+**Did not work / limits:** one profile per business means we cannot show per-publisher values (what
+Google says vs what Finder says) — the old v1 seed had three disagreeing listings, v2 deliberately
+does not. "What Google shows on a date" is defined as *the exception if entered, else that
+weekday's regular hours*.
 
 ---
 
-## 6. The metadata problem: "when was this field last updated?"
+## 3. Shopping centre hours
 
-Rules 2 (prefer the newest source) and 4 (stale fields) both depend on
-`listings.field_updated_at.{opening_hours,holiday_hours,description}`. It is the least realistic
-part of our mock data:
+**Answers:** for a shop inside a centre, the centre's published exception is a very strong signal:
+"the mall closes at 13:00, so do you".
 
-- **Yext** does not expose a per-field "last updated" timestamp for publisher channels; it exposes
-  the entity and its sync state.
-- **Google Business Profile** gives you the location's data and change history through the API in
-  some cases, but not a simple per-field timestamp per publisher.
-- What is realistic: Connect's **own** change log (when *we* last wrote the field) plus the
-  publisher's acknowledgement time, and the business's website's own `dateModified`.
+**In the demo:** `FI-D0004` Muoti Lyhty sits in `FI-M000` Kauppakeskus Revontuli. The importer keeps
+the centres' profiles and history, and `lib/predict` uses the centre's exception when the store's
+regular hours match the centre's that weekday (basis `SHOPPING_CENTRE`, confidence high).
 
-So in production we would store "last changed by us / last confirmed by the publisher" ourselves and
-treat a missing timestamp as "unknown" rather than "stale" — a rule that guesses staleness from a
-missing date would nag the owner, which is exactly the behaviour the product must avoid.
+**In production:** the same, from Yext / Connect: a centre is a customer too, and its hours are
+already maintained.
 
-Also note: phone numbers have no timestamp in our data model (`TrackedField` covers
-`opening_hours`, `holiday_hours`, `description`), so a phone conflict is detected (rule 2) but can
-never be called "stale" (rule 4).
+**Did not work / limits:** the demo has 15 centres but only one store inside a centre, so the rule is
+shown once. The signal is only used when the store and the centre share a weekday pattern.
 
 ---
 
-## 7. What we wanted but could not get
+## 4. Peer benchmarks
+
+**Answers:** the no-history case. A new customer has no previous season and no decisions; asking
+"what do cafés like this do on Christmas Eve?" is better than guessing or staying silent.
+
+**In the demo:** `peer_benchmarks.csv` aggregates what owners entered per country, city tier
+(`capital`, `large_city`, `town`, `ski_resort`), segment (33 types) and day key — only cells with at
+least 10 businesses. The importer keeps 421 rows for the demo cast's combinations.
+`lib/predict` suggests "closed" from peers only when most who entered something closed and enough
+did (basis `PEERS`, confidence low). `FI-D0017` Kahvila Kipinä (joined 12 Oct 2026) shows exactly
+this: two peer-based suggestions with low confidence, and the message asks instead of telling.
+
+**In production:** the same aggregates computed over Connect's own customer base, refreshed per
+season.
+
+**Did not work / limits:** the benchmarks describe what owners *entered*, so they are biased towards
+diligent owners; and a small segment/city combination may have no cell at all. That is why the
+confidence is low and the owner has the last word.
+
+---
+
+## 5. Google search views — what is at stake
+
+**Answers:** "if we get this wrong, what does it cost?" A special day is a day when people search;
+the number makes the message concrete instead of nagging.
+
+**In the demo:** `analytics_daily.parquet` (18 MB, 3.1M rows) has `GOOGLE_SEARCH_VIEWS` per
+entity and day. The importer reads it with `hyparquet` (MIT, devDependency, scripts only) and stores,
+per business and day key, the views on the **same special day last season** (Christmas Eve 2025 for
+Christmas Eve 2026). Detection copies the number into `evidence.expected_search_views`, so lane A's
+message can say "last Christmas Eve about 29 people found you on Google" — and the number comes from
+code, never from the LLM. `FI-D0001` Christmas Eve = 29 views.
+
+**In production:** Google Business Profile performance API (plus Finder/Connect analytics), per
+business and per day.
+
+**Did not work / limits:** the dataset only has search views (no per-channel attribution, no
+conversion data), and we do not use the file to prioritise which businesses to contact first — that
+would be a later extra. The number is last season's, so it is an honest *estimate* of what is at
+stake, not a promise.
+
+---
+
+## 6. Reviews and publisher user edits — closure signals
+
+**Answers:** "has this place closed for good?" Sending an owner a holiday-hours proposal for a
+business that no longer exists is worse than doing nothing, so this must be a **flag for a person**,
+not a suggestion.
+
+**In the demo:** `reviews.json` (59,856 reviews; 245 with text kept for the demo cast) and
+`publisher_suggestions.json` (5,843 user edits; 40 kept). A 150-day window, a keyword list per
+language ("lopettanut", "pysyvästi", "stängt för gott", "closed down", "lagt ned", …) and
+`fieldName: "closed"` edits decide it. `FI-D0011` Pizzeria Torni has five such reviews and a
+2026-10-14 `closed` edit, so detection produces one `needs_human/closed_for_good` issue; the owner
+never receives a message, and the dashboard lists it as "needs a person".
+
+**In production:** Google Business Profile reviews (owner OAuth), Finder reviews, Facebook
+recommendations, and publisher edit notifications from Yext.
+
+**Did not work / limits:** the reviews are synthetic and keyword matching is deliberately simple —
+an LLM classifier could read them, but then a closure decision would depend on a model. The current
+split is: **code decides that a person must look**, the person decides what to do. Reviews are
+*also* the natural place to grow review replies later (the extensibility story).
+
+---
+
+## 7. Owner decisions — learning and permission
+
+**Answers:** "what did this owner do last time?" — so the next proposal uses it; and "may we just do
+it?" — the standing permission.
+
+**In the demo:** `pilot_decision_log_2025.csv` is the 2025 pilot: 3,031 suggestions and what owners
+did with them. Our own `preferences` collection stores `learned` entries (proposed vs final value,
+decision, time), `ignored_fingerprints` (a declined issue does not come back) and
+`standing_permissions`; `customer_contacts.csv` adds `standing_permission_holidays` per owner, which
+the app treats as a standing permission for `special_day_hours` (`FI-D0012` is applied and then
+informed). `lib/predict` reads `learned` first (`OWNER_EDIT`), before last season, the centre or
+peers.
+
+**In production:** Connect's customer record, the pilot log, and the Yext change history. This is
+the only source that is *ours* — no third party can provide it, which is what makes the loop
+defensible.
+
+**Did not work / limits:** the demo freezes `DEMO_DATE`, so decisions do not age; a real system needs
+enough volume per business and change type before a learned preference is trusted, and should expire
+stale ones (a business may change its Christmas pattern). Standing permissions are per change type,
+not per date.
+
+---
+
+## 8. Publisher listings — where the change will show
+
+**Answers:** step 5 of the chain: after the owner approves, tell them where it shows and how fast.
+
+**In the demo:** `listings.json` gives each business's publishers with `status` (LIVE,
+WAITING_ON_PUBLISHER, OPTED_OUT, …) and `typicalUpdateSpeedSeconds` (Google about 2 minutes, Apple
+about 2 days). The importer keeps them on the business; the Yext write goes to the sandbox entity for
+`FI-D0001` and the confirmation lists only publishers that are really live for that business.
+
+**In production:** Yext publisher status per location; the write path is Yext itself.
+
+**Did not work / limits:** the sandbox has **0 live listings**, so the green "published" animation is
+driven by the dataset's publisher set, not by a real propagation check. Facebook is OPTED_OUT for
+Aurora and is therefore not claimed.
+
+---
+
+## What we wanted but could not get
 
 | Wanted | Why | What we did instead |
 |---|---|---|
-| Fonecta's dataset files | replace the mock businesses with real ones | kept `data/seed.ts` (8 Turku businesses); importer is stage C6, still TBD |
-| A machine-readable holiday calendar we could rely on | one fewer hardcoded list | six hardcoded dates in `lib/holidays.ts`, live source deferred to C8 |
-| Yext entity history / live listings in the sandbox | real "last year" and real `published_to` | seeded last-year hours; `published_to` from Yext's publisher list for Finland |
-| Google Business Profile / Finder read access | real conflicts and real reviews | mock listings and reviews; Gemini classifies the mock review text |
-| WhatsApp Business API | send the real message | simulated WhatsApp chat in the contact preview (`DESIGN.md` §12); WhatsApp is confirmed as a valid channel by Fonecta |
-| Per-field publisher timestamps | honest "stale" and "newest source" reasoning | documented limitation above; demo still shows the mechanism |
+| Real Finder / Google Business Profile APIs | real conflicts, real reviews, real views | Fonecta's synthetic dataset (CC BY 4.0); no scraping |
+| Per-publisher values and per-field timestamps | "which channel is wrong, since when?" | one profile per business; `entered_at` from the exception history |
+| A live Nordic holiday calendar | one fewer dataset file to trust | dataset calendar now; C8 tries a live public-holiday API with the dataset as fallback |
+| Real WhatsApp / SMS sending | reach the owner where they are | simulated chat in the contact preview; WhatsApp is confirmed as a valid channel by Fonecta |
+| Propagation confirmation from publishers | "published everywhere" honestly | publisher list + typical update speed, with Facebook OPTED_OUT excluded |
+| Real analytics attribution / conversions | prioritise by revenue, not only views | `GOOGLE_SEARCH_VIEWS` as an honest estimate of what is at stake |
 
-## 8. Bonus: one dataset replaced with a live source (C8)
+## Bonus: one dataset file replaced with a live source (C8)
 
-Planned, not done yet: fetch upcoming Finnish public holidays from a live HTTP API (candidate:
-Nager.Date, MIT-licensed, `https://date.nager.at/api/v3/PublicHolidays/<year>/FI`), with a short
-timeout, one retry, a cache, and the hardcoded `HOLIDAYS` list as fallback. Detection stays
-deterministic because the **window** still comes from `DEMO_DATE`; only the list of dates changes.
-When C8 lands, this doc gets a short "what we learned" section: whether the API was reachable from
-the venue, response shape, licence, and whether it matched the official Finnish calendar (it should
-include Christmas Eve, which is a de facto holiday but not an official public holiday).
+Planned, not done yet. Candidate: **Nager.Date** (MIT,
+`https://date.nager.at/api/v3/PublicHolidays/<year>/<CC>`), which returns official public holidays
+per country and year. Plan:
 
----
-
-## 9. Update: the dataset arrived (2026-11-07)
-
-Fonecta's challenge package is now in the working tree at
-`FONECTA/FONECTA_CONNECT_SUGGESTS_2026/` (kept out of git, see `.gitignore`; the brief PDF sits next
-to it). What it changes for us:
-
-- **The sources above become real.** `data/entities.json` (3,032 entities, FI/SE/NO, with holiday
-  hours and a `closed` flag), `holiday_hours_history.jsonl` / `regular_hours_history.jsonl` (2023 →
-  Nov 2026, including *how* each entry was made: `OWNER_UI`, `CONNECT_SUGGESTION` from the 2025
-  pilot, `FONECTA_SUPPORT`, `API_INTEGRATION`), `reviews.json`, `publisher_suggestions.json` (about
-  half noise), `analytics_daily.parquet`, `peer_benchmarks.csv`, `calendar_special_days.csv`,
-  weather and local events, plus `labels/` with the dev truth.
-- **The scoring format is known.** `evaluation/evaluate.py` scores a predictions CSV with
-  `entity_id,date,action,hours[,confidence]`, `action ∈ SUGGEST | NO_ACTION | FLAG`, missing rows
-  counted as `NO_ACTION`; it also reports `search_views_protected_pct` and
-  `closed_door_views_prevented_pct`. `evaluation/targets_2026.csv` has 41,755 rows (dev/test/demo
-  splits; only test is scored by the organisers).
-- **Two stages unblocked and done:** C10 (importer: the demo cast into `data/fonecta/demo.json`,
-  loaded by `/api/seed?source=fonecta`) and A10 (`lib/predict` + `predictions_2026.csv`, 61.6 on dev
-  vs 54.5 baseline). The score and the app share one prediction module.
-- **The data-model blocker was resolved by V1:** `types/` gained country, segment, contact, publishers,
-  one `Profile` per business (multi-interval and past-midnight hours), special days, exception history
-  and peer rows; `lib/hours.ts` is the one hours parser. C10 imports the 17 demo storylines plus the
-  15 shopping centres into MongoDB, and `C11` turns `lib/predict`'s answer into `special_day_hours`
-  issues (SUGGEST) and `needs_human` flags (FLAG).
-- **Closure signals are real, not guessed.** `reviews.json` and `publisher_suggestions.json` are in the
-  extract (reviews → the `reviews` collection, publisher user edits → `publisher_suggestions`).
-  `lib/predict` reads them and flags `FI-D0011` Pizzeria Torni as `closed_for_good` from five recent
-  reviews ("lopettanut", "closed down permanently", …) plus a `field: "closed"` publisher edit, so
-  C11 never sends the owner a suggestion for a business that has closed.
-- **What is at stake is measured, not invented.** `analytics_daily.parquet` (18 MB, 3.1M rows, read
-  with `hyparquet` in the importer only) gives each business's `GOOGLE_SEARCH_VIEWS` per day. The
-  importer takes the views on the **same special day last season** (by `day_key`, e.g. Christmas Eve
-  2025 for Christmas Eve 2026) and stores them as `Business.search_views_by_day_key`; detection
-  copies the number into `evidence.expected_search_views`. For `FI-D0001` Christmas Eve that is 29
-  search views last year — the number lane A's message may quote, with the code as its source.
-- **Event nights and school breaks are business-specific.** `targets_2026.csv` says which demo
-  business has an `EVENT` or `SCHOOL_BREAK` day on which date (`local_events.json` gives the event
-  its name in the owner's language). Those 25 rows become `SpecialDay` rows with a `business_id`, so
-  only that business sees them: `FI-D0010` Pub Kulma gets 9 arena nights (hours copied from its last
-  event night, 15:00–03:00) and `FI-D0005` Suksivuokraamo Kuura gets 3 school-break closures.
-- **What does not change:** the mock Turku businesses stay the scripted demo (`DESIGN.md` §13) until
-  the V2 switch, and `DEMO_DATE` still drives detection, so the demo stays deterministic while the
-  importer and the scoring adapter work off the real files.
+- the importer fetches the public holidays for FI/SE/NO for the seasons it imports, with a short
+  timeout, one retry and a cache, and uses them to **confirm or correct** the public-holiday dates
+  and names in `calendar_special_days.csv`;
+- everything the dataset knows beyond official holidays (eves, observances, commercial days, local
+  events, school breaks) stays from the dataset — a live API cannot replace those;
+- `DEMO_DATE` still defines the window, so detection stays deterministic; if the API is unreachable,
+  the dataset rows are used unchanged;
+- a short "what we learned" section will record coverage, response shape, licence, and any
+  differences from the official Finnish calendar (e.g. Christmas Eve is a de facto holiday but not
+  an official public holiday).
