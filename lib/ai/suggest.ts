@@ -33,8 +33,8 @@ You get one issue our code found, the evidence, the business's listings, and the
 
 Write JSON with:
 - reason: ONE short English sentence an owner understands, naming the data the proposal is based on (for example last year's holiday hours, or which listing was updated most recently)
-- message.en: the message to the owner in English, at most 2 sentences. Greet the owner by first name, say what is missing or different and why it matters, and state the exact proposed hours or value.
-- message.fi: the same message in natural Finnish, at most 2 sentences.
+- message.en: the message to the owner in English, at most 2 sentences. Greet the owner by first name, say what is missing or different, state the exact proposed hours or value, and ALWAYS say in plain words what the proposal is based on (see why_this_proposal): for example "the same as last year", "your website was updated most recently", "most of your listings show this number" or "what most hair salons do". The owner must see why from the message alone.
+- message.fi: the same message in natural Finnish, at most 2 sentences, also saying what the proposal is based on.
 
 Rules:
 - Plain, warm language, no jargon, no emojis.
