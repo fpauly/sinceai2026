@@ -55,7 +55,7 @@ These come from Fonecta's slides and **override everything below**.
 Our own seed answered a challenge we imagined. The judges score **their** data, **their** demo storylines and **their** scorer, so from now on the dataset is the source of truth. Where this section conflicts with sections 7, 8, 9, 13 or 16, **this section wins** until those sections are rewritten.
 
 **Rules for the switch**
-- **The current chain stays working** on `data/seed.ts` until the v2 chain works end to end; then the demo switches. `main` must stay runnable at every merge.
+- **Switched (V2, 7 Nov):** the demo runs on the dataset (`DEMO_DATE=2026-11-06`, `/api/seed` loads it). The v1 seed is still available as `/api/seed?source=seed` with `DEMO_DATE=2026-12-10`, but it is retired from the demo. `main` must stay runnable at every merge.
 - **Same principle:** code decides the hours (and the action), the LLM only writes messages and reads text, the owner has the last word.
 - **One prediction module for app and scorer:** `lib/predict/` (pure, no DB, no clock) decides `SUGGEST` + hours, `NO_ACTION` or `FLAG` for one business and one special day. Detection (step 1) and `predictions_2026.csv` (section 9.5) both call it, so the score measures exactly what the demo shows.
 
@@ -492,14 +492,21 @@ If time runs short, cut from the bottom.
 
 ## 16. Demo script (2–3 minutes, also the submission video)
 
-1. **Problem (20 s):** "You walk to a café that says it's open. The door is locked."
-2. **Detect (20 s):** dashboard → "Run daily check" → Rye & Shine Bakery: holiday hours missing; *the data:* public holiday calendar + last season's hours + its Yext entity
-3. **Suggest (20 s):** proposed hours and why exactly those ("same as last year"), confidence high, validated
-4. **Contact (20 s):** Liisa gets a WhatsApp message from Fonecta Connect explaining why, with a no-login link (optional: Connect calls her with the voice message)
-5. **Decide (30 s):** Liisa opens the WhatsApp link, edits "open 11–15 on the 26th", ticks "do this automatically next time", confirms
-6. **Apply (20 s):** written to the Rye & Shine entity in Yext (show it in the Yext sandbox) → "now showing on Google, Apple, Bing, Facebook…", channels turn green
-7. **Learn + control (20 s):** run the check again: the next suggestion uses her edit; the ignored description issue does not come back; a no-history business gets a cautious, low-confidence question instead of a guess
-8. **Close (10 s):** "Liisa doesn't have to remember anything. Connect does it for her." + extensibility: the same loop serves posts and review replies
+Runs on Fonecta's dataset (V2): `DEMO_DATE=2026-11-06`, `POST /api/seed` loads the demo cast. Before recording: `node scripts/yext-reset.mjs` (the sandbox entity is Kahvila Aurora), then `/api/seed`, `/api/detect`, `/api/suggest`. Never show API keys or `.env.local`.
+
+1. **Problem (15 s):** "You check Google, it says open. You walk there, and the door is locked." Busy owners forget, and holidays are when it goes wrong.
+2. **Detect (20 s):** dashboard → "Run daily check" → `FI-D0001` Kahvila Aurora, Helsinki: Christmas Eve (Thu 24 Dec) shows regular hours 07:30–18:00. *The data:* the special-day calendar, what Google shows now, last season's exception (07:30–13:00).
+3. **Suggest (20 s):** "Christmas Eve 24 Dec open 07:30–13:00", basis *last year*, confidence high, validated. Code decides the hours; the AI only writes the message (English + Finnish).
+4. **Contact (15 s):** Aleksi's preferred channel is **SMS**: one short message in Fonecta's own style (day and date, what Google shows, last year, "We suggest …") with a no-login link.
+5. **Decide (30 s):** Aleksi opens the link and accepts Christmas Eve, or edits a day (split hours like 09:00–12:00 and 13:00–15:00 work) and confirms. Option: "Do this automatically next time".
+6. **Apply (20 s):** written to the real Yext sandbox entity (show `node scripts/yext-check.mjs` or the Yext UI) → "Published via Yext to: Google (Search & Maps), Finder.fi …": Aurora's live publishers, fastest first, with typical update speed (Google about 2 minutes, Apple Maps about 2 days). Opted-out Facebook is not claimed.
+7. **Trust and learning (25 s):**
+   - `FI-D0012` Tilitoimisto Otso has standing permission: 5 dates applied without asking, then the owner is informed ("handle public holidays from now on").
+   - `FI-D0017` Kahvila Kipinä, a new customer with no history: peers suggest closed, confidence low, and the message asks instead of telling.
+   - `FI-D0013` Hammasklinikka Kallio is already correct: nothing is sent. `FI-D0011` Pizzeria Torni closed for good: flagged for a person, no message.
+   - `SE-D0008` Kafé Linnea gets its message in Swedish.
+8. **Results (10 s):** score on Fonecta's `evaluate.py` (dev, 2026) against the baseline 54.5; use the number from `docs/predict.md` on the day.
+9. **Close (10 s):** "Aleksi doesn't have to remember anything. Connect takes care of it." + extensibility: the same loop serves posts and review replies (one slide).
 
 ## 17. Conventions for Claude Code and other AI agents
 

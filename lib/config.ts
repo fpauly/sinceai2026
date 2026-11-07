@@ -4,7 +4,7 @@ import type { Language } from "@/types";
 export function demoDate(): string {
   const d = process.env.DEMO_DATE;
   if (d && /^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
-  return "2026-12-10";
+  return "2026-11-06"; // the Fonecta dataset's snapshot (DESIGN 0 "v2")
 }
 
 export function demoLanguage(): Language {

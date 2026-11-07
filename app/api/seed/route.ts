@@ -2,11 +2,12 @@ import { collections } from "@/lib/db";
 import { businesses, listings, reviews, preferences } from "@/data/seed";
 import { fonectaDemo } from "@/data/fonecta";
 
-// POST /api/seed — reset the database and load mock data.
-//   /api/seed                  the v1 Turku seed (the demo until the v2 switch)
-//   /api/seed?source=fonecta   the committed extract of Fonecta's dataset (stage C10)
+// POST /api/seed — reset the database and load demo data.
+//   /api/seed                  the committed extract of Fonecta's dataset (the demo since V2)
+//   /api/seed?source=fonecta   the same, by name
+//   /api/seed?source=seed      the retired v1 Turku seed (needs DEMO_DATE=2026-12-10 for its rules)
 export async function POST(request: Request) {
-  const source = new URL(request.url).searchParams.get("source") ?? "seed";
+  const source = new URL(request.url).searchParams.get("source") ?? "fonecta";
   try {
     if (source === "fonecta") return await seedFonecta();
     if (source !== "seed") {
