@@ -1,0 +1,26 @@
+# Files never uploaded by `npx vercel` (deploys from a laptop, B5). Keys are set in Vercel's settings.
+.env*
+!.env.example
+.vercel
+.git
+.githooks
+.github
+.claude
+node_modules
+.next
+out
+build
+coverage
+*.tsbuildinfo
+*.pem
+.DS_Store
+
+# Fonecta's full dataset stays local (82 MB); the app uses the committed extract in data/fonecta/
+/FONECTA/
+
+# Not needed at runtime
+/predictions_2026.csv
+*.jpg
+*.jpeg
+*.png
+*.heic
