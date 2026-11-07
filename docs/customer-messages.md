@@ -4,10 +4,10 @@ The messages Fonecta Connect sends to business owners, **exported from real sugg
 (`node scripts/export-messages.mjs --fresh`: seed → `/api/detect` → `/api/suggest`). Do not edit by hand; re-export instead.
 
 - Demo date ("today" for detection): **10 Dec 2026**
-- Exported: 2026-11-07, 6 suggestions for 5 businesses
-- Written by: 6 × Gemini
-- Validated by code (`lib/validate.ts`): 6 of 6 passed
-- No message (nothing to fix): Kukkakauppa Kauppatori, Pizzeria Port Arthur, Leipomo Martti
+- Exported: 2026-11-07, 8 suggestions for 6 businesses
+- Written by: 8 × Gemini
+- Validated by code (`lib/validate.ts`): 8 of 8 passed
+- No message (nothing to fix): Pizzeria Port Arthur, Leipomo Martti
 
 ## How a message is made
 
@@ -25,6 +25,27 @@ The demo is in English; the Finnish version is stored for every message (`messag
 
 Liisa · bakery · Turku · channel: **WhatsApp**
 
+### Missing holiday hours (high)
+
+**The data that told Connect**
+
+- Upcoming holidays with no hours on any listing: Christmas Eve (24 Dec 2026), Christmas Day (25 Dec 2026), Boxing Day (26 Dec 2026), New Year's Day (1 Jan 2027), Epiphany (6 Jan 2027)
+- Last season's hours on the listings: 24 Dec 2025 10:00–14:00, 25 Dec 2025 closed, 26 Dec 2025 closed, 1 Jan 2026 closed, 6 Jan 2026 closed
+
+**Proposed change:** `holiday_hours` → 24 Dec 2026 10:00–14:00, 25 Dec 2026 closed, 26 Dec 2026 closed, 1 Jan 2027 closed, 6 Jan 2027 closed  
+**Confidence:** high · **Written by:** Gemini · **Validation:** passed  
+**Why:** The proposal copies your hours from the same holidays last year since no new hours are set.
+
+**Message (English)**
+
+> Hi Liisa, your holiday hours for Christmas and New Year are not set yet so I can copy them from the same days last year, meaning Christmas Eve 10:00–14:00 and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany. Shall I publish this everywhere?
+
+<details><summary>Finnish version</summary>
+
+> Hei Liisa, joulun ja uuden vuoden aukioloaikojasi ei ole vielä asetettu, joten voin kopioida ne viime vuoden vastaavilta päiviltä eli jouluaattona 10:00–14:00 ja suljettuna joulupäivänä, tapaninpäivänä, uudenvuodenpäivänä sekä loppiaisena. Julkaisenko nämä kaikkialla?
+
+</details>
+
 ### Listings disagree (high)
 
 **The data that told Connect**
@@ -36,36 +57,35 @@ Liisa · bakery · Turku · channel: **WhatsApp**
 
 **Proposed change:** `opening_hours` → Sat 10:00–14:00  
 **Confidence:** high · **Written by:** Gemini · **Validation:** passed  
-**Why:** The proposed change is based on your website being updated most recently.
+**Why:** Your website was updated most recently.
 
 **Message (English)**
 
-> Hi Liisa, for Saturdays your website says 10:00–14:00 while Finder and Google say 10:00–18:00. Because your website was updated most recently, shall I use 10:00–14:00 everywhere?
+> Hi Liisa, for Saturdays your website says 10:00–14:00 but Finder and Google say 10:00–18:00. Your website was updated most recently, so shall I publish 10:00–14:00 everywhere?
 
 <details><summary>Finnish version</summary>
 
-> Hei Liisa, verkkosivuillasi lauantain aukioloaika on 10:00–14:00, mutta Finderissa ja Google lukee 10:00–18:00. Koska verkkosivusi päivitettiin viimeisimpänä, laitetaanko kaikkialle 10:00–14:00?
+> Hei Liisa, verkkosivusi ilmoittaa lauantain aukioloajaksi 10:00–14:00, mutta Finder ja Google näyttävät 10:00–18:00. Verkkosivusi on päivitetty viimeisimpänä, joten päivitetäänkö 10:00–14:00 kaikkialle?
 
 </details>
 
-### Missing holiday hours (high)
+### Not updated for over a year (low)
 
 **The data that told Connect**
 
-- Upcoming holidays with no hours on any listing: Christmas Eve (24 Dec 2026), Christmas Day (25 Dec 2026), Boxing Day (26 Dec 2026), New Year's Day (1 Jan 2027), Epiphany (6 Jan 2027)
-- Last season's hours on the listings: 24 Dec 2025 10:00–14:00, 25 Dec 2025 closed, 26 Dec 2025 closed, 1 Jan 2026 closed, 6 Jan 2026 closed
+- Field: `description`, last updated 1 May 2023 (1319 days ago) on Finder, Google, own website
 
-**Proposed change:** `holiday_hours` → 24 Dec 2026 10:00–14:00, 25 Dec 2026 closed, 26 Dec 2026 closed, 1 Jan 2027 closed, 6 Jan 2027 closed  
-**Confidence:** high · **Written by:** Gemini · **Validation:** passed  
-**Why:** The proposal is based on copying your holiday hours from the same days last year.
+**Proposed change:** `description` → Sourdough and rye bakery on Eerikinkatu.  
+**Confidence:** medium · **Written by:** Gemini · **Validation:** passed  
+**Why:** Your description was last updated on 1 May 2023 across all listings.
 
 **Message (English)**
 
-> Hi Liisa, your holiday hours for the upcoming Christmas and New Year period are not set yet. Shall I publish the same hours as last year, meaning 10:00–14:00 on Christmas Eve and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany?
+> Hi Liisa, your description hasn't been updated since 1 May 2023 on Finder, Google and your website. Is “Sourdough and rye bakery on Eerikinkatu” still right?
 
 <details><summary>Finnish version</summary>
 
-> Hei Liisa, tulevan joulun ja uuden vuoden ajan pyhäaikoja ei ole vielä asetettu. Haluatko minun julkaisevan samat aukioloajat kuin viime vuonna eli 10:00–14:00 jouluaattona ja suljettuna joulupäivänä, tapaninpäivänä, uudenvuodenpäivänä sekä loppiaisena?
+> Hei Liisa, kuvauksesi ei ole päivittynyt Finderissa, Googlessa ja verkkosivuillasi sitten 1 toukokuuta 2023. Onko “Sourdough and rye bakery on Eerikinkatu” yhä oikein?
 
 </details>
 
@@ -84,15 +104,15 @@ Jari · car repair · Turku · channel: **Voice call**
 
 **Proposed change:** `phone` → +358 2 100 7781  
 **Confidence:** medium · **Written by:** Gemini · **Validation:** passed  
-**Why:** Finder and your website agree on this value against Google.
+**Why:** Finder and your website agree on this value, against Google.
 
 **Message (English)**
 
-> Hi Jari, your website and Finder show +358 2 100 7781 while Google shows +358 2 100 7718. Shall I update this to +358 2 100 7781 everywhere, since Finder and your website agree on this value?
+> Hi Jari, your website and Finder show +358 2 100 7781 while Google shows +358 2 100 7718. Shall I update everything to +358 2 100 7781, as Finder and your website agree on this value?
 
 <details><summary>Finnish version</summary>
 
-> Hei Jari, verkkosivusi ja Finder näyttävät numeroa +358 2 100 7781, mutta Google näyttää numeroa +358 2 100 7718. Päivitänkö numeroksi +358 2 100 7781 kaikkialle, koska Finder ja verkkosivusi ovat samaa mieltä tästä arvosta?
+> Hei Jari, verkkosivusi ja Finder näyttävät numeroa +358 2 100 7781, mutta Google näyttää numeroa +358 2 100 7718. Päivitänkö tiedot kaikkialle muotoon +358 2 100 7781, koska Finder ja verkkosivusi ovat samaa mieltä tästä?
 
 </details>
 
@@ -115,11 +135,35 @@ Elina · bookshop · Turku · channel: **SMS**
 
 **Message (English)**
 
-> Hi Elina, for Saturdays your website and Finder say 10:00–16:00 while Google says 10:00–15:00. Finder and your website were updated most recently, so shall I update Google to 10:00–16:00 everywhere?
+> Hi Elina, for Saturdays your website and Finder say 10:00–16:00 but Google says 10:00–15:00. Because Finder and your website were updated most recently on 15 October 2026, shall I update Saturday hours to 10:00–16:00 everywhere?
 
 <details><summary>Finnish version</summary>
 
-> Hei Elina, verkkosivusi ja Finder näyttävät lauantaisin aukioloajaksi 10:00–16:00, mutta Google näyttää 10:00–15:00. Finder ja verkkosivusi on päivitetty viimeksi, joten päivitetäänkö Googleen 10:00–16:00 kaikkialle?
+> Hei Elina, verkkosivusi ja Finder näyttävät lauantaille aikoja 10:00–16:00, mutta Google näyttää 10:00–15:00. Koska Finder ja verkkosivusi on päivitetty viimeksi 15 lokakuuta 2026, päivitetäänkö lauantain aukioloajaksi 10:00–16:00 kaikkialle?
+
+</details>
+
+## Kukkakauppa Kauppatori
+
+Aino · florist · Turku · channel: **Connect app**
+
+### Not updated for over a year (low)
+
+**The data that told Connect**
+
+- Field: `opening_hours`, last updated 14 May 2024 (940 days ago) on Finder, Google, own website
+
+**Proposed change:** `opening_hours` → Mon 09:00–18:00, Tue 09:00–18:00, Wed 09:00–18:00, Thu 09:00–18:00, Fri 09:00–18:00, Sat 09:00–15:00, Sun closed  
+**Confidence:** medium · **Written by:** Gemini · **Validation:** passed  
+**Why:** Your opening hours were last updated on 14 May 2024 across all your listings.
+
+**Message (English)**
+
+> Hi Aino, your opening hours have not been updated since 14 May 2024 across Finder, Google, and your website. Are they still Monday to Friday 09:00–18:00, Saturday 09:00–15:00, and Sunday closed?
+
+<details><summary>Finnish version</summary>
+
+> Hei Aino, aukioloaikojasi ei ole päivitetty 14 May 2024 jälkeen Finderissa, Googlessa eikä omalla verkkosivustollasi. Ovatko ne edelleen maanantaista perjantaihin 09:00–18:00, lauantaina 09:00–15:00 ja sunnuntaina suljettu?
 
 </details>
 
@@ -136,15 +180,15 @@ Tomi · gym · Turku · channel: **Connect app**
 
 **Proposed change:** `holiday_hours` → 1 Jan 2027 closed  
 **Confidence:** low (shown to the owner as "please check") · **Written by:** Gemini · **Validation:** passed  
-**Why:** Missing holiday hours for New Year's Day based on what most gyms do.
+**Why:** New Year's Day hours are missing from all listings, so the proposal follows what most gyms do.
 
 **Message (English)**
 
-> Hi Tomi, your hours for New Year's Day are missing, and since I cannot find last year's hours, would you like me to set it as closed since that is what most gyms do?
+> Hi Tomi, your hours for New Year's Day are not set anywhere yet and I could not find them from last year. Would you like me to set them as closed on New Year's Day, which is what most gyms do?
 
 <details><summary>Finnish version</summary>
 
-> Hei Tomi, uudenvuodenpäivän aukioloajat puuttuvat, ja koska en löydä viime vuoden tietoja, haluatko minun merkitä sen suljetuksi, kuten useimmat kuntosalit tekevät?
+> Hei Tomi, uudenvuodenpäivän aukioloaikoja ei ole vielä asetettu minnekään eikä viime vuodelta löytynyt tietoja. Haluatko minun merkitsevän sen suljetuksi uudenvuodenpäivänä, kuten useimmat kuntosalit tekevät?
 
 </details>
 
@@ -161,14 +205,14 @@ Sanna · hair salon · Turku · channel: **SMS**
 
 **Proposed change:** `holiday_hours` → 24 Dec 2026 09:00–14:00, 25 Dec 2026 closed, 26 Dec 2026 closed, 1 Jan 2027 closed, 6 Jan 2027 closed  
 **Confidence:** low (shown to the owner as "please check") · **Written by:** Gemini · **Validation:** passed  
-**Why:** This proposal is based on what most hair salons do because no holiday hours are set and last year's hours are missing.
+**Why:** The proposal follows what most hair salons do because no hours are set for the coming holidays and no previous hours exist.
 
 **Message (English)**
 
-> Hi Sanna, your holiday hours aren't set anywhere yet and I can't find last year's hours. Shall I use what most hair salons do, which is 09:00–14:00 on Christmas Eve and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany?
+> Hi Sanna, your holiday hours are not set yet and I do not have last year's hours to copy, so would you like to use what most hair salons do, which is being open on Christmas Eve from 09:00–14:00 and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany?
 
 <details><summary>Finnish version</summary>
 
-> Hei Sanna, pyhäaukioloaikojasi ei ole vielä asetettu minnekään enkä löydä viime vuoden tietoja. Asetetaanko samat aukioloajat kuin useimmilla muilla kampaamoilla, eli jouluaattona klo 09:00–14:00 ja kiinni joulupäivänä, tapaninpäivänä, uudenvuodenpäivänä sekä loppiaisena?
+> Hei Sanna, pyhäaikojasi ei ole vielä asetettu eikä minulla ole viime vuoden tietoja kopioitavaksi, joten haluaisitko käyttää sitä, mitä useimmat kampaamot tekevät eli olla avoinna jouluaattona 09:00–14:00 ja suljettuna joulupäivänä, tapaninpäivänä, uudenvuodenpäivänä ja loppiaisena?
 
 </details>
