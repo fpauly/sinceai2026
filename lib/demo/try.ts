@@ -2,7 +2,7 @@ import "server-only";
 import { randomBytes, randomUUID } from "node:crypto";
 import { getDb } from "@/lib/db";
 import { fonectaDemo } from "@/data/fonecta";
-import type { Issue, Suggestion } from "@/types";
+import type { Issue, Preferences, Suggestion } from "@/types";
 
 // A private copy of one demo business for each visitor (the QR code in the video opens /try).
 // Each visitor answers their own copy, so many people can try it at once and every scan starts
@@ -13,7 +13,7 @@ export const COPY_PREFIX = "try-";
 export const isDemoCopy = (businessId: string) => businessId.startsWith(COPY_PREFIX);
 export const TRY_TEMPLATES = ["FI-D0010", "FI-D0001"] as const; // Pub Kulma (WhatsApp), Kahvila Aurora (SMS)
 const LIFETIME_MS = 6 * 60 * 60 * 1000;
-const COLLECTIONS = ["businesses", "profiles", "holiday_history", "issues", "suggestions"] as const;
+const COLLECTIONS = ["businesses", "profiles", "holiday_history", "issues", "suggestions", "preferences"] as const;
 
 let ttlReady: Promise<unknown> | null = null;
 function ensureTtl() {
@@ -36,12 +36,18 @@ export async function createDemoCopy(templateId: (typeof TRY_TEMPLATES)[number])
   const suggestions = await db.collection<Suggestion>("suggestions").find({ business_id: templateId, issue_id: { $in: issues.map((i) => i._id) } }).toArray();
   if (suggestions.length === 0) return { ok: false, error: "The demo is being prepared. Please try again in a minute." };
 
+  const templatePrefs = await db.collection<Preferences>("preferences").findOne({ business_id: templateId });
+
   const id = `${COPY_PREFIX}${randomBytes(5).toString("hex")}`;
   const expires_at = new Date(Date.now() + LIFETIME_MS);
   const issueIds = new Map(issues.map((issue) => [issue._id, randomUUID()]));
   const swap = (text: string) => text.split(templateId).join(id);
 
   const copies = {
+    // the copy owns its preferences from the start, so decisions in the copy also expire
+    preferences: [{
+      _id: id, business_id: id, ignored_fingerprints: [], notes: [], ...(templatePrefs ? { learned: templatePrefs.learned ?? [], standing_permissions: templatePrefs.standing_permissions ?? [] } : {}), expires_at,
+    }],
     businesses: [{ ...business, _id: id, yext_entity_id: null, demo_copy_of: templateId, expires_at }],
     profiles: [{ ...profile, _id: id, business_id: id, expires_at }],
     holiday_history: fonectaDemo.holiday_history
@@ -64,7 +70,7 @@ export async function createDemoCopy(templateId: (typeof TRY_TEMPLATES)[number])
     }),
   };
   // businesses last: the copy only becomes visible once everything it needs exists
-  for (const name of ["profiles", "holiday_history", "issues", "suggestions", "businesses"] as const) {
+  for (const name of ["preferences", "profiles", "holiday_history", "issues", "suggestions", "businesses"] as const) {
     const docs = copies[name] as Record<string, unknown>[];
     if (docs.length) await db.collection(name).insertMany(docs as never[]);
   }
