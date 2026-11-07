@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { AutomaticallyApplied, ContactWindow, OwnerMessage, contactChannel, contactLanguage, contactName } from "@/app/owner/contact-details";
+import { AutomaticallyApplied, ContactWindow, OwnerMessage, contactChannel, contactLanguage, contactName, decisionLabel, formatDate, groupTitle, sortByDate } from "@/app/owner/contact-details";
 import ReplyBox from "@/app/contact/ReplyBox";
 import ChannelSyncRow from "@/components/ChannelSyncRow";
 import { showHours } from "@/lib/hours";
@@ -69,7 +69,7 @@ function Message({ suggestion, language, allowReply, onDecidedAction }: { sugges
   const lines = evidenceLines(suggestion);
   return (
     <section className="min-w-0 border-b border-zinc-100 pb-4 text-sm leading-6 last:border-0">
-      <h2 className="font-semibold text-emerald-800">{titles[suggestion.issue.type]}</h2>
+      <h3 className="font-semibold text-emerald-800">{formatDate(suggestion.issue.evidence.date) ?? titles[suggestion.issue.type]}</h3>
       <OwnerMessage message={suggestion.message} language={language} />
       <div className="mt-3 border-l-2 border-emerald-600 pl-3">
         <h3 className="text-xs font-semibold text-emerald-800">Proposed change · {label(suggestion.proposed_change.field)}</h3>
@@ -127,23 +127,28 @@ function BusinessChat({ businessId }: { businessId: string }) {
   const { data } = state;
   const channel = contactChannel(data.business);
   const language = contactLanguage(data.business);
-  const automatic = data.automatically_applied ?? [];
+  const automatic = sortByDate(data.automatically_applied ?? []);
+  const suggestions = sortByDate(data.suggestions);
   const optedOut = data.business.contact?.opted_out;
   return <>
     <p className="rounded-lg bg-white/80 px-3 py-2 text-center text-xs text-zinc-600">For {contactName(data.business)} · {data.business.name}<br />{channel} preview · No message has been sent.</p>
     {lastDecision && (lastDecision.result.suggestion.decision === "ignored"
-      ? <p role="status" className="rounded-xl bg-white p-3 text-sm">Suggestion declined. Your hours were not changed.</p>
-      : <ChannelSyncRow key={lastDecision.result.suggestion._id} applied={lastDecision.result.suggestion.applied} receivedAt={lastDecision.receivedAt} business={data.business} />)}
-    {optedOut ? <div className="rounded-2xl bg-white p-4 text-sm leading-6"><h2 className="font-semibold">Not contacted</h2><p className="mt-2">This owner has opted out of suggestion messages.</p></div> : data.suggestions.length || automatic.length ? (
+      ? <p role="status" className="rounded-xl bg-white p-3 text-sm">{decisionLabel(lastDecision.result.suggestion)}: suggestion declined. Your information was not changed.</p>
+      : <ChannelSyncRow key={lastDecision.result.suggestion._id} changeLabel={decisionLabel(lastDecision.result.suggestion)} applied={lastDecision.result.suggestion.applied} receivedAt={lastDecision.receivedAt} business={data.business} />)}
+    {optedOut ? <div className="rounded-2xl bg-white p-4 text-sm leading-6"><h2 className="font-semibold">Not contacted</h2><p className="mt-2">This owner has opted out of suggestion messages.</p></div> : suggestions.length || automatic.length ? (
       <article aria-label={`${channel} message`} className="min-w-0 space-y-4 rounded-2xl bg-white p-4 shadow-sm">
         {channel === "Email" && <p className="border-b border-zinc-100 pb-2 text-sm font-semibold">Subject: Your business hours</p>}
+        <header className="border-b border-zinc-100 pb-3">
+          <h2 className="text-lg font-semibold text-emerald-900">{suggestions.length ? groupTitle(suggestions) : "Your hours have been updated"}</h2>
+          {suggestions.length > 1 && <p className="mt-1 text-xs leading-5 text-zinc-600">One message with all your dates. Review each suggestion below.</p>}
+          <ContactWindow business={data.business} />
+        </header>
         <AutomaticallyApplied suggestions={automatic} language={language} />
-        {data.suggestions.map((suggestion) => <Message key={suggestion._id} suggestion={suggestion} language={language} allowReply={channel === "SMS" || channel === "WhatsApp"} onDecidedAction={decided} />)}
-        <Link href={`/owner/${encodeURIComponent(businessId)}`} className="flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-3 py-2 text-center text-sm font-semibold text-white">{data.suggestions.length ? "Review your dates →" : "View your updated hours →"}</Link>
+        {suggestions.map((suggestion) => <Message key={suggestion._id} suggestion={suggestion} language={language} allowReply={channel === "SMS" || channel === "WhatsApp"} onDecidedAction={decided} />)}
+        <Link href={`/owner/${encodeURIComponent(businessId)}`} className="flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-3 py-2 text-center text-sm font-semibold text-white">{suggestions.length ? "Review your dates →" : "View your updated hours →"}</Link>
         <p className="text-center text-xs text-zinc-500">No login needed. You decide what changes.</p>
-        <ContactWindow business={data.business} />
       </article>
-    ) : <div className="rounded-2xl bg-white p-4 text-sm leading-6"><h2 className="font-semibold">No message needed</h2><p className="mt-2">There are no suggestions waiting for review or automatic changes to report.</p></div>}
+    ) : <div className="rounded-2xl bg-white p-4 text-sm leading-6"><h2 className="font-semibold">{lastDecision ? "You're all caught up" : "No action needed"}</h2><p className="mt-2">There are no suggestions waiting for your review.</p><Link href={`/owner/${encodeURIComponent(businessId)}`} className="mt-2 inline-flex min-h-11 items-center font-medium text-emerald-800 underline">View your business hours →</Link></div>}
   </>;
 }
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { displayedHours, isValidHours, normalizeHours, showHours } from "@/lib/hours";
-import { OwnerMessage } from "@/app/owner/contact-details";
+import { formatDate, OwnerMessage } from "@/app/owner/contact-details";
 import type { IssueType, Language, Listing, Profile } from "@/types";
 import type { ApiError, DecideRequest, DecideResponse, SuggestionWithIssue } from "@/types/api";
 
@@ -19,7 +19,12 @@ const confidenceStyles = {
   medium: "bg-sky-50 text-sky-800",
   low: "bg-amber-50 text-amber-900",
 };
-const labels: Record<string, string> = { mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday", finder: "Finder", google: "Google", website: "Website" };
+const labels: Record<string, string> = { mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday", finder: "Finder", google: "Google", website: "Website",
+  date: "Date", day_name: "Special day", weekday: "Day of the week", displayed_hours: "Hours when checked",
+  displayed_from: "Hours source", proposed_hours: "Suggested hours", basis: "Based on", basis_detail: "Supporting records",
+  expected_search_views: "Google search views last year", entered_at: "Recorded on", last_year: "Previous holiday hours",
+  shopping_centre: "Shopping centre", owner_edit: "Your previous edit", peers: "Similar businesses", en: "English", local: "Local name",
+};
 
 function label(key: string): string {
   if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
@@ -31,8 +36,12 @@ function label(key: string): string {
 function display(value: unknown): string {
   if (value === undefined || value === null) return "Not set";
   if (value === "closed") return "Closed";
-  if (typeof value === "string") return value.trim() ? showHours(value, "Closed") : value;
-  if (typeof value === "object") return Object.entries(value).map(([key, item]) => `${label(key)}: ${display(item)}`).join(" · ");
+  if (typeof value === "string") {
+    const description = ({ OWNER_EDIT: "Your previous edit", LAST_YEAR: "Your previous holiday hours", SHOPPING_CENTRE: "Shopping-centre hours", PEERS: "Similar businesses", REGULAR: "Regular hours", regular: "Regular hours", exception: "Special-day hours" } as Record<string, string>)[value];
+    const date = formatDate(value) ?? (/^\d{4}-\d{2}-\d{2}T/.test(value) ? formatDate(value.slice(0, 10)) : null);
+    return description ?? labels[value] ?? date ?? (value.trim() ? showHours(value, "Closed") : value);
+  }
+  if (typeof value === "object") return Object.entries(value).filter(([key]) => !["_id", "business_id", "event_id", "fingerprint"].includes(key)).map(([key, item]) => `${label(key)}: ${display(item)}`).join(" · ");
   return String(value);
 }
 
@@ -47,7 +56,7 @@ function CustomerHoursPreview({ businessName, date, before, after, hasProfile }:
     {businessName && <p className="mt-2 break-words text-sm font-medium">{businessName}</p>}
     <p className="mt-1 text-xs text-zinc-500">{label(date)}</p>
     <div className="mt-3 grid grid-cols-2 gap-2 text-sm leading-6">
-      <div className="min-w-0 rounded-lg bg-zinc-50 p-2"><p className="text-xs text-zinc-500">{hasProfile ? "Latest saved profile" : "Google hours at detection"}</p><p className="mt-1 break-words">{hoursText(before)}</p></div>
+      <div className="min-w-0 rounded-lg bg-zinc-50 p-2"><p className="text-xs text-zinc-500">{hasProfile ? "Current saved hours" : "Google hours at detection"}</p><p className="mt-1 break-words">{hoursText(before)}</p></div>
       <div className="min-w-0 rounded-lg bg-emerald-50 p-2"><p className="text-xs text-emerald-800">After your approval</p><p className="mt-1 break-words font-medium text-emerald-900">{hoursText(after)}</p></div>
     </div>
     <p className="mt-2 text-xs leading-5 text-zinc-500">Preview only. Nothing is published until you confirm.</p>
@@ -206,7 +215,7 @@ export default function NotificationCard({ suggestion, listings, profile, busine
       <span className={`inline-block rounded-full px-2.5 py-1 text-xs font-medium ${confidenceStyles[suggestion.confidence]}`}>
         {suggestion.confidence === "low" ? "Low confidence · please check" : `${suggestion.confidence === "high" ? "High" : "Medium"} confidence`}
       </span>
-      <h2 className="mt-3 text-xl font-semibold tracking-tight">{titles[suggestion.issue.type]}</h2>
+      <h2 className="mt-3 text-xl font-semibold tracking-tight">{formatDate(suggestion.issue.evidence.date) ?? titles[suggestion.issue.type]}</h2>
       <OwnerMessage message={suggestion.message} language={language} />
       <div className="mt-4 rounded-xl bg-zinc-50 p-3">
         <h3 className="text-sm font-semibold">Why this change?</h3>
@@ -214,7 +223,7 @@ export default function NotificationCard({ suggestion, listings, profile, busine
         <details className="mt-2 text-xs text-zinc-600">
           <summary className="cursor-pointer py-1 font-medium">See the data behind this</summary>
           <dl className="mt-2 space-y-2 break-words">
-            {Object.entries(suggestion.issue.evidence).map(([key, value]) => (
+            {Object.entries(suggestion.issue.evidence).filter(([key]) => !["day_key", "business_id", "event_id", "fingerprint"].includes(key)).map(([key, value]) => (
               <div key={key}><dt className="font-semibold capitalize">{label(key)}</dt><dd className="mt-1 leading-5">{Array.isArray(value) ? value.map(display).join(" · ") : display(value)}</dd></div>
             ))}
           </dl>
@@ -226,7 +235,7 @@ export default function NotificationCard({ suggestion, listings, profile, busine
             <h3 className="mb-2 font-medium">{label(key)}</h3>
             <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-2">
               <div className="min-w-0 break-words"><p className="mb-1 text-xs text-zinc-500">Before</p>
-                {profile && <p className="text-xs leading-5 text-zinc-600">Published hours: {display(change.field === "holiday_hours" ? displayedHours(profile, key).hours : Object.entries(profile.regular_hours).find(([day]) => day === key)?.[1])}</p>}
+                {profile && <p className="text-xs leading-5 text-zinc-600">Current hours: {display(change.field === "holiday_hours" ? displayedHours(profile, key).hours : Object.entries(profile.regular_hours).find(([day]) => day === key)?.[1])}</p>}
                 {listings.map((listing) => <p key={listing._id} className="text-xs leading-5 text-zinc-600">{label(listing.source)}: {display(current(listing, key))}</p>)}
               </div>
               <span aria-hidden="true" className="pt-5 text-zinc-400">→</span>

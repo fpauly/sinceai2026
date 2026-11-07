@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { AutomaticallyApplied, contactChannel, contactLanguage, contactName } from "@/app/owner/contact-details";
+import { AutomaticallyApplied, contactChannel, contactLanguage, contactName, decisionLabel, groupTitle, sortByDate } from "@/app/owner/contact-details";
 import ChannelSyncRow from "@/components/ChannelSyncRow";
 import type { AppliedResult } from "@/types";
 import NotificationCard from "@/components/NotificationCard";
@@ -25,12 +25,12 @@ function BusinessView({ businessId }: { businessId: string }) {
   const [attempt, setAttempt] = useState(0);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const [publication, setPublication] = useState<{ id: string; applied: AppliedResult | null | undefined; receivedAt: number } | null>(null);
+  const [publication, setPublication] = useState<{ id: string; applied: AppliedResult | null | undefined; receivedAt: number; label: string } | null>(null);
 
   function decided(result: DecideResponse) {
     const ignored = result.suggestion.decision === "ignored";
-    setNotice(ignored ? "Suggestion ignored. We will remember your choice." : null);
-    setPublication(ignored ? null : { id: result.suggestion._id, applied: result.suggestion.applied, receivedAt: Date.now() });
+    setNotice(ignored ? `${decisionLabel(result.suggestion)}: suggestion declined. Your information was not changed.` : null);
+    setPublication(ignored ? null : { id: result.suggestion._id, applied: result.suggestion.applied, receivedAt: Date.now(), label: decisionLabel(result.suggestion) });
     setState((current) => current.status === "ready" ? {
       status: "ready", data: { ...current.data, suggestions: current.data.suggestions.filter((item) => item._id !== result.suggestion._id) },
     } : current);
@@ -69,6 +69,7 @@ function BusinessView({ businessId }: { businessId: string }) {
   );
 
   const { data } = state;
+  const suggestions = sortByDate(data.suggestions);
 
   return (
     <>
@@ -78,14 +79,15 @@ function BusinessView({ businessId }: { businessId: string }) {
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">Hi {contactName(data.business)}!</h1>
         <p className="mt-2 text-sm leading-6 text-zinc-600">{data.suggestions.length ? "A few details need your attention. You decide what changes." : "There are no suggestions waiting for your review."}</p>
       </header>
-      {data.business.contact && <p className="mb-4 text-xs text-zinc-500">Contact channel: {contactChannel(data.business)} · Language: {contactLanguage(data.business)}</p>}
+      {data.business.contact && <p className="mb-4 text-xs text-zinc-500">Contact channel: {contactChannel(data.business)} · Language: {{ en: "English", fi: "Finnish", sv: "Swedish", nb: "Norwegian" }[contactLanguage(data.business)]}</p>}
       {data.business.contact?.opted_out && <p className="mb-4 rounded-xl bg-zinc-100 p-3 text-sm">Not contacted. You have opted out of suggestion messages.</p>}
-      <div className="mb-4"><AutomaticallyApplied suggestions={data.automatically_applied ?? []} language={contactLanguage(data.business)} /></div>
+      {!!data.automatically_applied?.length && <div className="mb-4"><AutomaticallyApplied suggestions={sortByDate(data.automatically_applied)} language={contactLanguage(data.business)} /></div>}
       {notice && <p role="status" className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm leading-6 text-emerald-900">{notice}</p>}
-      {publication && <ChannelSyncRow key={publication.id} applied={publication.applied} receivedAt={publication.receivedAt} business={data.business} />}
-      {data.suggestions.length ? (
-        <section aria-label="Suggestions to review" className="space-y-4">
-          {data.suggestions.map((suggestion) => <NotificationCard key={suggestion._id} suggestion={suggestion} listings={data.listings} profile={data.profile} businessName={data.business.name} language={contactLanguage(data.business)} onDecidedAction={decided} />)}
+      {publication && <ChannelSyncRow key={publication.id} changeLabel={publication.label} applied={publication.applied} receivedAt={publication.receivedAt} business={data.business} />}
+      {suggestions.length ? (
+        <section aria-label="Suggestions to review" className="space-y-4 rounded-2xl border border-zinc-200 bg-zinc-100 p-3">
+          <h2 className="px-1 text-lg font-semibold">{groupTitle(suggestions)}</h2>
+          {suggestions.map((suggestion) => <NotificationCard key={suggestion._id} suggestion={suggestion} listings={data.listings} profile={data.profile} businessName={data.business.name} language={contactLanguage(data.business)} onDecidedAction={decided} />)}
         </section>
       ) : (
         <section className="rounded-2xl border border-emerald-200 bg-white px-4 py-10 text-center"><h2 className="text-xl font-semibold">Nothing waiting for review</h2><p className="mt-2 text-sm leading-6 text-zinc-600">There is nothing to review right now.</p></section>

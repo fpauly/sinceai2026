@@ -5,9 +5,10 @@ import { livePublishers, updateSpeedText } from "@/lib/yext/publishers";
 import type { AppliedResult, Business } from "@/types";
 
 /** Yext confirms the write; publisher visibility below is only a time-based estimate. */
-export default function ChannelSyncRow({ applied, business, receivedAt, children }: {
+export default function ChannelSyncRow({ applied, business, receivedAt, changeLabel, children }: {
   applied: AppliedResult | null | undefined;
   business: Pick<Business, "publishers">;
+  changeLabel?: string;
   receivedAt: number; // Client timestamp when the successful decision response arrived.
   children?: ReactNode; // Slot for the optional VoiceButton.
 }) {
@@ -32,13 +33,13 @@ export default function ChannelSyncRow({ applied, business, receivedAt, children
 
   const elapsed = now ? Math.max(0, (now - startedAt) / 1000) : 0;
   return <section aria-label="Publication status" className={`mb-5 rounded-xl border p-4 text-sm leading-6 ${confirmed ? "border-emerald-200 bg-white" : "border-amber-200 bg-amber-50"}`}>
-    <h2 className="font-semibold">{confirmed ? "Change saved and published via Yext" : "Change saved locally"}</h2>
+    <h2 className="font-semibold">{changeLabel ? `${changeLabel}: ${confirmed ? "update published" : "changes saved"}` : confirmed ? "Update published" : "Changes saved"}</h2>
     <p role="status" className="mt-2 break-words">{confirmed
       ? names.length ? `Published via Yext to: ${names.join(", ")}.` : "Yext confirmed the write. No publication channels were returned."
-      : "External publication is not confirmed. Your saved hours have not been verified on publisher sites."}</p>
-    {!confirmed && applied?.error && <details className="mt-2 text-xs text-zinc-600"><summary className="cursor-pointer py-1">Publication details</summary><p className="mt-1 break-words">{applied.error}</p></details>}
+      : "Your changes are saved. Publication to your online channels is not confirmed."}</p>
+
     {confirmed && names.length > 0 && <>
-      <p className="mt-3 text-xs leading-5 text-zinc-500">Estimated visibility based on each channel’s typical update time. Timing starts when this app receives confirmation. Green indicators are estimates, not live confirmation from those sites.</p>
+      <p className="mt-3 text-xs leading-5 text-zinc-500">Channels update at different speeds. Green means the typical update time has passed; it does not confirm the change is already visible.</p>
       <ul className="mt-3 space-y-3">{names.map((name, index) => {
         const seconds = speeds[index];
         const timed = validSpeed(seconds) && Number.isFinite(startedAt);
