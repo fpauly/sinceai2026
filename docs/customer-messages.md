@@ -36,15 +36,15 @@ Liisa · bakery · Turku · channel: **WhatsApp**
 
 **Proposed change:** `opening_hours` → Sat 10:00–14:00  
 **Confidence:** high · **Written by:** Gemini · **Validation:** passed  
-**Why:** Your website was updated most recently.
+**Why:** The proposed change is based on your website being updated most recently.
 
 **Message (English)**
 
-> Hi Liisa, your website says 10:00–14:00 on Saturdays while Google and Finder say 10:00–18:00. Since your website was updated most recently, shall I update Saturday hours to 10:00–14:00 everywhere?
+> Hi Liisa, for Saturdays your website says 10:00–14:00 while Finder and Google say 10:00–18:00. Because your website was updated most recently, shall I use 10:00–14:00 everywhere?
 
 <details><summary>Finnish version</summary>
 
-> Hei Liisa, verkkosivuillasi lauantain aukioloaika on 10:00–14:00, mutta Google ja Finder näyttävät ajaksi 10:00–18:00. Koska verkkosivusi on päivitetty viimeksi, päivitetäänkö lauantain aukioloajaksi 10:00–14:00 kaikkialle?
+> Hei Liisa, verkkosivuillasi lauantain aukioloaika on 10:00–14:00, mutta Finderissa ja Google lukee 10:00–18:00. Koska verkkosivusi päivitettiin viimeisimpänä, laitetaanko kaikkialle 10:00–14:00?
 
 </details>
 
@@ -57,15 +57,15 @@ Liisa · bakery · Turku · channel: **WhatsApp**
 
 **Proposed change:** `holiday_hours` → 24 Dec 2026 10:00–14:00, 25 Dec 2026 closed, 26 Dec 2026 closed, 1 Jan 2027 closed, 6 Jan 2027 closed  
 **Confidence:** high · **Written by:** Gemini · **Validation:** passed  
-**Why:** This proposal is based on last year's holiday hours.
+**Why:** The proposal is based on copying your holiday hours from the same days last year.
 
 **Message (English)**
 
-> Hi Liisa, your holiday hours are not set yet for the upcoming festive season, so customers might miss your opening times. Shall I set your hours to 10:00–14:00 on Christmas Eve, and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany?
+> Hi Liisa, your holiday hours for the upcoming Christmas and New Year period are not set yet. Shall I publish the same hours as last year, meaning 10:00–14:00 on Christmas Eve and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany?
 
 <details><summary>Finnish version</summary>
 
-> Hei Liisa, tulevan joulun ja uuden vuoden aukioloaikoja ei ole vielä asetettu, joten asiakkaat saattavat hukata tiedot. Asetetaanko aukioloajoiksi 10:00–14:00 jouluaattona sekä suljettu joulupäivänä, tapaninpäivänä, uudenvuodenpäivänä ja loppiaisena?
+> Hei Liisa, tulevan joulun ja uuden vuoden ajan pyhäaikoja ei ole vielä asetettu. Haluatko minun julkaisevan samat aukioloajat kuin viime vuonna eli 10:00–14:00 jouluaattona ja suljettuna joulupäivänä, tapaninpäivänä, uudenvuodenpäivänä sekä loppiaisena?
 
 </details>
 
@@ -84,15 +84,15 @@ Jari · car repair · Turku · channel: **Voice call**
 
 **Proposed change:** `phone` → +358 2 100 7781  
 **Confidence:** medium · **Written by:** Gemini · **Validation:** passed  
-**Why:** Finder and your website agree on this value, against Google.
+**Why:** Finder and your website agree on this value against Google.
 
 **Message (English)**
 
-> Hi Jari, your website and Finder show +358 2 100 7781 while Google shows +358 2 100 7718. Shall I update Google to +358 2 100 7781 so your listings match?
+> Hi Jari, your website and Finder show +358 2 100 7781 while Google shows +358 2 100 7718. Shall I update this to +358 2 100 7781 everywhere, since Finder and your website agree on this value?
 
 <details><summary>Finnish version</summary>
 
-> Hei Jari, verkkosivusi ja Finder näyttävät numeroa +358 2 100 7781, mutta Google näyttää numeroa +358 2 100 7718. Päivitänkö Googleen numeroksi +358 2 100 7781, jotta tiedot ovat kaikkialla samat?
+> Hei Jari, verkkosivusi ja Finder näyttävät numeroa +358 2 100 7781, mutta Google näyttää numeroa +358 2 100 7718. Päivitänkö numeroksi +358 2 100 7781 kaikkialle, koska Finder ja verkkosivusi ovat samaa mieltä tästä arvosta?
 
 </details>
 
@@ -111,15 +111,15 @@ Elina · bookshop · Turku · channel: **SMS**
 
 **Proposed change:** `opening_hours` → Sat 10:00–16:00  
 **Confidence:** high · **Written by:** Gemini · **Validation:** passed  
-**Why:** Finder and your website were updated most recently on 15 Oct 2026.
+**Why:** Finder and your website were updated most recently on 15 October 2026.
 
 **Message (English)**
 
-> Hi Elina, for Saturdays your website and Finder say 10:00–16:00 but Google says 10:00–15:00. Shall I update Google to 10:00–16:00 as well?
+> Hi Elina, for Saturdays your website and Finder say 10:00–16:00 while Google says 10:00–15:00. Finder and your website were updated most recently, so shall I update Google to 10:00–16:00 everywhere?
 
 <details><summary>Finnish version</summary>
 
-> Hei Elina, verkkosivusi ja Finder näyttävät lauantaille aikoja 10:00–16:00, mutta Google näyttää aikoja 10:00–15:00. Päivitetäänkö Googleenkin ajaksi 10:00–16:00?
+> Hei Elina, verkkosivusi ja Finder näyttävät lauantaisin aukioloajaksi 10:00–16:00, mutta Google näyttää 10:00–15:00. Finder ja verkkosivusi on päivitetty viimeksi, joten päivitetäänkö Googleen 10:00–16:00 kaikkialle?
 
 </details>
 
@@ -136,15 +136,15 @@ Tomi · gym · Turku · channel: **Connect app**
 
 **Proposed change:** `holiday_hours` → 1 Jan 2027 closed  
 **Confidence:** low (shown to the owner as "please check") · **Written by:** Gemini · **Validation:** passed  
-**Why:** No hours are set for the coming holidays and there are no hours from last year to copy, so this follows what most gyms do.
+**Why:** Missing holiday hours for New Year's Day based on what most gyms do.
 
 **Message (English)**
 
-> Hi Tomi, New Year's Day is coming up and your hours for it aren't set anywhere yet, and I can't find last year's hours for it. Shall I use what most gyms do: closed on New Year's Day?
+> Hi Tomi, your hours for New Year's Day are missing, and since I cannot find last year's hours, would you like me to set it as closed since that is what most gyms do?
 
 <details><summary>Finnish version</summary>
 
-> Hei Tomi, uudenvuodenpäivä lähestyy eivätkä sen aukioloajat ole vielä missään esillä, enkä löydä viime vuoden tietoja. Laitetaanko tähän sen mukaan, mitä useimmat kuntosalit tekevät eli suljettu uudenvuodenpäivänä?
+> Hei Tomi, uudenvuodenpäivän aukioloajat puuttuvat, ja koska en löydä viime vuoden tietoja, haluatko minun merkitä sen suljetuksi, kuten useimmat kuntosalit tekevät?
 
 </details>
 
@@ -161,14 +161,14 @@ Sanna · hair salon · Turku · channel: **SMS**
 
 **Proposed change:** `holiday_hours` → 24 Dec 2026 09:00–14:00, 25 Dec 2026 closed, 26 Dec 2026 closed, 1 Jan 2027 closed, 6 Jan 2027 closed  
 **Confidence:** low (shown to the owner as "please check") · **Written by:** Gemini · **Validation:** passed  
-**Why:** This is based on what most hair salons do since there are no hours set for the coming holidays and no hours from last year to copy.
+**Why:** This proposal is based on what most hair salons do because no holiday hours are set and last year's hours are missing.
 
 **Message (English)**
 
-> Hi Sanna, since your holiday hours for Christmas Eve through Epiphany are not set anywhere yet, would you like me to set them as Christmas Eve 09:00–14:00 and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany following a common pattern for hair salons?
+> Hi Sanna, your holiday hours aren't set anywhere yet and I can't find last year's hours. Shall I use what most hair salons do, which is 09:00–14:00 on Christmas Eve and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany?
 
 <details><summary>Finnish version</summary>
 
-> Hei Sanna, koska joulun ja loppiaisen ajan aukioloaikojasi ei ole vielä asetettu minnekään, haluaisitko minun merkitsevän jouluaatolle ajan 09:00–14:00 ja joulupäivän, tapaninpäivän, uudenvuodenpäivän sekä loppiaisen suljetuiksi yleisen kampaamojen käytännön mukaisesti?
+> Hei Sanna, pyhäaukioloaikojasi ei ole vielä asetettu minnekään enkä löydä viime vuoden tietoja. Asetetaanko samat aukioloajat kuin useimmilla muilla kampaamoilla, eli jouluaattona klo 09:00–14:00 ja kiinni joulupäivänä, tapaninpäivänä, uudenvuodenpäivänä sekä loppiaisena?
 
 </details>
