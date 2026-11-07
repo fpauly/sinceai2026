@@ -46,3 +46,6 @@ next-env.d.ts
 /*.jpeg
 /*.png
 /*.heic
+
+# Fonecta dataset (about 82 MB, CC BY 4.0 / MIT): unzip locally, never commit (DESIGN.md section 0)
+/FONECTA/
