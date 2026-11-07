@@ -136,7 +136,13 @@ export interface PredictContext {
   centre?: { business: Business; profile: Profile; history: HolidayHistoryEntry[] } | null;
   peers: PeerBenchmark[]; // rows for this business's country, city tier and segment
   learned?: LearnedDecision[]; // preferences.learned (the owner's past edits / declines)
+  closure_signals?: ClosureSignal[]; // reviews and publisher edits that may say "closed for good"
 }
+
+/** A hint that the business may have closed for good (reviews.json, publisher_suggestions.json). */
+export type ClosureSignal =
+  | { source: "review"; date: string; text: string } // date: ISO datetime of the review
+  | { source: "publisher"; date: string; field: string }; // a Google/Apple/Bing user edit; field "closed" or "hours"
 
 export type Predict = (ctx: PredictContext) => Prediction;
 
