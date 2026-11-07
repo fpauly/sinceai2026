@@ -54,7 +54,8 @@ export async function runDetection(businessId?: string): Promise<Issue[]> {
   const today = demoDate(); // DEMO_DATE: rules never read the clock
 
   // All businesses, so a shopping centre is always available as context. 32 rows at most.
-  const allBusinesses = await c.businesses.find().sort({ _id: 1 }).toArray();
+  // visitors' /try copies (lib/demo/try.ts) are never detected again: they already carry their suggestions
+  const allBusinesses = await c.businesses.find({ _id: { $not: /^try-/ } }).sort({ _id: 1 }).toArray();
   const businesses = businessId ? allBusinesses.filter((b) => b._id === businessId) : allBusinesses;
   if (businesses.length === 0) return [];
 
