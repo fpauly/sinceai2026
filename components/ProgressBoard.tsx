@@ -13,29 +13,37 @@ interface Status {
   ok: boolean;
   demo_date: string;
   db: { ok: boolean; name: string; error?: string };
-  counts?: { businesses: number; listings: number; reviews: number };
-  issues?: { total: number; by_type: Record<string, number>; by_status: Record<string, number> };
+  counts?: { businesses: number; listings: number; reviews: number; profiles?: number; contacts?: number };
+  issues?: {
+    total: number; by_type: Record<string, number>; by_status: Record<string, number>;
+    with_search_views?: number; event_nights?: number;
+  };
   suggestions?: {
     total: number; decided: number; by_decision: Record<string, number>;
-    validated: number; applied: number; applied_yext: number;
+    validated: number; applied: number; applied_yext: number; by_source?: Record<string, number>;
   };
   ignored_fingerprints?: number;
   learned?: number;
   standing_permissions?: number;
+  predictions_2026?: number | null;
 }
+
+// v2 demo cast (Fonecta dataset): Kahvila Aurora is the main storyline.
+const DEMO = "FI-D0001";
 
 // Route probe: a missing route gives Next's HTML 404. 405 (wrong method) or any JSON reply means it exists.
 const PROBES = {
   detect: "/api/detect",
   suggest: "/api/suggest",
   businesses: "/api/businesses",
-  business: "/api/businesses/rye_shine",
+  business: `/api/businesses/${DEMO}`,
   decide: "/api/suggestions/_probe/decide",
+  reply: "/api/suggestions/_probe/reply",
   tts: "/api/suggestions/_probe/tts",
   voiceReply: "/api/voice/reply",
   dashboardPage: "/dashboard",
-  ownerPage: "/owner/rye_shine",
-  contactPage: "/contact/rye_shine",
+  ownerPage: `/owner/${DEMO}`,
+  contactPage: `/contact/${DEMO}`,
 } as const;
 type ProbeKey = keyof typeof PROBES;
 type Probes = Record<ProbeKey, boolean>;
@@ -67,75 +75,92 @@ interface Milestone {
 function milestones(s: Status | null, p: Probes | null): Milestone[] {
   const t = s?.issues?.by_type ?? {};
   const n = (k: string) => t[k] ?? 0;
-  const rule124 = n("missing_holiday_hours") + n("cross_platform_conflict") + n("stale_field");
   const sug = s?.suggestions;
+  const dec = sug?.by_decision ?? {};
+  const byOwner = (dec.accepted ?? 0) + (dec.edited ?? 0) + (dec.declined ?? 0);
+  const gemini = sug?.by_source?.gemini ?? 0;
   const has = (k: ProbeKey) => !!p?.[k];
+  const link = (k: ProbeKey) => (has(k) ? PROBES[k] : undefined);
 
   return [
     {
-      id: "M1", title: "Foundation", lane: "all",
+      id: "M1", title: "Foundation (Fonecta dataset)", lane: "all",
       items: [
         { label: "Database connected", done: !!s?.db.ok, detail: s ? (s.db.ok ? s.db.name : s.db.error) : undefined },
-        { label: "Demo data seeded", done: (s?.counts?.businesses ?? 0) > 0, detail: s?.counts ? `${s.counts.businesses} businesses, ${s.counts.listings} listings, ${s.counts.reviews} reviews` : undefined },
+        {
+          label: "Fonecta demo cast loaded", done: (s?.counts?.profiles ?? 0) > 0,
+          detail: s?.counts ? `${s.counts.businesses} businesses, ${s.counts.profiles ?? 0} profiles, ${s.counts.contacts ?? 0} contacts` : undefined,
+        },
       ],
     },
     {
       id: "1", title: "Detect", lane: "C",
       items: [
         { label: "POST /api/detect", done: has("detect") },
-        { label: "Holiday / conflict / stale issues found", done: rule124 > 0, detail: `${rule124} issues (8 expected after seed)` },
+        { label: "Special-day hours found", done: n("special_day_hours") > 0, detail: `${n("special_day_hours")} issues (50 after loading the cast)` },
+        { label: "Closed-for-good flagged for a human", done: n("needs_human") > 0, detail: `${n("needs_human")} (Pizzeria Torni)` },
       ],
     },
     {
       id: "2", title: "Suggest", lane: "A+C",
       items: [
         { label: "POST /api/suggest", done: has("suggest") },
-        { label: "Suggestions generated", done: (sug?.total ?? 0) > 0, detail: `${sug?.total ?? 0} suggestions` },
-        { label: "Suggestions validated by code", done: (sug?.validated ?? 0) > 0, detail: `${sug?.validated ?? 0} validated` },
+        { label: "Suggestions validated by code", done: (sug?.validated ?? 0) > 0, detail: `${sug?.validated ?? 0} of ${sug?.total ?? 0}` },
+        { label: "Messages written by Gemini", done: gemini > 0, detail: `${gemini} Gemini, ${sug?.by_source?.fallback ?? 0} template` },
       ],
     },
     {
-      id: "3", title: "Contact", lane: "D",
+      id: "3", title: "Contact the owner", lane: "D",
       items: [
-        { label: "Message preview page", done: has("contactPage"), href: has("contactPage") ? "/contact/rye_shine" : undefined },
+        { label: "Message preview (Aurora)", done: has("contactPage"), href: link("contactPage") },
       ],
     },
     {
-      id: "4", title: "Decide", lane: "D",
+      id: "4", title: "Owner decides", lane: "D",
       items: [
-        { label: "GET /api/businesses/[id]", done: has("business") },
-        { label: "Owner page (no login)", done: has("ownerPage"), href: has("ownerPage") ? "/owner/rye_shine" : undefined },
+        { label: "Owner page (no login)", done: has("ownerPage"), href: link("ownerPage") },
         { label: "POST /api/suggestions/[id]/decide", done: has("decide") },
-        { label: "Owner made a decision", done: (sug?.decided ?? 0) > 0, detail: `${sug?.decided ?? 0} decided, ${s?.ignored_fingerprints ?? 0} ignored remembered` },
+        { label: "Owner approved, edited or declined", done: byOwner > 0, detail: `${byOwner} decided` },
       ],
     },
     {
-      id: "5", title: "Apply (Yext)", lane: "B",
+      id: "5", title: "Publish (Yext)", lane: "B",
       items: [
-        { label: "Change applied after a decision", done: (sug?.applied ?? 0) > 0, detail: `${sug?.applied ?? 0} applied` },
-        { label: "Written to the Yext sandbox", done: (sug?.applied_yext ?? 0) > 0, detail: `${sug?.applied_yext ?? 0} via Yext` },
+        { label: "Saved to the profile", done: (sug?.applied ?? 0) > 0, detail: `${sug?.applied ?? 0} applied` },
+        { label: "Written to the Yext sandbox", done: (sug?.applied_yext ?? 0) > 0, detail: `${sug?.applied_yext ?? 0} via Yext (Aurora)` },
       ],
     },
     {
       id: "L", title: "Learn", lane: "A+D",
       items: [
+        { label: "Applied by standing permission", done: (dec.auto ?? 0) > 0, detail: `${dec.auto ?? 0} (FI-D0012 "handle holidays from now on")` },
         { label: "Owner decisions remembered", done: (s?.learned ?? 0) > 0, detail: `${s?.learned ?? 0} learned` },
-        { label: "Standing permission given", done: (s?.standing_permissions ?? 0) > 0, detail: `${s?.standing_permissions ?? 0}` },
+      ],
+    },
+    {
+      id: "S", title: "Score", lane: "A",
+      items: [
+        {
+          label: "predictions_2026.csv for Fonecta's scorer", done: (s?.predictions_2026 ?? 0) > 0,
+          detail: s?.predictions_2026 ? `${s.predictions_2026} rows · 62.1 on dev (baseline 54.5), docs/predict.md` : undefined,
+        },
       ],
     },
     {
       id: "M8", title: "Dashboard", lane: "C",
       items: [
         { label: "GET /api/businesses", done: has("businesses") },
-        { label: "Dashboard page", done: has("dashboardPage"), href: has("dashboardPage") ? "/dashboard" : undefined },
+        { label: "Dashboard page", done: has("dashboardPage"), href: link("dashboardPage") },
       ],
     },
     {
-      id: "+", title: "Extras", lane: "extra",
+      id: "+", title: "Stand-out extras", lane: "extra",
       items: [
+        { label: "Search views behind each issue (C14)", done: (s?.issues?.with_search_views ?? 0) > 0, detail: `${s?.issues?.with_search_views ?? 0}` },
+        { label: "Event nights and school breaks (C15)", done: (s?.issues?.event_nights ?? 0) > 0, detail: `${s?.issues?.event_nights ?? 0}` },
+        { label: "Reply by text (D12)", done: has("reply") },
         { label: "Voice message (TTS)", done: has("tts") },
-        { label: "Voice reply (STT)", done: has("voiceReply") },
-        { label: "Review signal issues", done: n("review_signal") > 0, detail: `${n("review_signal")}` },
+        { label: "Voice reply", done: has("voiceReply") },
       ],
     },
   ];
@@ -211,7 +236,7 @@ export default function ProgressBoard() {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <ActionButton label="Reset demo" busy={busy} onClick={() => run("Reset demo", "/api/seed")} />
+        <ActionButton label="Load Fonecta cast" busy={busy} onClick={() => run("Load Fonecta cast", "/api/seed?source=fonecta")} />
         <ActionButton label="Run detection" busy={busy} disabled={!probes?.detect} onClick={() => run("Run detection", "/api/detect")} />
         <ActionButton label="Generate suggestions" busy={busy} disabled={!probes?.suggest} onClick={() => run("Generate suggestions", "/api/suggest")} />
       </div>
