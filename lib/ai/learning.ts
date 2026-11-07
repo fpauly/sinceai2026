@@ -1,4 +1,4 @@
-import type { Hours, IssueType, LearnedDecision, Preferences, ProposedChange } from "@/types";
+import type { Business, Hours, IssueType, LearnedDecision, Preferences, ProposedChange } from "@/types";
 
 // Learning (DESIGN 11, stage A5): what the owner did before shapes the next suggestion.
 // Pure helpers over `preferences` (written by D's lib/apply.ts on every decision):
@@ -36,12 +36,18 @@ export function ownerOpeningHours(prefs: Preferences | null, day: string): Hours
   return null;
 }
 
-/** Did the owner say "do this automatically next time" for this kind of change? */
+/** Did the owner say "do this automatically next time" for this kind of change? Either in our UI
+ *  (preferences), or, for special-day hours, in Connect's CRM (`contact.standing_permission_holidays`,
+ *  customer_contacts.csv: "handle public holidays from now on"). */
 export function hasStandingPermission(
   prefs: Preferences | null,
   issueType: IssueType,
   field: ProposedChange["field"],
+  business?: Pick<Business, "contact"> | null,
 ): boolean {
+  if (issueType === "special_day_hours" && field === "holiday_hours" && business?.contact?.standing_permission_holidays) {
+    return true;
+  }
   return (prefs?.standing_permissions ?? []).some((p) => p.issue_type === issueType && p.field === field);
 }
 

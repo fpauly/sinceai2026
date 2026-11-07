@@ -21,7 +21,8 @@ export async function POST(req: Request) {
     const c = await collections();
 
     const issues = await c.issues
-      .find({ status: "open", ...(businessId ? { business_id: businessId } : {}) })
+      // needs_human issues go to Connect staff (dashboard), never to the owner
+      .find({ status: "open", type: { $ne: "needs_human" }, ...(businessId ? { business_id: businessId } : {}) })
       .sort({ created_at: 1 })
       .toArray();
     if (issues.length === 0) return Response.json({ ok: true, created: [] } satisfies SuggestResponse);
@@ -74,6 +75,8 @@ async function suggestOne(issue: Issue, ctx: Ctx): Promise<Suggestion | null> {
     return null;
   }
 
+  if (business.contact?.opted_out) return null; // opted out of suggestions: no message (DESIGN 0 v2)
+
   const c = await collections();
   // Claim the issue first so two parallel runs never create two suggestions for it.
   const claimed = await c.issues.updateOne({ _id: issue._id, status: "open" }, { $set: { status: "suggested" } });
@@ -109,7 +112,7 @@ async function suggestOne(issue: Issue, ctx: Ctx): Promise<Suggestion | null> {
   }
 
   // Standing permission: apply a valid suggestion now; on any problem it simply waits for the owner.
-  if (suggestion.validation?.ok && hasStandingPermission(prefs, issue.type, suggestion.proposed_change.field)) {
+  if (suggestion.validation?.ok && hasStandingPermission(prefs, issue.type, suggestion.proposed_change.field, business)) {
     try {
       const { suggestion: applied } = await applyDecision(suggestion._id, { decision: "accepted", via: "tap" }, { auto: true });
       return applied;

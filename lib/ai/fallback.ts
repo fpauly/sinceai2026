@@ -22,6 +22,7 @@ import type {
   TypedProposedChange,
 } from "@/types/api";
 import { ownerHolidayHours, ownerOpeningHours } from "@/lib/ai/learning";
+import { specialDaySuggestion } from "@/lib/ai/specialDay";
 
 // Step 2 (Suggest) without an LLM: one template per issue type, EN + FI, in Fonecta Connect's voice.
 // Used when Gemini is off, fails, or produces an invalid suggestion (DESIGN 9, 9.4).
@@ -419,7 +420,8 @@ export function fallbackSuggestion(
     case "review_signal":
       return reviewSignal(business, issue, listings);
     case "special_day_hours":
+      return specialDaySuggestion(business, issue);
     case "needs_human":
-      throw new Error(`no template for ${issue.type} yet (stage A11)`);
+      throw new Error("needs_human issues go to Connect staff, not to the owner");
   }
 }
