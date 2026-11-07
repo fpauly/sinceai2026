@@ -34,6 +34,7 @@ async function clearEverything(c: Awaited<ReturnType<typeof collections>>) {
     c.holiday_history.deleteMany({}),
     c.special_days.deleteMany({}),
     c.peers.deleteMany({}),
+    c.publisher_suggestions.deleteMany({}),
   ]);
 }
 
@@ -90,6 +91,8 @@ async function seedFonecta() {
     c.holiday_history.insertMany(demo.holiday_history),
     c.special_days.insertMany(demo.special_days),
     c.peers.insertMany(demo.peers),
+    c.reviews.insertMany(demo.reviews),
+    c.publisher_suggestions.insertMany(demo.publisher_suggestions),
   ]);
 
   // Issues and suggestions are created per demo run, so only their lookup indexes are needed.
@@ -100,6 +103,7 @@ async function seedFonecta() {
     c.holiday_history.createIndex({ business_id: 1, date: -1 }),
     c.special_days.createIndex({ country: 1, date: 1 }),
     c.peers.createIndex({ country: 1, city_tier: 1, segment: 1, day_key: 1 }),
+    c.publisher_suggestions.createIndex({ business_id: 1, date: -1 }),
   ]);
 
   return Response.json({
@@ -111,6 +115,8 @@ async function seedFonecta() {
       holiday_history: demo.holiday_history.length,
       special_days: demo.special_days.length,
       peers: demo.peers.length,
+      reviews: demo.reviews.length,
+      publisher_suggestions: demo.publisher_suggestions.length,
     },
   });
 }

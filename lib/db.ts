@@ -11,6 +11,7 @@ import type {
   HolidayHistoryEntry,
   SpecialDay,
   PeerBenchmark,
+  PublisherSuggestion,
 } from "@/types";
 
 // Singleton MongoClient, reused across hot reloads in dev.
@@ -51,6 +52,7 @@ export async function collections(): Promise<{
   holiday_history: Collection<HolidayHistoryEntry>;
   special_days: Collection<SpecialDay>;
   peers: Collection<PeerBenchmark>;
+  publisher_suggestions: Collection<PublisherSuggestion>;
 }> {
   const db = await getDb();
   return {
@@ -64,5 +66,6 @@ export async function collections(): Promise<{
     holiday_history: db.collection<HolidayHistoryEntry>("holiday_history"),
     special_days: db.collection<SpecialDay>("special_days"),
     peers: db.collection<PeerBenchmark>("peers"),
+    publisher_suggestions: db.collection<PublisherSuggestion>("publisher_suggestions"),
   };
 }

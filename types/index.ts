@@ -160,6 +160,17 @@ export interface Review {
   text: string;
 }
 
+/** v2: a publisher (Google/Apple/Bing) user edit waiting for confirmation (publisher_suggestions.json).
+ *  `field` "closed" is what lib/predict reads as a closure signal. */
+export interface PublisherSuggestion {
+  _id: string;
+  business_id: string;
+  date: string; // dateCreated, "YYYY-MM-DD"
+  field: string; // fieldName, e.g. "closed" or "hours"
+  status: string; // WAITING_ON_CUSTOMER, EXPIRED, …
+  publisher_id: string;
+}
+
 export type IssueType =
   | "missing_holiday_hours"
   | "cross_platform_conflict"

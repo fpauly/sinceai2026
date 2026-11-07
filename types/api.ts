@@ -11,6 +11,7 @@ import type {
   PeerBenchmark,
   Profile,
   SpecialDay,
+  PublisherSuggestion,
   Decision,
   DecidedVia,
   HolidayHours,
@@ -170,6 +171,15 @@ export interface RuleContext {
   listings: Listing[];
   reviews: Review[];
   today: string; // DEMO_DATE, "YYYY-MM-DD"
+
+  // ---- v2 (Fonecta dataset): set when the business has a Profile; the v1 rules are not run then ----
+  profile?: Profile;
+  history?: HolidayHistoryEntry[]; // this business's exception history
+  special_days?: SpecialDay[]; // calendar rows for every country (rules filter by business.country)
+  peers?: PeerBenchmark[]; // rows for this business's (country, city tier, segment)
+  centre?: { business: Business; profile: Profile; history: HolidayHistoryEntry[] } | null;
+  publisher_suggestions?: PublisherSuggestion[];
+  learned?: LearnedDecision[]; // preferences.learned
 }
 
 /** What a rule returns. runDetection adds _id, status "open" and created_at. */

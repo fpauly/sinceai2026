@@ -9,7 +9,9 @@
     "profiles": 32,
     "holiday_history": 1102,
     "special_days": 244,
-    "peers": 421
+    "peers": 421,
+    "reviews": 245,
+    "publisher_suggestions": 40
   },
   "businesses": [
     {
@@ -23646,6 +23648,2045 @@
       "closed_share_among_entered": 0.815,
       "median_open_special": "12:00",
       "median_close_special": "16:00"
+    }
+  ],
+  "reviews": [
+    {
+      "_id": "fonecta_914057800",
+      "business_id": "FI-D0001",
+      "date": "2023-08-05",
+      "rating": 5,
+      "text": "Perheen kanssa. Ihana tunnelma ja hyvät juomat. Annokset olivat maukkaita ja kauniisti esillepantuja. Kahvi oli erinomaista ja pulla tuoretta. Kiitos!"
+    },
+    {
+      "_id": "fonecta_914057790",
+      "business_id": "FI-D0001",
+      "date": "2024-04-03",
+      "rating": 5,
+      "text": "Viihtyisä paikka, tänne tullaan uudestaan. Ihana tunnelma ja hyvät juomat. Hinta-laatusuhde kohdallaan. Kortilla pystyi maksamaan sujuvasti."
+    },
+    {
+      "_id": "fonecta_914057797",
+      "business_id": "FI-D0001",
+      "date": "2024-09-28",
+      "rating": 4,
+      "text": "Paras pizza pitkään aikaan! Henkilökunta oli todella mukavaa. Ei valittamista."
+    },
+    {
+      "_id": "fonecta_914057793",
+      "business_id": "FI-D0001",
+      "date": "2024-11-04",
+      "rating": 3,
+      "text": "Helt okej, inget speciellt. Snabb service trots kö. För dyrt för vad man fick. Tack!"
+    },
+    {
+      "_id": "fonecta_914057802",
+      "business_id": "FI-D0001",
+      "date": "2024-11-17",
+      "rating": 5,
+      "text": "First visit. Quick service even though it was busy. Great coffee and fresh pastries. Good value for money."
+    },
+    {
+      "_id": "fonecta_914057792",
+      "business_id": "FI-D0001",
+      "date": "2024-12-25",
+      "rating": 4,
+      "text": "Really good food and friendly staff. Good value for money. Quick service even though it was busy. Parking was a bit tight though."
+    },
+    {
+      "_id": "fonecta_914057801",
+      "business_id": "FI-D0001",
+      "date": "2025-02-27",
+      "rating": 5,
+      "text": "Ensimmäinen käynti. Nopea palvelu ruuhkasta huolimatta. Viihtyisä paikka, tänne tullaan uudestaan. Henkilökunta oli todella mukavaa."
+    },
+    {
+      "_id": "fonecta_914057788",
+      "business_id": "FI-D0001",
+      "date": "2025-05-11",
+      "rating": 5,
+      "text": "Työkaverin suosituksesta. Hinta-laatusuhde kohdallaan. Viihtyisä paikka, tänne tullaan uudestaan. Tosi hyvää ruokaa ja ystävällinen palvelu. Tullaan uudestaan."
+    },
+    {
+      "_id": "fonecta_914057787",
+      "business_id": "FI-D0001",
+      "date": "2025-05-15",
+      "rating": 4,
+      "text": "Perheen kanssa. Hinta-laatusuhde kohdallaan. Kahvi oli erinomaista ja pulla tuoretta."
+    },
+    {
+      "_id": "fonecta_914057804",
+      "business_id": "FI-D0001",
+      "date": "2025-06-08",
+      "rating": 5,
+      "text": "Kiitos että olitte auki helluntaina, pelastitte päivän."
+    },
+    {
+      "_id": "fonecta_914057798",
+      "business_id": "FI-D0001",
+      "date": "2025-06-26",
+      "rating": 5,
+      "text": "Tosi hyvää ruokaa ja ystävällinen palvelu. Paras pizza pitkään aikaan! Hinta-laatusuhde kohdallaan."
+    },
+    {
+      "_id": "fonecta_914057791",
+      "business_id": "FI-D0001",
+      "date": "2025-07-14",
+      "rating": 4,
+      "text": "Lounastauolla piipahdus. Paras pizza pitkään aikaan! Tosi hyvää ruokaa ja ystävällinen palvelu. Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914057786",
+      "business_id": "FI-D0001",
+      "date": "2025-12-05",
+      "rating": 5,
+      "text": "Lounastauolla piipahdus. Kahvi oli erinomaista ja pulla tuoretta. Henkilökunta oli todella mukavaa. Annokset olivat maukkaita ja kauniisti esillepantuja. Ei valittamista."
+    },
+    {
+      "_id": "fonecta_914057783",
+      "business_id": "FI-D0001",
+      "date": "2026-04-19",
+      "rating": 3,
+      "text": "Perheen kanssa. Ihan ok, ei mitään erikoista."
+    },
+    {
+      "_id": "fonecta_914057805",
+      "business_id": "FI-D0002",
+      "date": "2024-02-20",
+      "rating": 3,
+      "text": "Työkaverin suosituksesta. Keskiverto kokemus. Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914057809",
+      "business_id": "FI-D0002",
+      "date": "2025-04-19",
+      "rating": 2,
+      "text": "Tultiin pääsiäislauantaina paikan päälle, mutta ovi oli kiinni, vaikka Googlen mukaan piti olla auki. Päivittäkää aukioloajat!"
+    },
+    {
+      "_id": "fonecta_914057807",
+      "business_id": "FI-D0002",
+      "date": "2026-03-01",
+      "rating": 5,
+      "text": "Käytiin perjantaina. Ihana tunnelma ja hyvät juomat. Viihtyisä paikka, tänne tullaan uudestaan. Tosi hyvää ruokaa ja ystävällinen palvelu. Kiitos!"
+    },
+    {
+      "_id": "fonecta_914057818",
+      "business_id": "FI-D0003",
+      "date": "2023-09-10",
+      "rating": 4,
+      "text": "Työkaverin suosituksesta. Sain hyvää neuvontaa ostoksiin. Löysin heti mitä etsin. Ystävällinen myyjä auttoi. Suosittelen!"
+    },
+    {
+      "_id": "fonecta_914057812",
+      "business_id": "FI-D0003",
+      "date": "2024-02-19",
+      "rating": 3,
+      "text": "Perheen kanssa. Keskiverto kokemus. Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914057824",
+      "business_id": "FI-D0003",
+      "date": "2024-03-08",
+      "rating": 4,
+      "text": "Toinen kerta täällä. Hinnat kohdallaan ja kassalla ei jonoa. Sain hyvää neuvontaa ostoksiin. Löysin heti mitä etsin. Kortilla pystyi maksamaan sujuvasti."
+    },
+    {
+      "_id": "fonecta_914057815",
+      "business_id": "FI-D0003",
+      "date": "2024-04-12",
+      "rating": 3,
+      "text": "Toimii, mutta hinta vähän korkea. Hinnat kohdallaan ja kassalla ei jonoa. Myyjä ei ehtinyt auttaa."
+    },
+    {
+      "_id": "fonecta_914057822",
+      "business_id": "FI-D0003",
+      "date": "2024-06-02",
+      "rating": 3,
+      "text": "Työkaverin suosituksesta. Toimii, mutta hinta vähän korkea. Tullaan uudestaan."
+    },
+    {
+      "_id": "fonecta_914057823",
+      "business_id": "FI-D0003",
+      "date": "2024-08-12",
+      "rating": 5,
+      "text": "Bra sortiment och kunnig personal. Vi kommer tillbaka."
+    },
+    {
+      "_id": "fonecta_914057820",
+      "business_id": "FI-D0003",
+      "date": "2024-08-17",
+      "rating": 3,
+      "text": "Lounastauolla piipahdus. Toimii, mutta hinta vähän korkea. Suosittelen!"
+    },
+    {
+      "_id": "fonecta_914057826",
+      "business_id": "FI-D0003",
+      "date": "2024-09-21",
+      "rating": 3,
+      "text": "Var här i fredags. Helt okej, inget speciellt. Bra sortiment och kunnig personal. Lång kö i kassan. Tack!"
+    },
+    {
+      "_id": "fonecta_914057810",
+      "business_id": "FI-D0003",
+      "date": "2025-01-02",
+      "rating": 3,
+      "text": "Toinen kerta täällä. Keskiverto kokemus. Ei valittamista."
+    },
+    {
+      "_id": "fonecta_914057821",
+      "business_id": "FI-D0003",
+      "date": "2025-03-14",
+      "rating": 2,
+      "text": "Ensimmäinen käynti. Jono kassalle oli pitkä. Valikoima oli suppea."
+    },
+    {
+      "_id": "fonecta_914057816",
+      "business_id": "FI-D0003",
+      "date": "2025-03-25",
+      "rating": 4,
+      "text": "Ensimmäinen käynti. Ystävällinen myyjä auttoi."
+    },
+    {
+      "_id": "fonecta_914057817",
+      "business_id": "FI-D0003",
+      "date": "2025-06-16",
+      "rating": 4,
+      "text": "Hinnat kohdallaan ja kassalla ei jonoa. Ei valittamista."
+    },
+    {
+      "_id": "fonecta_914057827",
+      "business_id": "FI-D0003",
+      "date": "2025-06-21",
+      "rating": 1,
+      "text": "Juhannuspäivänä suljettiin jo klo 14, vaikka netissä luki 9–15."
+    },
+    {
+      "_id": "fonecta_914057814",
+      "business_id": "FI-D0003",
+      "date": "2025-12-14",
+      "rating": 2,
+      "text": "Ensimmäinen käynti. Myyjä ei ehtinyt auttaa. Jono kassalle oli pitkä."
+    },
+    {
+      "_id": "fonecta_914057828",
+      "business_id": "FI-D0003",
+      "date": "2026-04-06",
+      "rating": 5,
+      "text": "Kiva että olitte auki toisena pääsiäispäivänä!"
+    },
+    {
+      "_id": "fonecta_914057829",
+      "business_id": "FI-D0004",
+      "date": "2023-08-29",
+      "rating": 2,
+      "text": "Toinen kerta täällä. Jono kassalle oli pitkä. Myyjä ei ehtinyt auttaa."
+    },
+    {
+      "_id": "fonecta_914057831",
+      "business_id": "FI-D0004",
+      "date": "2023-09-07",
+      "rating": 4,
+      "text": "Ystävällinen myyjä auttoi. Ei valittamista."
+    },
+    {
+      "_id": "fonecta_914057833",
+      "business_id": "FI-D0004",
+      "date": "2024-02-01",
+      "rating": 5,
+      "text": "Työkaverin suosituksesta. Ystävällinen myyjä auttoi. Suosittelen!"
+    },
+    {
+      "_id": "fonecta_914057838",
+      "business_id": "FI-D0004",
+      "date": "2024-02-10",
+      "rating": 5,
+      "text": "Siisti ja selkeä myymälä. Tullaan uudestaan."
+    },
+    {
+      "_id": "fonecta_914057832",
+      "business_id": "FI-D0004",
+      "date": "2024-09-21",
+      "rating": 4,
+      "text": "Hinnat kohdallaan ja kassalla ei jonoa. Ystävällinen myyjä auttoi. Sain hyvää neuvontaa ostoksiin. Ei valittamista."
+    },
+    {
+      "_id": "fonecta_914057840",
+      "business_id": "FI-D0004",
+      "date": "2025-03-25",
+      "rating": 5,
+      "text": "Hyvä valikoima ja asiantunteva palvelu. Siisti ja selkeä myymälä. Löysin heti mitä etsin. Parkkipaikka tosin ahdas."
+    },
+    {
+      "_id": "fonecta_914057841",
+      "business_id": "FI-D0004",
+      "date": "2025-06-20",
+      "rating": 4,
+      "text": "Hinnat kohdallaan ja kassalla ei jonoa. Siisti ja selkeä myymälä. Löysin heti mitä etsin. Kortilla pystyi maksamaan sujuvasti."
+    },
+    {
+      "_id": "fonecta_914057839",
+      "business_id": "FI-D0004",
+      "date": "2025-07-01",
+      "rating": 4,
+      "text": "Löysin heti mitä etsin. Sain hyvää neuvontaa ostoksiin. Hyvä valikoima ja asiantunteva palvelu. Suosittelen!"
+    },
+    {
+      "_id": "fonecta_914057834",
+      "business_id": "FI-D0004",
+      "date": "2025-12-24",
+      "rating": 5,
+      "text": "Siisti ja selkeä myymälä. Sain hyvää neuvontaa ostoksiin. Ystävällinen myyjä auttoi."
+    },
+    {
+      "_id": "fonecta_914057830",
+      "business_id": "FI-D0004",
+      "date": "2026-03-09",
+      "rating": 3,
+      "text": "Työkaverin suosituksesta. Perushyvä. Hinnat kohdallaan ja kassalla ei jonoa. Hinnat olivat korkeat."
+    },
+    {
+      "_id": "fonecta_914057835",
+      "business_id": "FI-D0004",
+      "date": "2026-07-04",
+      "rating": 2,
+      "text": "Myyjä ei ehtinyt auttaa. Jono kassalle oli pitkä."
+    },
+    {
+      "_id": "fonecta_914057848",
+      "business_id": "FI-D0005",
+      "date": "2023-09-01",
+      "rating": 5,
+      "text": "Lounastauolla piipahdus. Mukava paikka koko perheelle."
+    },
+    {
+      "_id": "fonecta_914057844",
+      "business_id": "FI-D0005",
+      "date": "2024-09-06",
+      "rating": 4,
+      "text": "Työkaverin suosituksesta. Henkilökunta oli avuliasta."
+    },
+    {
+      "_id": "fonecta_914057850",
+      "business_id": "FI-D0005",
+      "date": "2025-01-05",
+      "rating": 3,
+      "text": "Okay, nothing special. Will come back."
+    },
+    {
+      "_id": "fonecta_914057854",
+      "business_id": "FI-D0006",
+      "date": "2023-06-05",
+      "rating": 4,
+      "text": "Perheen kanssa. Lounas oli monipuolinen ja raikas. Ei valittamista."
+    },
+    {
+      "_id": "fonecta_914057856",
+      "business_id": "FI-D0006",
+      "date": "2023-07-06",
+      "rating": 4,
+      "text": "Perheen kanssa. Hinta-laatusuhde kohdallaan. Tosi hyvää ruokaa ja ystävällinen palvelu. Ei valittamista."
+    },
+    {
+      "_id": "fonecta_914057851",
+      "business_id": "FI-D0006",
+      "date": "2023-08-29",
+      "rating": 5,
+      "text": "Viihtyisä paikka, tänne tullaan uudestaan. Kahvi oli erinomaista ja pulla tuoretta. Hinta-laatusuhde kohdallaan. Parkkipaikka tosin ahdas."
+    },
+    {
+      "_id": "fonecta_914057864",
+      "business_id": "FI-D0006",
+      "date": "2024-01-01",
+      "rating": 1,
+      "text": "Aukioloajat olivat väärin uudenvuodenpäivänä. Seisottiin suljetun oven takana."
+    },
+    {
+      "_id": "fonecta_914057852",
+      "business_id": "FI-D0006",
+      "date": "2024-11-24",
+      "rating": 3,
+      "text": "Työkaverin suosituksesta. Keskiverto kokemus."
+    },
+    {
+      "_id": "fonecta_914057865",
+      "business_id": "FI-D0006",
+      "date": "2025-01-28",
+      "rating": 1,
+      "text": "Kesäravintola on tauolla, netissä silti aukioloajat."
+    },
+    {
+      "_id": "fonecta_914057861",
+      "business_id": "FI-D0006",
+      "date": "2025-08-02",
+      "rating": 4,
+      "text": "Ensimmäinen käynti. Lounas oli monipuolinen ja raikas. Hinta-laatusuhde kohdallaan. Kortilla pystyi maksamaan sujuvasti."
+    },
+    {
+      "_id": "fonecta_914057859",
+      "business_id": "FI-D0006",
+      "date": "2025-09-19",
+      "rating": 4,
+      "text": "Kävin pitkästä aikaa. Annokset olivat maukkaita ja kauniisti esillepantuja. Viihtyisä paikka, tänne tullaan uudestaan. Tullaan uudestaan."
+    },
+    {
+      "_id": "fonecta_914057866",
+      "business_id": "FI-D0006",
+      "date": "2025-11-15",
+      "rating": 2,
+      "text": "Kesäravintola on tauolla, netissä silti aukioloajat."
+    },
+    {
+      "_id": "fonecta_914057863",
+      "business_id": "FI-D0006",
+      "date": "2025-12-29",
+      "rating": 4,
+      "text": "Lounastauolla piipahdus. Viihtyisä paikka, tänne tullaan uudestaan. Ihana tunnelma ja hyvät juomat. Lounas oli monipuolinen ja raikas. Suosittelen!"
+    },
+    {
+      "_id": "fonecta_914057855",
+      "business_id": "FI-D0006",
+      "date": "2026-10-23",
+      "rating": 5,
+      "text": "Paras pizza pitkään aikaan! Viihtyisä paikka, tänne tullaan uudestaan. Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914057876",
+      "business_id": "FI-D0007",
+      "date": "2024-01-22",
+      "rating": 4,
+      "text": "Kävin pitkästä aikaa. Asiantunteva ja ystävällinen henkilökunta. Kortilla pystyi maksamaan sujuvasti."
+    },
+    {
+      "_id": "fonecta_914057870",
+      "business_id": "FI-D0007",
+      "date": "2024-03-14",
+      "rating": 5,
+      "text": "Toinen kerta täällä. Selkeä viestintä koko ajan. Asiantunteva ja ystävällinen henkilökunta."
+    },
+    {
+      "_id": "fonecta_914057874",
+      "business_id": "FI-D0007",
+      "date": "2024-07-08",
+      "rating": 5,
+      "text": "Ensimmäinen käynti. Hoidettiin tehokkaasti ja hinta oli sovittu. Asiantunteva ja ystävällinen henkilökunta. Ammattitaitoista palvelua, suosittelen. Kortilla pystyi maksamaan sujuvasti."
+    },
+    {
+      "_id": "fonecta_914057871",
+      "business_id": "FI-D0007",
+      "date": "2024-11-16",
+      "rating": 4,
+      "text": "With the family. Professional service, recommended. Got an appointment quickly and everything went smoothly. Result was exactly what I wanted."
+    },
+    {
+      "_id": "fonecta_914057881",
+      "business_id": "FI-D0007",
+      "date": "2024-12-28",
+      "rating": 1,
+      "text": "Harmi, välipäivinä ovet kiinni. Aukiolotiedot kannattaisi päivittää pyhien ajaksi."
+    },
+    {
+      "_id": "fonecta_914057882",
+      "business_id": "FI-D0007",
+      "date": "2025-04-17",
+      "rating": 1,
+      "text": "Netissä luki auki 10–18, mutta kiirastorstaina oli suljettu. Turha reissu."
+    },
+    {
+      "_id": "fonecta_914057868",
+      "business_id": "FI-D0007",
+      "date": "2025-04-19",
+      "rating": 3,
+      "text": "Toimii, mutta hinta vähän korkea. Tullaan uudestaan."
+    },
+    {
+      "_id": "fonecta_914057883",
+      "business_id": "FI-D0007",
+      "date": "2025-05-30",
+      "rating": 1,
+      "text": "Tultiin helatorstaina paikan päälle, mutta ovi oli kiinni, vaikka Googlen mukaan piti olla auki. Päivittäkää aukioloajat!"
+    },
+    {
+      "_id": "fonecta_914057869",
+      "business_id": "FI-D0007",
+      "date": "2025-06-04",
+      "rating": 3,
+      "text": "Kävin pitkästä aikaa. Keskiverto kokemus. Hoidettiin tehokkaasti ja hinta oli sovittu. Hinta oli kalliimpi kuin luvattiin. Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914057867",
+      "business_id": "FI-D0007",
+      "date": "2025-09-01",
+      "rating": 5,
+      "text": "Työkaverin suosituksesta. Asiantunteva ja ystävällinen henkilökunta. Aika järjestyi nopeasti ja kaikki sujui hyvin. Selkeä viestintä koko ajan. Tullaan uudestaan."
+    },
+    {
+      "_id": "fonecta_914057880",
+      "business_id": "FI-D0007",
+      "date": "2026-04-09",
+      "rating": 4,
+      "text": "Result was exactly what I wanted. Got an appointment quickly and everything went smoothly. Will come back."
+    },
+    {
+      "_id": "fonecta_914057877",
+      "business_id": "FI-D0007",
+      "date": "2026-05-03",
+      "rating": 5,
+      "text": "Aika järjestyi nopeasti ja kaikki sujui hyvin. Tullaan uudestaan."
+    },
+    {
+      "_id": "fonecta_914057878",
+      "business_id": "FI-D0007",
+      "date": "2026-10-10",
+      "rating": 5,
+      "text": "Työkaverin suosituksesta. Lopputulos oli juuri sellainen kuin toivoin."
+    },
+    {
+      "_id": "fonecta_914058023",
+      "business_id": "FI-D0010",
+      "date": "2023-07-13",
+      "rating": 5,
+      "text": "Ensimmäinen käynti. Kahvi oli erinomaista ja pulla tuoretta. Annokset olivat maukkaita ja kauniisti esillepantuja. Tullaan uudestaan."
+    },
+    {
+      "_id": "fonecta_914058009",
+      "business_id": "FI-D0010",
+      "date": "2023-07-16",
+      "rating": 5,
+      "text": "Lounastauolla piipahdus. Henkilökunta oli todella mukavaa. Tullaan uudestaan."
+    },
+    {
+      "_id": "fonecta_914058018",
+      "business_id": "FI-D0010",
+      "date": "2023-07-18",
+      "rating": 3,
+      "text": "Perushyvä. Suosittelen!"
+    },
+    {
+      "_id": "fonecta_914058026",
+      "business_id": "FI-D0010",
+      "date": "2023-10-03",
+      "rating": 5,
+      "text": "Työkaverin suosituksesta. Hinta-laatusuhde kohdallaan. Tosi hyvää ruokaa ja ystävällinen palvelu. Kahvi oli erinomaista ja pulla tuoretta."
+    },
+    {
+      "_id": "fonecta_914057988",
+      "business_id": "FI-D0010",
+      "date": "2023-10-19",
+      "rating": 4,
+      "text": "Lounastauolla piipahdus. Lounas oli monipuolinen ja raikas. Annokset olivat maukkaita ja kauniisti esillepantuja."
+    },
+    {
+      "_id": "fonecta_914058005",
+      "business_id": "FI-D0010",
+      "date": "2023-11-06",
+      "rating": 2,
+      "text": "Kävin pitkästä aikaa. Tilaus meni väärin kahdesti. Ruoka oli haaleaa ja odotus pitkä."
+    },
+    {
+      "_id": "fonecta_914058027",
+      "business_id": "FI-D0010",
+      "date": "2024-01-02",
+      "rating": 2,
+      "text": "Aukioloajat olivat väärin uudenvuodenpäivänä. Seisottiin suljetun oven takana."
+    },
+    {
+      "_id": "fonecta_914057996",
+      "business_id": "FI-D0010",
+      "date": "2024-02-24",
+      "rating": 4,
+      "text": "Ihana tunnelma ja hyvät juomat. Kahvi oli erinomaista ja pulla tuoretta. Suosittelen!"
+    },
+    {
+      "_id": "fonecta_914057993",
+      "business_id": "FI-D0010",
+      "date": "2024-02-29",
+      "rating": 5,
+      "text": "Lounastauolla piipahdus. Lounas oli monipuolinen ja raikas. Hinta-laatusuhde kohdallaan. Henkilökunta oli todella mukavaa. Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914057980",
+      "business_id": "FI-D0010",
+      "date": "2024-03-19",
+      "rating": 3,
+      "text": "Työkaverin suosituksesta. Keskiverto kokemus. Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914058008",
+      "business_id": "FI-D0010",
+      "date": "2024-03-27",
+      "rating": 5,
+      "text": "Toinen kerta täällä. Paras pizza pitkään aikaan! Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914057979",
+      "business_id": "FI-D0010",
+      "date": "2024-08-05",
+      "rating": 2,
+      "text": "Ensimmäinen käynti. Pöydät olivat likaisia. Tilaus meni väärin kahdesti."
+    },
+    {
+      "_id": "fonecta_914057973",
+      "business_id": "FI-D0010",
+      "date": "2024-08-26",
+      "rating": 5,
+      "text": "Andra gången här. Mysigt ställe, vi kommer gärna tillbaka. Tack!"
+    },
+    {
+      "_id": "fonecta_914057992",
+      "business_id": "FI-D0010",
+      "date": "2024-09-12",
+      "rating": 4,
+      "text": "Toinen kerta täällä. Ihana tunnelma ja hyvät juomat."
+    },
+    {
+      "_id": "fonecta_914057983",
+      "business_id": "FI-D0010",
+      "date": "2024-10-14",
+      "rating": 5,
+      "text": "Työkaverin suosituksesta. Viihtyisä paikka, tänne tullaan uudestaan. Ihana tunnelma ja hyvät juomat. Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914057994",
+      "business_id": "FI-D0010",
+      "date": "2024-11-02",
+      "rating": 5,
+      "text": "Käytiin perjantaina. Tosi hyvää ruokaa ja ystävällinen palvelu. Kortilla pystyi maksamaan sujuvasti."
+    },
+    {
+      "_id": "fonecta_914058015",
+      "business_id": "FI-D0010",
+      "date": "2025-02-11",
+      "rating": 5,
+      "text": "Kahvi oli erinomaista ja pulla tuoretta. Henkilökunta oli todella mukavaa. Paras pizza pitkään aikaan! Kiitos!"
+    },
+    {
+      "_id": "fonecta_914057978",
+      "business_id": "FI-D0010",
+      "date": "2025-02-12",
+      "rating": 5,
+      "text": "Työkaverin suosituksesta. Annokset olivat maukkaita ja kauniisti esillepantuja. Hinta-laatusuhde kohdallaan. Paras pizza pitkään aikaan! Kiitos!"
+    },
+    {
+      "_id": "fonecta_914058007",
+      "business_id": "FI-D0010",
+      "date": "2025-03-08",
+      "rating": 5,
+      "text": "Työkaverin suosituksesta. Ihana tunnelma ja hyvät juomat."
+    },
+    {
+      "_id": "fonecta_914057977",
+      "business_id": "FI-D0010",
+      "date": "2025-03-10",
+      "rating": 5,
+      "text": "Työkaverin suosituksesta. Paras pizza pitkään aikaan! Parkkipaikka tosin ahdas."
+    },
+    {
+      "_id": "fonecta_914057986",
+      "business_id": "FI-D0010",
+      "date": "2025-03-31",
+      "rating": 4,
+      "text": "Työkaverin suosituksesta. Lounas oli monipuolinen ja raikas. Nopea palvelu ruuhkasta huolimatta. Paras pizza pitkään aikaan!"
+    },
+    {
+      "_id": "fonecta_914058028",
+      "business_id": "FI-D0010",
+      "date": "2025-04-20",
+      "rating": 1,
+      "text": "Netissä luki auki 15–0, mutta pääsiäispäivänä oli suljettu. Turha reissu."
+    },
+    {
+      "_id": "fonecta_914058003",
+      "business_id": "FI-D0010",
+      "date": "2025-08-31",
+      "rating": 5,
+      "text": "Viihtyisä paikka, tänne tullaan uudestaan. Nopea palvelu ruuhkasta huolimatta. Paras pizza pitkään aikaan! Kiitos!"
+    },
+    {
+      "_id": "fonecta_914057984",
+      "business_id": "FI-D0010",
+      "date": "2025-09-26",
+      "rating": 4,
+      "text": "First visit. Cosy place, we will come back. Really good food and friendly staff. Lovely atmosphere and good drinks."
+    },
+    {
+      "_id": "fonecta_914058020",
+      "business_id": "FI-D0010",
+      "date": "2025-12-18",
+      "rating": 5,
+      "text": "Ensimmäinen käynti. Viihtyisä paikka, tänne tullaan uudestaan. Tosi hyvää ruokaa ja ystävällinen palvelu."
+    },
+    {
+      "_id": "fonecta_914058029",
+      "business_id": "FI-D0010",
+      "date": "2025-12-26",
+      "rating": 1,
+      "text": "Tultiin tapaninpäivänä paikan päälle, mutta ovi oli kiinni, vaikka Googlen mukaan piti olla auki. Päivittäkää aukioloajat!"
+    },
+    {
+      "_id": "fonecta_914057999",
+      "business_id": "FI-D0010",
+      "date": "2025-12-31",
+      "rating": 4,
+      "text": "Käytiin perjantaina. Tosi hyvää ruokaa ja ystävällinen palvelu. Parkkipaikka tosin ahdas."
+    },
+    {
+      "_id": "fonecta_914057989",
+      "business_id": "FI-D0010",
+      "date": "2026-01-05",
+      "rating": 3,
+      "text": "Visited on a Friday. Average experience. Cosy place, we will come back. Food was lukewarm and the wait was long. Recommended!"
+    },
+    {
+      "_id": "fonecta_914057985",
+      "business_id": "FI-D0010",
+      "date": "2026-03-19",
+      "rating": 5,
+      "text": "Hinta-laatusuhde kohdallaan. Nopea palvelu ruuhkasta huolimatta. Kortilla pystyi maksamaan sujuvasti."
+    },
+    {
+      "_id": "fonecta_914058025",
+      "business_id": "FI-D0010",
+      "date": "2026-05-06",
+      "rating": 4,
+      "text": "Lovely atmosphere and good drinks. Best pizza in a long time! Good value for money. Parking was a bit tight though."
+    },
+    {
+      "_id": "fonecta_914058002",
+      "business_id": "FI-D0010",
+      "date": "2026-05-09",
+      "rating": 5,
+      "text": "Käytiin perjantaina. Henkilökunta oli todella mukavaa. Kahvi oli erinomaista ja pulla tuoretta. Paras pizza pitkään aikaan!"
+    },
+    {
+      "_id": "fonecta_914057997",
+      "business_id": "FI-D0010",
+      "date": "2026-05-14",
+      "rating": 5,
+      "text": "Kävin pitkästä aikaa. Kahvi oli erinomaista ja pulla tuoretta. Lounas oli monipuolinen ja raikas. Tosi hyvää ruokaa ja ystävällinen palvelu."
+    },
+    {
+      "_id": "fonecta_914057976",
+      "business_id": "FI-D0010",
+      "date": "2026-06-29",
+      "rating": 4,
+      "text": "Käytiin perjantaina. Annokset olivat maukkaita ja kauniisti esillepantuja. Lounas oli monipuolinen ja raikas. Tosi hyvää ruokaa ja ystävällinen palvelu. Suosittelen!"
+    },
+    {
+      "_id": "fonecta_914057981",
+      "business_id": "FI-D0010",
+      "date": "2026-08-22",
+      "rating": 4,
+      "text": "Good value for money. Cosy place, we will come back. Great coffee and fresh pastries. Parking was a bit tight though."
+    },
+    {
+      "_id": "fonecta_914058000",
+      "business_id": "FI-D0010",
+      "date": "2026-08-26",
+      "rating": 4,
+      "text": "Tosi hyvää ruokaa ja ystävällinen palvelu. Nopea palvelu ruuhkasta huolimatta. Annokset olivat maukkaita ja kauniisti esillepantuja."
+    },
+    {
+      "_id": "fonecta_914057982",
+      "business_id": "FI-D0010",
+      "date": "2026-09-01",
+      "rating": 5,
+      "text": "Toinen kerta täällä. Paras pizza pitkään aikaan! Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914058004",
+      "business_id": "FI-D0010",
+      "date": "2026-09-27",
+      "rating": 4,
+      "text": "Rekommenderat av en kollega. Mysigt ställe, vi kommer gärna tillbaka. Kaffet var utmärkt och bullarna färska. Prisvärt och gott. Rekommenderas!"
+    },
+    {
+      "_id": "fonecta_914058021",
+      "business_id": "FI-D0010",
+      "date": "2026-10-04",
+      "rating": 5,
+      "text": "Lounastauolla piipahdus. Tosi hyvää ruokaa ja ystävällinen palvelu. Henkilökunta oli todella mukavaa. Lounas oli monipuolinen ja raikas."
+    },
+    {
+      "_id": "fonecta_914057975",
+      "business_id": "FI-D0010",
+      "date": "2026-10-16",
+      "rating": 5,
+      "text": "Työkaverin suosituksesta. Nopea palvelu ruuhkasta huolimatta. Lounas oli monipuolinen ja raikas. Henkilökunta oli todella mukavaa. Kortilla pystyi maksamaan sujuvasti."
+    },
+    {
+      "_id": "fonecta_914057987",
+      "business_id": "FI-D0010",
+      "date": "2026-10-23",
+      "rating": 4,
+      "text": "Henkilökunta oli todella mukavaa. Annokset olivat maukkaita ja kauniisti esillepantuja. Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914058046",
+      "business_id": "FI-D0011",
+      "date": "2023-12-13",
+      "rating": 5,
+      "text": "Työkaverin suosituksesta. Henkilökunta oli todella mukavaa. Paras pizza pitkään aikaan! Lounas oli monipuolinen ja raikas."
+    },
+    {
+      "_id": "fonecta_914058043",
+      "business_id": "FI-D0011",
+      "date": "2024-03-03",
+      "rating": 5,
+      "text": "Henkilökunta oli todella mukavaa. Lounas oli monipuolinen ja raikas. Kiitos!"
+    },
+    {
+      "_id": "fonecta_914058039",
+      "business_id": "FI-D0011",
+      "date": "2024-05-08",
+      "rating": 4,
+      "text": "Second time here. Great coffee and fresh pastries. Will come back."
+    },
+    {
+      "_id": "fonecta_914058045",
+      "business_id": "FI-D0011",
+      "date": "2024-06-25",
+      "rating": 4,
+      "text": "Käytiin perjantaina. Nopea palvelu ruuhkasta huolimatta."
+    },
+    {
+      "_id": "fonecta_914058035",
+      "business_id": "FI-D0011",
+      "date": "2024-09-13",
+      "rating": 3,
+      "text": "Second time here. Decent. Good value for money. Staff seemed uninterested."
+    },
+    {
+      "_id": "fonecta_914058040",
+      "business_id": "FI-D0011",
+      "date": "2024-11-02",
+      "rating": 3,
+      "text": "With the family. Average experience. Cosy place, we will come back. Food was lukewarm and the wait was long. Recommended!"
+    },
+    {
+      "_id": "fonecta_914058049",
+      "business_id": "FI-D0011",
+      "date": "2025-06-20",
+      "rating": 1,
+      "text": "Tultiin juhannusaattona klo 16.20 ja ovet olivat jo kiinni. Netissä oli eri ajat."
+    },
+    {
+      "_id": "fonecta_914058042",
+      "business_id": "FI-D0011",
+      "date": "2025-08-06",
+      "rating": 4,
+      "text": "Työkaverin suosituksesta. Ihana tunnelma ja hyvät juomat. Henkilökunta oli todella mukavaa. Ei valittamista."
+    },
+    {
+      "_id": "fonecta_914058030",
+      "business_id": "FI-D0011",
+      "date": "2026-01-26",
+      "rating": 4,
+      "text": "Lounas oli monipuolinen ja raikas. Kahvi oli erinomaista ja pulla tuoretta."
+    },
+    {
+      "_id": "fonecta_914058047",
+      "business_id": "FI-D0011",
+      "date": "2026-04-18",
+      "rating": 5,
+      "text": "Toinen kerta täällä. Nopea palvelu ruuhkasta huolimatta. Tosi hyvää ruokaa ja ystävällinen palvelu. Kortilla pystyi maksamaan sujuvasti."
+    },
+    {
+      "_id": "fonecta_914058031",
+      "business_id": "FI-D0011",
+      "date": "2026-05-15",
+      "rating": 4,
+      "text": "Käytiin perjantaina. Paras pizza pitkään aikaan! Parkkipaikka tosin ahdas."
+    },
+    {
+      "_id": "fonecta_914058044",
+      "business_id": "FI-D0011",
+      "date": "2026-07-01",
+      "rating": 2,
+      "text": "Tilaus meni väärin kahdesti. Pöydät olivat likaisia."
+    },
+    {
+      "_id": "fonecta_914058034",
+      "business_id": "FI-D0011",
+      "date": "2026-08-19",
+      "rating": 4,
+      "text": "Työkaverin suosituksesta. Tosi hyvää ruokaa ja ystävällinen palvelu. Tullaan uudestaan."
+    },
+    {
+      "_id": "fonecta_914058032",
+      "business_id": "FI-D0011",
+      "date": "2026-08-24",
+      "rating": 5,
+      "text": "Second time here. Quick service even though it was busy. Best pizza in a long time! Cosy place, we will come back."
+    },
+    {
+      "_id": "fonecta_914058037",
+      "business_id": "FI-D0011",
+      "date": "2026-09-01",
+      "rating": 5,
+      "text": "Lounas oli monipuolinen ja raikas. Ihana tunnelma ja hyvät juomat. Parkkipaikka tosin ahdas."
+    },
+    {
+      "_id": "fonecta_914058055",
+      "business_id": "FI-D0011",
+      "date": "2026-09-20",
+      "rating": 2,
+      "text": "Paikka on lopettanut, ovessa lappu ja tilat tyhjinä."
+    },
+    {
+      "_id": "fonecta_914058053",
+      "business_id": "FI-D0011",
+      "date": "2026-09-25",
+      "rating": 3,
+      "text": "This place has closed down permanently."
+    },
+    {
+      "_id": "fonecta_914058051",
+      "business_id": "FI-D0011",
+      "date": "2026-10-10",
+      "rating": 2,
+      "text": "Lopettanut toimintansa, valitettavasti."
+    },
+    {
+      "_id": "fonecta_914058052",
+      "business_id": "FI-D0011",
+      "date": "2026-10-10",
+      "rating": 3,
+      "text": "Tämä on suljettu pysyvästi, älkää tulko turhaan."
+    },
+    {
+      "_id": "fonecta_914058054",
+      "business_id": "FI-D0011",
+      "date": "2026-10-12",
+      "rating": 3,
+      "text": "Lopettanut toimintansa, valitettavasti."
+    },
+    {
+      "_id": "fonecta_914058050",
+      "business_id": "FI-D0011",
+      "date": "2026-11-01",
+      "rating": 1,
+      "text": "Pyhäinpäivänä kiinni vaikka kaikkialla netissä luki auki. Tarkistakaa tiedot."
+    },
+    {
+      "_id": "fonecta_914058058",
+      "business_id": "FI-D0012",
+      "date": "2024-06-24",
+      "rating": 4,
+      "text": "Lounastauolla piipahdus. Lopputulos oli juuri sellainen kuin toivoin. Asiantunteva ja ystävällinen henkilökunta. Kiitos!"
+    },
+    {
+      "_id": "fonecta_914058059",
+      "business_id": "FI-D0012",
+      "date": "2024-12-31",
+      "rating": 1,
+      "text": "Kartan mukaan auki, todellisuudessa kiinni uudenvuodenaattona. Harmillista."
+    },
+    {
+      "_id": "fonecta_914058056",
+      "business_id": "FI-D0012",
+      "date": "2025-02-22",
+      "rating": 5,
+      "text": "Ammattitaitoista palvelua, suosittelen. Hoidettiin tehokkaasti ja hinta oli sovittu. Lopputulos oli juuri sellainen kuin toivoin."
+    },
+    {
+      "_id": "fonecta_914058060",
+      "business_id": "FI-D0012",
+      "date": "2025-04-24",
+      "rating": 2,
+      "text": "Kartta väitti että olette auki toisena pääsiäispäivänä. Ei ollut."
+    },
+    {
+      "_id": "fonecta_914058062",
+      "business_id": "FI-D0013",
+      "date": "2024-05-11",
+      "rating": 3,
+      "text": "Toinen kerta täällä. Perushyvä. Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914058061",
+      "business_id": "FI-D0013",
+      "date": "2026-01-06",
+      "rating": 5,
+      "text": "Toinen kerta täällä. Lopputulos oli juuri sellainen kuin toivoin. Aika järjestyi nopeasti ja kaikki sujui hyvin. Ei valittamista."
+    },
+    {
+      "_id": "fonecta_914058070",
+      "business_id": "FI-D0014",
+      "date": "2023-08-23",
+      "rating": 4,
+      "text": "Second time here. Well organised and clean. Great place for the whole family. Recommended!"
+    },
+    {
+      "_id": "fonecta_914058073",
+      "business_id": "FI-D0014",
+      "date": "2023-12-28",
+      "rating": 3,
+      "text": "Kävin pitkästä aikaa. Keskiverto kokemus. Hyvät tilat ja palvelu. Tilat olivat kuluneet."
+    },
+    {
+      "_id": "fonecta_914058069",
+      "business_id": "FI-D0014",
+      "date": "2024-02-18",
+      "rating": 4,
+      "text": "Henkilökunta oli avuliasta. Hyvät tilat ja palvelu. Mukava paikka koko perheelle. Ei valittamista."
+    },
+    {
+      "_id": "fonecta_914058063",
+      "business_id": "FI-D0014",
+      "date": "2024-03-15",
+      "rating": 4,
+      "text": "Käytiin perjantaina. Hyvin järjestetty ja siisti. Elämys, suosittelen!"
+    },
+    {
+      "_id": "fonecta_914058077",
+      "business_id": "FI-D0014",
+      "date": "2024-04-27",
+      "rating": 4,
+      "text": "Toinen kerta täällä. Lapset viihtyivät tosi hyvin. Mukava paikka koko perheelle. Tullaan uudestaan."
+    },
+    {
+      "_id": "fonecta_914058066",
+      "business_id": "FI-D0014",
+      "date": "2024-05-22",
+      "rating": 5,
+      "text": "Kids loved it. Great place for the whole family. Recommended!"
+    },
+    {
+      "_id": "fonecta_914058071",
+      "business_id": "FI-D0014",
+      "date": "2024-06-09",
+      "rating": 5,
+      "text": "Visited on a Friday. Great place for the whole family. Well organised and clean."
+    },
+    {
+      "_id": "fonecta_914058080",
+      "business_id": "FI-D0014",
+      "date": "2024-06-26",
+      "rating": 4,
+      "text": "Mukava paikka koko perheelle. Hyvin järjestetty ja siisti. Suosittelen!"
+    },
+    {
+      "_id": "fonecta_914058079",
+      "business_id": "FI-D0014",
+      "date": "2024-07-06",
+      "rating": 4,
+      "text": "Työkaverin suosituksesta. Henkilökunta oli avuliasta. Parkkipaikka tosin ahdas."
+    },
+    {
+      "_id": "fonecta_914058074",
+      "business_id": "FI-D0014",
+      "date": "2024-08-05",
+      "rating": 4,
+      "text": "Hyvin järjestetty ja siisti. Hyvät tilat ja palvelu. Lapset viihtyivät tosi hyvin. Suosittelen!"
+    },
+    {
+      "_id": "fonecta_914058075",
+      "business_id": "FI-D0014",
+      "date": "2024-09-14",
+      "rating": 3,
+      "text": "Ensimmäinen käynti. Ihan ok, ei mitään erikoista. Hyvin järjestetty ja siisti. Tilat olivat kuluneet. Kiitos!"
+    },
+    {
+      "_id": "fonecta_914058068",
+      "business_id": "FI-D0014",
+      "date": "2025-12-19",
+      "rating": 4,
+      "text": "Toinen kerta täällä. Mukava paikka koko perheelle. Elämys, suosittelen! Kiitos!"
+    },
+    {
+      "_id": "fonecta_914058078",
+      "business_id": "FI-D0014",
+      "date": "2026-04-06",
+      "rating": 4,
+      "text": "With the family. Nice facilities and service. Kids loved it. Parking was a bit tight though."
+    },
+    {
+      "_id": "fonecta_914058110",
+      "business_id": "FI-D0017",
+      "date": "2025-04-18",
+      "rating": 2,
+      "text": "Online it said open 08:00–17:00, but it was closed on Good Friday. Wasted trip."
+    },
+    {
+      "_id": "fonecta_914058111",
+      "business_id": "FI-D0017",
+      "date": "2025-04-30",
+      "rating": 1,
+      "text": "Tultiin vappuaattona klo 16.20 ja ovet olivat jo kiinni. Netissä oli eri ajat."
+    },
+    {
+      "_id": "fonecta_914058112",
+      "business_id": "FI-D0017",
+      "date": "2026-01-05",
+      "rating": 2,
+      "text": "Loppiaisaattona suljettiin jo klo 15, vaikka netissä luki 8–17."
+    },
+    {
+      "_id": "fonecta_914058104",
+      "business_id": "FI-D0017",
+      "date": "2026-08-19",
+      "rating": 5,
+      "text": "Hinta-laatusuhde kohdallaan. Annokset olivat maukkaita ja kauniisti esillepantuja. Tosi hyvää ruokaa ja ystävällinen palvelu. Suosittelen!"
+    },
+    {
+      "_id": "fonecta_914058106",
+      "business_id": "FI-D0017",
+      "date": "2026-08-21",
+      "rating": 3,
+      "text": "Lounastauolla piipahdus. Perushyvä. Henkilökunta oli todella mukavaa. Pöydät olivat likaisia. Hyvä meininki."
+    },
+    {
+      "_id": "fonecta_914058103",
+      "business_id": "FI-D0017",
+      "date": "2026-08-22",
+      "rating": 4,
+      "text": "Hinta-laatusuhde kohdallaan."
+    },
+    {
+      "_id": "fonecta_914058107",
+      "business_id": "FI-D0017",
+      "date": "2026-09-08",
+      "rating": 4,
+      "text": "Annokset olivat maukkaita ja kauniisti esillepantuja. Ei valittamista."
+    },
+    {
+      "_id": "fonecta_914058102",
+      "business_id": "FI-D0017",
+      "date": "2026-09-21",
+      "rating": 4,
+      "text": "With the family. Good value for money. Great coffee and fresh pastries. Parking was a bit tight though."
+    },
+    {
+      "_id": "fonecta_914058105",
+      "business_id": "FI-D0017",
+      "date": "2026-09-21",
+      "rating": 5,
+      "text": "Kävin pitkästä aikaa. Nopea palvelu ruuhkasta huolimatta. Kiitos!"
+    },
+    {
+      "_id": "fonecta_914058109",
+      "business_id": "FI-D0017",
+      "date": "2026-11-02",
+      "rating": 5,
+      "text": "Quick service even though it was busy. Good value for money. Cosy place, we will come back. Thanks!"
+    },
+    {
+      "_id": "fonecta_914057964",
+      "business_id": "NO-D0009",
+      "date": "2024-01-30",
+      "rating": 4,
+      "text": "Andre gang her. Kaffen var utmerket og bollene ferske. God valuta for pengene. Takk!"
+    },
+    {
+      "_id": "fonecta_914057959",
+      "business_id": "NO-D0009",
+      "date": "2024-04-26",
+      "rating": 5,
+      "text": "Kaffen var utmerket og bollene ferske. Veldig god mat og hyggelig betjening. Rask service selv om det var fullt. Anbefales!"
+    },
+    {
+      "_id": "fonecta_914057960",
+      "business_id": "NO-D0009",
+      "date": "2024-08-03",
+      "rating": 2,
+      "text": "Staff seemed uninterested. Overpriced for what you get."
+    },
+    {
+      "_id": "fonecta_914057968",
+      "business_id": "NO-D0009",
+      "date": "2024-08-18",
+      "rating": 4,
+      "text": "Second time here. Best pizza in a long time! Quick service even though it was busy. Thanks!"
+    },
+    {
+      "_id": "fonecta_914057955",
+      "business_id": "NO-D0009",
+      "date": "2024-12-13",
+      "rating": 5,
+      "text": "Med familien. Koselig sted, vi kommer gjerne tilbake. Lunsjen var frisk og variert. Fin stemning og gode drinker. Anbefales!"
+    },
+    {
+      "_id": "fonecta_914057954",
+      "business_id": "NO-D0009",
+      "date": "2025-02-09",
+      "rating": 2,
+      "text": "Andre gang her. Uinteressert betjening."
+    },
+    {
+      "_id": "fonecta_914057971",
+      "business_id": "NO-D0009",
+      "date": "2025-04-21",
+      "rating": 1,
+      "text": "Det sto åpent 7–18 på nett, men det var stengt langfredag. Bortkastet tur."
+    },
+    {
+      "_id": "fonecta_914057972",
+      "business_id": "NO-D0009",
+      "date": "2025-05-01",
+      "rating": 3,
+      "text": "1. mai stengte de allerede 13 selv om det sto 7–18 på nett."
+    },
+    {
+      "_id": "fonecta_914057969",
+      "business_id": "NO-D0009",
+      "date": "2025-06-29",
+      "rating": 3,
+      "text": "Middels opplevelse. Vi kommer tilbake."
+    },
+    {
+      "_id": "fonecta_914057962",
+      "business_id": "NO-D0009",
+      "date": "2025-09-23",
+      "rating": 5,
+      "text": "Anbefalt av en kollega. God valuta for pengene. Anbefales!"
+    },
+    {
+      "_id": "fonecta_914058085",
+      "business_id": "NO-D0015",
+      "date": "2023-12-21",
+      "rating": 3,
+      "text": "Helt greit, ikke noe spesielt. Resultatet ble akkurat som jeg ønsket. Dyrere enn lovet. Vi kommer tilbake."
+    },
+    {
+      "_id": "fonecta_914058086",
+      "business_id": "NO-D0015",
+      "date": "2024-03-30",
+      "rating": 3,
+      "text": "Grei nok. Profesjonell service, anbefales. Timen ble flyttet to ganger uten forklaring."
+    },
+    {
+      "_id": "fonecta_914058082",
+      "business_id": "NO-D0015",
+      "date": "2024-06-03",
+      "rating": 3,
+      "text": "Var her på fredag. Grei nok. Vi kommer tilbake."
+    },
+    {
+      "_id": "fonecta_914058091",
+      "business_id": "NO-D0015",
+      "date": "2024-07-31",
+      "rating": 3,
+      "text": "Andre gang her. Grei nok. Anbefales!"
+    },
+    {
+      "_id": "fonecta_914058099",
+      "business_id": "NO-D0015",
+      "date": "2024-10-20",
+      "rating": 3,
+      "text": "Andre gang her. Middels opplevelse. Fikk time raskt og alt gikk greit. Ingen svarte på telefonen. Vi kommer tilbake."
+    },
+    {
+      "_id": "fonecta_914058100",
+      "business_id": "NO-D0015",
+      "date": "2024-12-30",
+      "rating": 1,
+      "text": "Vi kom hit i romjulen, men det var stengt selv om Google sa at det var åpent. Oppdater åpningstidene!"
+    },
+    {
+      "_id": "fonecta_914058094",
+      "business_id": "NO-D0015",
+      "date": "2025-06-12",
+      "rating": 3,
+      "text": "Grei nok."
+    },
+    {
+      "_id": "fonecta_914058093",
+      "business_id": "NO-D0015",
+      "date": "2025-12-29",
+      "rating": 4,
+      "text": "Første besøk. Profesjonell service, anbefales. Fikk time raskt og alt gikk greit."
+    },
+    {
+      "_id": "fonecta_914058090",
+      "business_id": "NO-D0015",
+      "date": "2026-02-10",
+      "rating": 4,
+      "text": "Første besøk. Profesjonell service, anbefales. Takk!"
+    },
+    {
+      "_id": "fonecta_914058089",
+      "business_id": "NO-D0015",
+      "date": "2026-03-02",
+      "rating": 5,
+      "text": "Resultatet ble akkurat som jeg ønsket."
+    },
+    {
+      "_id": "fonecta_914058101",
+      "business_id": "NO-D0015",
+      "date": "2026-04-05",
+      "rating": 5,
+      "text": "Takk for at dere holdt åpent første påskedag."
+    },
+    {
+      "_id": "fonecta_914058097",
+      "business_id": "NO-D0015",
+      "date": "2026-04-23",
+      "rating": 3,
+      "text": "Andre gang her. Grei nok. Profesjonell service, anbefales. Dyrere enn lovet. Parkeringen var litt trang."
+    },
+    {
+      "_id": "fonecta_914058087",
+      "business_id": "NO-D0015",
+      "date": "2026-04-28",
+      "rating": 4,
+      "text": "Friendly and knowledgeable staff. Professional service, recommended."
+    },
+    {
+      "_id": "fonecta_914058092",
+      "business_id": "NO-D0015",
+      "date": "2026-05-28",
+      "rating": 5,
+      "text": "Var her på fredag. Resultatet ble akkurat som jeg ønsket."
+    },
+    {
+      "_id": "fonecta_914057941",
+      "business_id": "SE-D0008",
+      "date": "2023-07-10",
+      "rating": 3,
+      "text": "Första besöket. Medelbra upplevelse. Kaffet var utmärkt och bullarna färska. För dyrt för vad man fick. Rekommenderas!"
+    },
+    {
+      "_id": "fonecta_914057933",
+      "business_id": "SE-D0008",
+      "date": "2023-08-04",
+      "rating": 2,
+      "text": "Rekommenderat av en kollega. För dyrt för vad man fick. Maten var ljummen och väntan lång."
+    },
+    {
+      "_id": "fonecta_914057948",
+      "business_id": "SE-D0008",
+      "date": "2023-08-10",
+      "rating": 4,
+      "text": "Lunchen var fräsch och varierad. Prisvärt och gott. Kaffet var utmärkt och bullarna färska."
+    },
+    {
+      "_id": "fonecta_914057891",
+      "business_id": "SE-D0008",
+      "date": "2023-08-15",
+      "rating": 5,
+      "text": "Första besöket. Prisvärt och gott. Kaffet var utmärkt och bullarna färska. Tack!"
+    },
+    {
+      "_id": "fonecta_914057890",
+      "business_id": "SE-D0008",
+      "date": "2023-08-26",
+      "rating": 4,
+      "text": "Första besöket. Mysigt ställe, vi kommer gärna tillbaka. Tack!"
+    },
+    {
+      "_id": "fonecta_914057901",
+      "business_id": "SE-D0008",
+      "date": "2023-10-10",
+      "rating": 5,
+      "text": "Var här i fredags. Härlig stämning och goda drinkar."
+    },
+    {
+      "_id": "fonecta_914057950",
+      "business_id": "SE-D0008",
+      "date": "2023-11-12",
+      "rating": 5,
+      "text": "Första besöket. Prisvärt och gott. Mysigt ställe, vi kommer gärna tillbaka. Härlig stämning och goda drinkar."
+    },
+    {
+      "_id": "fonecta_914057917",
+      "business_id": "SE-D0008",
+      "date": "2024-01-12",
+      "rating": 5,
+      "text": "Andra gången här. Riktigt god mat och trevlig personal. Härlig stämning och goda drinkar. Kaffet var utmärkt och bullarna färska."
+    },
+    {
+      "_id": "fonecta_914057914",
+      "business_id": "SE-D0008",
+      "date": "2024-01-20",
+      "rating": 3,
+      "text": "Helt okej, inget speciellt. Lunchen var fräsch och varierad. Beställningen blev fel två gånger. Tack!"
+    },
+    {
+      "_id": "fonecta_914057892",
+      "business_id": "SE-D0008",
+      "date": "2024-04-10",
+      "rating": 3,
+      "text": "Andra gången här. Godkänt."
+    },
+    {
+      "_id": "fonecta_914057928",
+      "business_id": "SE-D0008",
+      "date": "2024-05-03",
+      "rating": 4,
+      "text": "Prisvärt och gott. Mysigt ställe, vi kommer gärna tillbaka. Härlig stämning och goda drinkar. Rekommenderas!"
+    },
+    {
+      "_id": "fonecta_914057939",
+      "business_id": "SE-D0008",
+      "date": "2024-05-03",
+      "rating": 4,
+      "text": "Var här i fredags. Snabb service trots kö. Mysigt ställe, vi kommer gärna tillbaka."
+    },
+    {
+      "_id": "fonecta_914057947",
+      "business_id": "SE-D0008",
+      "date": "2024-05-16",
+      "rating": 3,
+      "text": "Var här i fredags. Helt okej, inget speciellt. Kaffet var utmärkt och bullarna färska. Ointresserad personal."
+    },
+    {
+      "_id": "fonecta_914057951",
+      "business_id": "SE-D0008",
+      "date": "2024-06-19",
+      "rating": 3,
+      "text": "Medelbra upplevelse. Härlig stämning och goda drinkar. Beställningen blev fel två gånger. Vi kommer tillbaka."
+    },
+    {
+      "_id": "fonecta_914057922",
+      "business_id": "SE-D0008",
+      "date": "2024-06-24",
+      "rating": 5,
+      "text": "Med familjen. Snabb service trots kö. Kaffet var utmärkt och bullarna färska. Härlig stämning och goda drinkar."
+    },
+    {
+      "_id": "fonecta_914057944",
+      "business_id": "SE-D0008",
+      "date": "2024-07-27",
+      "rating": 5,
+      "text": "Bästa pizzan på länge! Härlig stämning och goda drinkar. Mysigt ställe, vi kommer gärna tillbaka."
+    },
+    {
+      "_id": "fonecta_914057940",
+      "business_id": "SE-D0008",
+      "date": "2024-10-15",
+      "rating": 4,
+      "text": "Med familjen. Bästa pizzan på länge! Kaffet var utmärkt och bullarna färska. Rekommenderas!"
+    },
+    {
+      "_id": "fonecta_914057889",
+      "business_id": "SE-D0008",
+      "date": "2024-10-22",
+      "rating": 5,
+      "text": "Första besöket. Kaffet var utmärkt och bullarna färska. Riktigt god mat och trevlig personal. Snabb service trots kö. Rekommenderas!"
+    },
+    {
+      "_id": "fonecta_914057949",
+      "business_id": "SE-D0008",
+      "date": "2024-11-11",
+      "rating": 3,
+      "text": "Medelbra upplevelse. Lunchen var fräsch och varierad. Maten var ljummen och väntan lång. Rekommenderas!"
+    },
+    {
+      "_id": "fonecta_914057910",
+      "business_id": "SE-D0008",
+      "date": "2024-12-22",
+      "rating": 3,
+      "text": "Godkänt. Härlig stämning och goda drinkar. Ointresserad personal. Tack!"
+    },
+    {
+      "_id": "fonecta_914057926",
+      "business_id": "SE-D0008",
+      "date": "2024-12-30",
+      "rating": 4,
+      "text": "Rekommenderat av en kollega. Kaffet var utmärkt och bullarna färska. Prisvärt och gott. Rekommenderas!"
+    },
+    {
+      "_id": "fonecta_914057921",
+      "business_id": "SE-D0008",
+      "date": "2025-03-05",
+      "rating": 4,
+      "text": "Mysigt ställe, vi kommer gärna tillbaka. Härlig stämning och goda drinkar."
+    },
+    {
+      "_id": "fonecta_914057898",
+      "business_id": "SE-D0008",
+      "date": "2025-03-31",
+      "rating": 5,
+      "text": "Snabb service trots kö. Riktigt god mat och trevlig personal."
+    },
+    {
+      "_id": "fonecta_914057903",
+      "business_id": "SE-D0008",
+      "date": "2025-03-31",
+      "rating": 3,
+      "text": "Average experience. Really good food and friendly staff. Staff seemed uninterested."
+    },
+    {
+      "_id": "fonecta_914057904",
+      "business_id": "SE-D0008",
+      "date": "2025-04-30",
+      "rating": 3,
+      "text": "Medelbra upplevelse. Mysigt ställe, vi kommer gärna tillbaka. Maten var ljummen och väntan lång."
+    },
+    {
+      "_id": "fonecta_914057905",
+      "business_id": "SE-D0008",
+      "date": "2025-05-23",
+      "rating": 3,
+      "text": "Decent. Good value for money. Staff seemed uninterested. Parking was a bit tight though."
+    },
+    {
+      "_id": "fonecta_914057886",
+      "business_id": "SE-D0008",
+      "date": "2025-06-27",
+      "rating": 5,
+      "text": "Rekommenderat av en kollega. Mysigt ställe, vi kommer gärna tillbaka. Lunchen var fräsch och varierad. Riktigt god mat och trevlig personal. Rekommenderas!"
+    },
+    {
+      "_id": "fonecta_914057925",
+      "business_id": "SE-D0008",
+      "date": "2025-08-09",
+      "rating": 2,
+      "text": "Med familjen. Ointresserad personal."
+    },
+    {
+      "_id": "fonecta_914057888",
+      "business_id": "SE-D0008",
+      "date": "2025-09-09",
+      "rating": 4,
+      "text": "Mysigt ställe, vi kommer gärna tillbaka. Parkeringen var dock trång."
+    },
+    {
+      "_id": "fonecta_914057908",
+      "business_id": "SE-D0008",
+      "date": "2026-01-13",
+      "rating": 5,
+      "text": "Prisvärt och gott. Härlig stämning och goda drinkar. Kaffet var utmärkt och bullarna färska."
+    },
+    {
+      "_id": "fonecta_914057920",
+      "business_id": "SE-D0008",
+      "date": "2026-02-17",
+      "rating": 3,
+      "text": "Medelbra upplevelse. Bästa pizzan på länge! Ointresserad personal. Rekommenderas!"
+    },
+    {
+      "_id": "fonecta_914057885",
+      "business_id": "SE-D0008",
+      "date": "2026-02-23",
+      "rating": 4,
+      "text": "Andra gången här. Riktigt god mat och trevlig personal. Tack!"
+    },
+    {
+      "_id": "fonecta_914057942",
+      "business_id": "SE-D0008",
+      "date": "2026-02-28",
+      "rating": 4,
+      "text": "Kaffet var utmärkt och bullarna färska. Riktigt god mat och trevlig personal. Parkeringen var dock trång."
+    },
+    {
+      "_id": "fonecta_914057943",
+      "business_id": "SE-D0008",
+      "date": "2026-03-03",
+      "rating": 4,
+      "text": "Med familjen. Mysigt ställe, vi kommer gärna tillbaka. Lunchen var fräsch och varierad. Riktigt god mat och trevlig personal."
+    },
+    {
+      "_id": "fonecta_914057916",
+      "business_id": "SE-D0008",
+      "date": "2026-04-03",
+      "rating": 4,
+      "text": "Första besöket. Lunchen var fräsch och varierad. Vi kommer tillbaka."
+    },
+    {
+      "_id": "fonecta_914057952",
+      "business_id": "SE-D0008",
+      "date": "2026-04-06",
+      "rating": 1,
+      "text": "Det stod öppet 8–18 på nätet men det var stängt på annandag påsk. Onödig resa."
+    },
+    {
+      "_id": "fonecta_914057907",
+      "business_id": "SE-D0008",
+      "date": "2026-05-29",
+      "rating": 4,
+      "text": "Kaffet var utmärkt och bullarna färska. Riktigt god mat och trevlig personal."
+    },
+    {
+      "_id": "fonecta_914057953",
+      "business_id": "SE-D0008",
+      "date": "2026-06-19",
+      "rating": 5,
+      "text": "Tack för att ni hade öppet på midsommarafton."
+    },
+    {
+      "_id": "fonecta_914057918",
+      "business_id": "SE-D0008",
+      "date": "2026-07-06",
+      "rating": 3,
+      "text": "Andra gången här. Godkänt."
+    },
+    {
+      "_id": "fonecta_914057934",
+      "business_id": "SE-D0008",
+      "date": "2026-07-07",
+      "rating": 4,
+      "text": "Första besöket. Prisvärt och gott. Vi kommer tillbaka."
+    },
+    {
+      "_id": "fonecta_914057902",
+      "business_id": "SE-D0008",
+      "date": "2026-07-27",
+      "rating": 4,
+      "text": "Med familjen. Lunchen var fräsch och varierad. Rekommenderas!"
+    },
+    {
+      "_id": "fonecta_914057938",
+      "business_id": "SE-D0008",
+      "date": "2026-08-11",
+      "rating": 4,
+      "text": "Bästa pizzan på länge! Härlig stämning och goda drinkar. Lunchen var fräsch och varierad. Rekommenderas!"
+    },
+    {
+      "_id": "fonecta_914057899",
+      "business_id": "SE-D0008",
+      "date": "2026-08-14",
+      "rating": 4,
+      "text": "Second time here. Best pizza in a long time! Will come back."
+    },
+    {
+      "_id": "fonecta_914057897",
+      "business_id": "SE-D0008",
+      "date": "2026-08-22",
+      "rating": 1,
+      "text": "Andra gången här. För dyrt för vad man fick."
+    },
+    {
+      "_id": "fonecta_914058121",
+      "business_id": "SE-D0016",
+      "date": "2023-08-05",
+      "rating": 3,
+      "text": "Var här i fredags. Medelbra upplevelse. Prisvärt och gott. Maten var ljummen och väntan lång. Vi kommer tillbaka."
+    },
+    {
+      "_id": "fonecta_914058116",
+      "business_id": "SE-D0016",
+      "date": "2024-01-17",
+      "rating": 4,
+      "text": "Riktigt god mat och trevlig personal. Kaffet var utmärkt och bullarna färska. Lunchen var fräsch och varierad. Vi kommer tillbaka."
+    },
+    {
+      "_id": "fonecta_914058131",
+      "business_id": "SE-D0016",
+      "date": "2024-03-29",
+      "rating": 1,
+      "text": "Det stod öppet 11–23 på nätet men det var stängt på långfredagen. Onödig resa."
+    },
+    {
+      "_id": "fonecta_914058114",
+      "business_id": "SE-D0016",
+      "date": "2024-05-02",
+      "rating": 5,
+      "text": "Första besöket. Härlig stämning och goda drinkar. Vi kommer tillbaka."
+    },
+    {
+      "_id": "fonecta_914058132",
+      "business_id": "SE-D0016",
+      "date": "2024-06-22",
+      "rating": 1,
+      "text": "Fel öppettider på midsommardagen. Stod framför en stängd dörr."
+    },
+    {
+      "_id": "fonecta_914058115",
+      "business_id": "SE-D0016",
+      "date": "2024-09-29",
+      "rating": 4,
+      "text": "Rekommenderat av en kollega. Mysigt ställe, vi kommer gärna tillbaka. Prisvärt och gott. Parkeringen var dock trång."
+    },
+    {
+      "_id": "fonecta_914058118",
+      "business_id": "SE-D0016",
+      "date": "2025-02-18",
+      "rating": 5,
+      "text": "Första besöket. Lunchen var fräsch och varierad."
+    },
+    {
+      "_id": "fonecta_914058122",
+      "business_id": "SE-D0016",
+      "date": "2025-03-01",
+      "rating": 5,
+      "text": "Andra gången här. Mysigt ställe, vi kommer gärna tillbaka. Kaffet var utmärkt och bullarna färska. Parkeringen var dock trång."
+    },
+    {
+      "_id": "fonecta_914058126",
+      "business_id": "SE-D0016",
+      "date": "2025-04-17",
+      "rating": 4,
+      "text": "Rekommenderat av en kollega. Kaffet var utmärkt och bullarna färska. Härlig stämning och goda drinkar. Mysigt ställe, vi kommer gärna tillbaka. Vi kommer tillbaka."
+    },
+    {
+      "_id": "fonecta_914058113",
+      "business_id": "SE-D0016",
+      "date": "2025-10-26",
+      "rating": 5,
+      "text": "Mysigt ställe, vi kommer gärna tillbaka. Lunchen var fräsch och varierad."
+    },
+    {
+      "_id": "fonecta_914058129",
+      "business_id": "SE-D0016",
+      "date": "2026-01-28",
+      "rating": 3,
+      "text": "Andra gången här. Medelbra upplevelse. Parkeringen var dock trång."
+    },
+    {
+      "_id": "fonecta_914058130",
+      "business_id": "SE-D0016",
+      "date": "2026-02-16",
+      "rating": 4,
+      "text": "Andra gången här. Snabb service trots kö. Riktigt god mat och trevlig personal. Härlig stämning och goda drinkar."
+    },
+    {
+      "_id": "fonecta_914058123",
+      "business_id": "SE-D0016",
+      "date": "2026-02-25",
+      "rating": 5,
+      "text": "Mysigt ställe, vi kommer gärna tillbaka. Snabb service trots kö. Bästa pizzan på länge!"
+    },
+    {
+      "_id": "fonecta_914058119",
+      "business_id": "SE-D0016",
+      "date": "2026-05-23",
+      "rating": 4,
+      "text": "Med familjen. Prisvärt och gott. Kaffet var utmärkt och bullarna färska. Snabb service trots kö. Rekommenderas!"
+    },
+    {
+      "_id": "fonecta_914058133",
+      "business_id": "SE-D0016",
+      "date": "2026-06-30",
+      "rating": 2,
+      "text": "Numera öppet bara mån–lör 11–22."
+    },
+    {
+      "_id": "fonecta_914058134",
+      "business_id": "SE-D0016",
+      "date": "2026-07-06",
+      "rating": 2,
+      "text": "Öppettiderna har ändrats, nätet visar gamla tider."
+    },
+    {
+      "_id": "fonecta_914058135",
+      "business_id": "SE-D0016",
+      "date": "2026-08-08",
+      "rating": 2,
+      "text": "Numera öppet bara mån–lör 11–22."
+    }
+  ],
+  "publisher_suggestions": [
+    {
+      "_id": "ps-005783",
+      "business_id": "FI-D0002",
+      "date": "2024-12-25",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "APPLE"
+    },
+    {
+      "_id": "ps-005785",
+      "business_id": "FI-D0002",
+      "date": "2025-06-04",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005784",
+      "business_id": "FI-D0002",
+      "date": "2025-11-02",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005786",
+      "business_id": "FI-D0004",
+      "date": "2024-04-01",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005788",
+      "business_id": "FI-D0004",
+      "date": "2024-11-02",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "APPLE"
+    },
+    {
+      "_id": "ps-005787",
+      "business_id": "FI-D0004",
+      "date": "2025-01-02",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005792",
+      "business_id": "FI-D0005",
+      "date": "2024-05-15",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005789",
+      "business_id": "FI-D0005",
+      "date": "2024-12-31",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005790",
+      "business_id": "FI-D0005",
+      "date": "2025-04-23",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "BING"
+    },
+    {
+      "_id": "ps-005791",
+      "business_id": "FI-D0005",
+      "date": "2025-10-29",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005797",
+      "business_id": "FI-D0007",
+      "date": "2024-09-25",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005793",
+      "business_id": "FI-D0007",
+      "date": "2024-12-24",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005796",
+      "business_id": "FI-D0007",
+      "date": "2025-04-19",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005794",
+      "business_id": "FI-D0007",
+      "date": "2026-07-17",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005795",
+      "business_id": "FI-D0007",
+      "date": "2026-08-14",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005809",
+      "business_id": "FI-D0010",
+      "date": "2024-03-31",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "FACEBOOK"
+    },
+    {
+      "_id": "ps-005810",
+      "business_id": "FI-D0010",
+      "date": "2024-04-18",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "BING"
+    },
+    {
+      "_id": "ps-005805",
+      "business_id": "FI-D0010",
+      "date": "2024-05-26",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "APPLE"
+    },
+    {
+      "_id": "ps-005811",
+      "business_id": "FI-D0010",
+      "date": "2024-06-18",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005806",
+      "business_id": "FI-D0010",
+      "date": "2024-11-15",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005807",
+      "business_id": "FI-D0010",
+      "date": "2024-12-09",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005808",
+      "business_id": "FI-D0010",
+      "date": "2026-04-17",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005813",
+      "business_id": "FI-D0011",
+      "date": "2026-08-25",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005812",
+      "business_id": "FI-D0011",
+      "date": "2026-10-14",
+      "field": "closed",
+      "status": "WAITING_ON_CUSTOMER",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005814",
+      "business_id": "FI-D0012",
+      "date": "2025-01-01",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005815",
+      "business_id": "FI-D0012",
+      "date": "2026-06-21",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005817",
+      "business_id": "FI-D0014",
+      "date": "2026-09-02",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005816",
+      "business_id": "FI-D0014",
+      "date": "2026-10-16",
+      "field": "hours",
+      "status": "WAITING_ON_CUSTOMER",
+      "publisher_id": "APPLE"
+    },
+    {
+      "_id": "ps-005818",
+      "business_id": "FI-D0017",
+      "date": "2025-01-26",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "FACEBOOK"
+    },
+    {
+      "_id": "ps-005801",
+      "business_id": "NO-D0009",
+      "date": "2024-02-08",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005800",
+      "business_id": "NO-D0009",
+      "date": "2024-03-31",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "APPLE"
+    },
+    {
+      "_id": "ps-005803",
+      "business_id": "NO-D0009",
+      "date": "2024-04-03",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "FACEBOOK"
+    },
+    {
+      "_id": "ps-005804",
+      "business_id": "NO-D0009",
+      "date": "2025-03-22",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005802",
+      "business_id": "NO-D0009",
+      "date": "2025-06-02",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005799",
+      "business_id": "SE-D0008",
+      "date": "2025-04-01",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005798",
+      "business_id": "SE-D0008",
+      "date": "2026-04-06",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005822",
+      "business_id": "SE-D0016",
+      "date": "2024-03-17",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005819",
+      "business_id": "SE-D0016",
+      "date": "2025-06-08",
+      "field": "hours",
+      "status": "REJECTED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005821",
+      "business_id": "SE-D0016",
+      "date": "2026-06-18",
+      "field": "hours",
+      "status": "EXPIRED",
+      "publisher_id": "GOOGLEMYBUSINESS"
+    },
+    {
+      "_id": "ps-005820",
+      "business_id": "SE-D0016",
+      "date": "2026-11-01",
+      "field": "hours",
+      "status": "WAITING_ON_CUSTOMER",
+      "publisher_id": "GOOGLEMYBUSINESS"
     }
   ]
 }

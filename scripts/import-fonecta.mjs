@@ -91,6 +91,8 @@ if (wanted.filter(isCentre).length !== 15) {
   fail(`expected 15 shopping centres, found ${wanted.filter(isCentre).length}`);
 }
 
+const storylineIds = new Set(wanted.filter(isStoryline).map((entity) => entity.meta.id));
+
 const contacts = new Map(
   readCsv("customer_contacts.csv", 9).map((row) => [row.entity_id, row]),
 );
@@ -181,6 +183,35 @@ for (const entity of wanted) {
 
   profiles.push({ _id: id, business_id: id, regular_hours: regularHours, holiday_hours: sortedHolidayHours });
 }
+
+// ---------- source: reviews and publisher edits (closure signals for lib/predict) ----------
+
+// Only the storylines: these are the reviews messages and closure flags are built from. The
+// dataset's dates are epoch milliseconds; our Review.date is an ISO date.
+const reviews = readJson("reviews.json").response.reviews
+  .filter((row) => storylineIds.has(row.locationId) && (row.content ?? "").trim())
+  .map((row) => ({
+    _id: `fonecta_${row.id}`,
+    business_id: row.locationId,
+    date: new Date(row.publisherDate).toISOString().slice(0, 10),
+    rating: Math.min(5, Math.max(1, Number(row.rating))),
+    text: row.content.trim(),
+  }))
+  .sort((a, b) => a.business_id.localeCompare(b.business_id) || a.date.localeCompare(b.date) || a._id.localeCompare(b._id));
+
+// Google/Apple/Bing user edits. lib/predict reads `field === "closed"` as a closure signal;
+// the rest is kept for the staff view. A new collection (lib/db.ts) keeps Business clean.
+const publisherSuggestions = readJson("publisher_suggestions.json").response.suggestions
+  .filter((row) => storylineIds.has(row.locationId))
+  .map((row) => ({
+    _id: row.id,
+    business_id: row.locationId,
+    date: row.dateCreated,
+    field: row.fieldName,
+    status: row.status,
+    publisher_id: row.publisherId,
+  }))
+  .sort((a, b) => a.business_id.localeCompare(b.business_id) || a.date.localeCompare(b.date));
 
 // ---------- source: exception history ----------
 
@@ -281,7 +312,6 @@ const peers = readCsv("peer_benchmarks.csv", 12)
 // ---------- checks before writing ----------
 
 const problems = [];
-const storylineIds = new Set(wanted.filter(isStoryline).map((entity) => entity.meta.id));
 for (const profile of profiles) {
   for (const day of ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]) {
     if (!isValidHours(profile.regular_hours[day])) problems.push(`${profile._id}: invalid regular hours on ${day}`);
@@ -298,6 +328,16 @@ for (const row of history) if (!isValidHours(row.hours)) problems.push(`history 
 if (new Set(history.map((row) => row._id)).size !== history.length) problems.push("history: duplicate _id");
 if (new Set(specialDays.map((day) => day._id)).size !== specialDays.length) problems.push("special_days: duplicate _id");
 if (new Set(peers.map((row) => row._id)).size !== peers.length) problems.push("peers: duplicate _id");
+for (const review of reviews) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(review.date)) problems.push(`review ${review._id}: bad date "${review.date}"`);
+  if (!Number.isInteger(review.rating) || review.rating < 1 || review.rating > 5) {
+    problems.push(`review ${review._id}: bad rating ${review.rating}`);
+  }
+}
+if (new Set(reviews.map((row) => row._id)).size !== reviews.length) problems.push("reviews: duplicate _id");
+if (new Set(publisherSuggestions.map((row) => row._id)).size !== publisherSuggestions.length) {
+  problems.push("publisher_suggestions: duplicate _id");
+}
 if (problems.length) fail(`\n  - ${problems.join("\n  - ")}`);
 
 // ---------- write ----------
@@ -308,6 +348,8 @@ const counts = {
   holiday_history: history.length,
   special_days: specialDays.length,
   peers: peers.length,
+  reviews: reviews.length,
+  publisher_suggestions: publisherSuggestions.length,
 };
 
 const extract = {
@@ -322,6 +364,8 @@ const extract = {
   holiday_history: history,
   special_days: specialDays,
   peers,
+  reviews,
+  publisher_suggestions: publisherSuggestions,
 };
 
 mkdirSync(dirname(OUT), { recursive: true });
