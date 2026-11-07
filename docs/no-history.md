@@ -1,68 +1,68 @@
 # How Connect behaves for a customer with no history
 
 Fonecta asked: *what does the system do for a business it knows nothing about yet?*
-Short answer: **it still notices the problem, it does not pretend to know the answer, and it asks.**
+Short answer: **it only speaks up when similar businesses agree, it says it is not sure, and it asks.**
 
-## What "no history" means here
+## The case: `FI-D0017` Kahvila Kipinä
 
-For holiday hours, the best evidence is what the business did on the same days last year.
-A business has **no history** when none of its listings (Finder, Google, own website) has hours for those days last season.
-In the demo:
+A café in Turku that has never entered special hours: **0 entries** in the exception history.
+Google shows its regular hours (08:00–17:00) on every holiday.
+Its owner, Aino, prefers SMS in Finnish, between 12 and 16.
 
-| Business | Situation |
-|---|---|
-| **Parturi Kampaamo Linnankatu** (hair salon) | No holiday hours at all, ever. Full no-history case. |
-| **Kuntosali Itäharju** (gym) | Has hours for this Christmas, but nothing for New Year's Day, this year or last year. No history *for that date*. |
-| Rye & Shine Bakery (for comparison) | Had hours for every holiday last season, so Connect proposes the same again with confidence *high*. |
+The best evidence Connect has for a business is what that business did on the same day before (`docs/predict.md`, rules 1–3).
+Kipinä has none of that, so only the last rule applies: **similar businesses**.
 
 ## What happens, step by step
 
-1. **Detection does not need history.** The rule compares the public holiday calendar with the listings
-   (`lib/rules/missingHolidayHours.ts`). A business with no history gets the same "holiday hours are missing" issue as everyone else.
-   The evidence simply says `last_year: {}`.
-2. **The proposal falls back to the common pattern for the category, chosen by code** (`lib/ai/fallback.ts`):
-   - Christmas Eve: a short day, from the business's usual opening time on that weekday until 14:00 at the latest
-     (closed if it usually opens later or is closed that day);
-   - the other public holidays: closed.
+1. **Detection does not need history.** `lib/predict` looks at every special day for every business. For Kipinä, rules 1–3 find nothing.
+2. **Similar businesses decide, but only when they clearly agree.** Code reads Fonecta's peer benchmarks for the same
+   country, city size and segment (Finnish cafés in large cities, 636 business-days per day).
+   Connect proposes **closed** only when at least **70 %** of the cafés that entered something were closed, **and** at least **15 %** of all of them entered "closed":
+
+   | Day | Closed, among cafés that entered something | Entered "closed", of all | Connect |
+   |---|---|---|---|
+   | Christmas Day | 86 % | 38 % | suggests **closed** |
+   | New Year's Day | 76 % | 31 % | suggests **closed** |
+   | Boxing Day | 62 % | 21 % | nothing: peers don't agree enough |
+   | Epiphany | 41 % | 13 % | nothing |
+   | Independence Day | 39 % | 12 % | nothing |
+   | Christmas Eve | 34 % | 13 % | nothing |
+   | New Year's Eve | 13 % | 2 % | nothing |
 
    Code makes this choice, not the LLM, so it is the same every time and never invents hours.
-   Each date is handled on its own: dates with last year's hours copy them, dates without use the pattern.
-3. **Confidence is lowered.** All dates from the pattern → confidence **low**. Some from last year, some from the pattern → **medium**.
-   The owner view shows a low-confidence card with a "please check" badge.
-4. **The message is a question, and it says why.** It says the hours are a common pattern for this kind of business, not the owner's own data,
-   and asks whether to use them. Gemini writes the wording; code checks it (`lib/validate.ts`: only the issue's dates,
-   valid hours, at most two sentences). Without Gemini, a fixed template says the same thing.
-5. **The owner decides.** Accept, edit (for example "open 10–14 on New Year's Day") or ignore. Nothing is published before that.
-6. **Next time there is history.** Whatever the owner confirmed is written to all listings and Yext, so next season the
-   business has last year's hours to copy. Learning (stage A5, not built yet) will also reuse the owner's edits in the next suggestion.
+   It never proposes opening hours from peers (each café's hours differ), only "closed".
+3. **Confidence is low.** Both suggestions have confidence **low**, and the owner card shows them as "please check".
+4. **The message asks instead of telling.** The basis sentence becomes a question. The same validation applies as for every message
+   (`lib/validate.ts`: only that date, exactly the decided hours, at most two sentences plus the suggestion line).
+5. **The owner decides.** Approve, edit (for example "open 10–14") or decline. Nothing is published before that.
+6. **Next time there is history.** Whatever Aino confirms is saved to her profile and published through Yext.
+   From then on Connect uses her own answer: it does not ask again about a date she has set
+   (rule 0b), and next season the same day has *her* hours to copy (rules 1 and 3, confidence high).
 
 ## The real messages (exported from the app, see `docs/customer-messages.md`)
 
-**Parturi Kampaamo Linnankatu**, no history at all. Proposed: Christmas Eve 09:00–14:00 (the salon opens at 09:00 on Thursdays), closed on the other four holidays. Confidence: **low**.
+**Christmas Day**, proposed closed, confidence **low**:
 
-> Hi Sanna, your holiday hours are not set yet and I do not have last year's hours to copy, so would you like to use what most hair salons do, which is being open on Christmas Eve from 09:00–14:00 and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany?
+> Hi Aino, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 08:00–17:00. Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: Christmas Day 25 Dec closed.
 
-**Kuntosali Itäharju**, no history for New Year's Day. Proposed: closed on 1 Jan. Confidence: **low**.
+In Finnish, as Aino receives it:
 
-> Hi Tomi, your hours for New Year's Day are not set anywhere yet and I could not find them from last year. Would you like me to set them as closed on New Year's Day, which is what most gyms do?
+> Hei Aino, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 8–17. Useimmat vastaavat yritykset alueellanne ovat silloin kiinni, eikä teille ole merkitty poikkeusaikoja, joten pitääkö tämä paikkansa teilläkin? Ehdotamme: joulupäivä 25.12 kiinni.
 
-For comparison, **Rye & Shine Bakery** (has history), confidence **high**:
+For comparison, **`FI-D0001` Kahvila Aurora**, which has history (confidence **high**):
 
-> Hi Liisa, your holiday hours for Christmas and New Year are not set yet so I can copy them from the same days last year, meaning Christmas Eve 10:00–14:00 and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany. Shall I publish this everywhere?
+> Hi Aleksi, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 07:30–18:00. Last year you were open 07:30–13:00, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec open 07:30–13:00.
 
-Template version (used when Gemini is not available) for Parturi:
+## Is it right? (Fonecta's scorer)
 
-> Hi Sanna, the holidays (Christmas Eve – Epiphany) are coming up and your hours for them aren't set anywhere yet, and I can't find last year's hours for them. Shall I use what most hair salons do: Christmas Eve 09:00–14:00; closed on Christmas Day, Boxing Day, New Year's Day and Epiphany?
+The peer rule is the same as Fonecta's baseline (thresholds 0.7 and 0.15). We tried others (closed share 0.6–0.8,
+entered-closed share 0.1–0.35) on the dev businesses: they either produced more harmful suggestions or found fewer real changes,
+so we kept these. A wrong "closed" is the most harmful mistake (a customer stays away from an open café), which is why
+Connect stays quiet on days where peers are split, like Boxing Day.
 
 ## Why this design
 
-- **Cautious, not silent.** Saying nothing leaves customers at a locked door on Christmas Eve. Guessing with high confidence would be wrong.
-  A clearly marked question is the honest middle.
-- **Code chooses, AI explains.** The pattern is fixed code that is easy to check, and every message is validated before the owner sees it.
+- **Cautious, not silent.** On Christmas Day most cafés are closed; leaving "open 08:00–17:00" on Google sends customers to a locked door.
+- **Not guessing either.** Where peers are split, a guess is as likely to hurt as to help, so Connect says nothing.
+- **Code chooses, AI explains.** The thresholds are fixed code that is easy to check; every message is validated before the owner sees it.
 - **One answer fixes it.** The owner's reply becomes the history for next year.
-
-## In production
-
-The category pattern is hard-coded for the demo. With Fonecta's data, Connect could learn it from similar businesses:
-the most common holiday hours of hair salons in the same city last year, with the share of businesses that used them as the confidence.
-It would still be a proposal for the owner to confirm, never published on its own.
