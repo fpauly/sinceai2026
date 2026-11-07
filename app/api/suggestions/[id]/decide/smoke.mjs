@@ -98,7 +98,7 @@ try {
   assert.equal((await db.collection("issues").findOne({ _id: concurrent })).status, saved.decision === "ignored" ? "ignored" : "resolved");
   console.log("PASS concurrent decisions: only one request wins");
 
-  const invalid = await fixture("invalid", { field: "holiday_hours", value: { "2026-12-24": "18:00-09:00" } });
+  const invalid = await fixture("invalid", { field: "holiday_hours", value: { "2026-12-24": "25:00-26:00" } });
   assert.equal((await decide(invalid, { decision: "accepted", via: "tap" })).status, 400);
   assert.equal((await db.collection("suggestions").findOne({ _id: invalid })).decided_at, null);
   assert.equal((await decide(invalid, { decision: "auto", via: "tap" })).status, 400);
@@ -190,6 +190,27 @@ try {
   prefs = await db.collection("preferences").findOne({ _id: businessId });
   assert.equal(prefs.learned.filter((item) => item.at === retryAt).length, 1);
   console.log("PASS expired crash lease, original decision pinned, publication result reused and learning not duplicated on recovery");
+
+  for (const hours of ["10:00-14:00,17:00-22:00", "18:00-02:00", "00:00-23:59"]) {
+    for (const decision of ["accepted", "edited"]) {
+      const id = await fixture(`hours-${decision}-${hours}`, { field: "holiday_hours", value: { "2026-12-24": hours } });
+      const result = await decide(id, { decision, via: "tap", ...(decision === "edited" ? { edited_value: { "2026-12-24": hours } } : {}) });
+      assert.equal(result.status, 200, JSON.stringify(result.body));
+      for (const listing of await db.collection("listings").find({ business_id: businessId }).toArray()) {
+        assert.equal(listing.holiday_hours["2026-12-24"], hours);
+      }
+    }
+  }
+  for (const hours of ["25:00-26:00", "10:00-14:00,13:00-16:00", ""]) {
+    const id = await fixture(`bad-hours-${hours}`, { field: "holiday_hours", value: { "2026-12-24": hours } });
+    const before = await db.collection("listings").find({ business_id: businessId }).toArray();
+    for (const decision of ["accepted", "edited"]) {
+      assert.equal((await decide(id, { decision, via: "tap", ...(decision === "edited" ? { edited_value: { "2026-12-24": hours } } : {}) })).status, 400);
+    }
+    assert.deepEqual(await db.collection("listings").find({ business_id: businessId }).toArray(), before);
+    assert.equal((await db.collection("suggestions").findOne({ _id: id })).decision, null);
+  }
+  console.log("PASS split, overnight and 24-hour acceptance/edits; invalid, blank and overlapping hours rejected without writes");
 
   const invented = await fixture("invented-dates", { field: "holiday_hours", value: { "2026-12-31": "closed" } });
   assert.equal((await decide(invented, { decision: "edited", via: "tap", edited_value: { "2026-12-31": "10:00-14:00" } })).status, 400);

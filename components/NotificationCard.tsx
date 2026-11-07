@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { isValidHours, normalizeHours, showHours } from "@/lib/hours";
 import type { IssueType, Listing } from "@/types";
 import type { ApiError, DecideRequest, DecideResponse, SuggestionWithIssue } from "@/types/api";
 
@@ -29,7 +30,7 @@ function label(key: string): string {
 function display(value: unknown): string {
   if (value === undefined || value === null) return "Not set";
   if (value === "closed") return "Closed";
-  if (typeof value === "string") return value.replace(/(\d{2}:\d{2})-(\d{2}:\d{2})/, "$1–$2");
+  if (typeof value === "string") return value.trim() ? showHours(value, "Closed") : value;
   if (typeof value === "object") return Object.entries(value).map(([key, item]) => `${label(key)}: ${display(item)}`).join(" · ");
   return String(value);
 }
@@ -66,6 +67,7 @@ export default function NotificationCard({ suggestion, listings, onDecidedAction
   const [standingPermission, setStandingPermission] = useState(false);
   const [editMode, setEditMode] = useState<"view" | "edit" | "confirm">("view");
   const [draft, setDraft] = useState<Record<string, string>>({});
+  const [multiplePeriods, setMultiplePeriods] = useState<Record<string, boolean>>({});
   const [pendingRequest, setPendingRequest] = useState<DecideRequest | null>(null);
   const [checkingPending, setCheckingPending] = useState(true);
   const [recoveryError, setRecoveryError] = useState(false);
@@ -107,6 +109,7 @@ export default function NotificationCard({ suggestion, listings, onDecidedAction
   const recoveryBlocked = checkingPending || recoveryError || pendingRequest !== null;
 
   function startEdit() {
+    setMultiplePeriods(Object.fromEntries(rows.map(([key, value]) => [key, typeof value === "string" && value.includes(",")])));
     setDraft(Object.fromEntries(rows.map(([key, value]) => [key, typeof value === "string" ? value : ""])));
     previousHours.current = Object.fromEntries(rows.filter(([, value]) => typeof value === "string" && value !== "closed")) as Record<string, string>;
     setError(null);
@@ -120,12 +123,11 @@ export default function NotificationCard({ suggestion, listings, onDecidedAction
 
   function reviewEdit() {
     if (hoursField) {
-      const validHours = (value: string) => value === "closed" ||
-        (/^([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-3]):[0-5]\d$/.test(value) && value.slice(0, 5) < value.slice(6));
-      if (!Object.keys(draft).length || !Object.values(draft).every(validHours)) {
-        setError("Choose valid opening and closing times, with closing after opening, or mark the day closed.");
+      if (!Object.keys(draft).length || !Object.values(draft).every((value) => value.trim().length > 0 && isValidHours(value))) {
+        setError("Enter valid hours without overlapping periods, or mark the day closed. Closing can be after midnight.");
         return;
       }
+      setDraft(Object.fromEntries(Object.entries(draft).map(([key, value]) => [key, normalizeHours(value)])));
     } else if (!String(finalValue).trim()) {
       setError("Please enter a value before continuing.");
       return;
@@ -213,10 +215,17 @@ export default function NotificationCard({ suggestion, listings, onDecidedAction
           <fieldset key={key} disabled={busy} className="min-w-0 space-y-2">
             <legend className="text-sm font-medium">{label(key)}</legend>
             <label className="flex min-h-9 items-center gap-2 text-sm"><input type="checkbox" checked={draft[key] === "closed"} onChange={(event) => toggleClosed(key, event.target.checked)} className="size-4 accent-emerald-700" />Closed</label>
-            {draft[key] !== "closed" && <div className="grid min-w-0 grid-cols-2 gap-2">
+            {draft[key] !== "closed" && <>
+              <label className="flex min-h-9 items-center gap-2 text-sm"><input type="checkbox" checked={!!multiplePeriods[key]} onChange={(event) => setMultiplePeriods((current) => ({ ...current, [key]: event.target.checked }))} disabled={draft[key]?.includes(",")} className="size-4 accent-emerald-700" />Multiple opening periods</label>
+              {multiplePeriods[key] ? <label className="block text-xs text-zinc-600">Opening periods
+                <input type="text" required value={draft[key] ?? ""} placeholder="10:00-14:00,17:00-22:00" onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))} className="mt-1 block min-h-11 w-full min-w-0 rounded-lg border border-zinc-300 bg-white px-2 text-sm text-zinc-900" />
+                <span className="mt-1 block leading-5">Separate periods with a comma, for example 10:00-14:00,17:00-22:00. Remove extra periods before switching to single-period editing.</span>
+              </label> : <div className="grid min-w-0 grid-cols-2 gap-2">
               <label className="min-w-0 text-xs text-zinc-600">Opens<input type="time" required value={draft[key]?.split("-")[0] ?? ""} onChange={(event) => setDraft((current) => ({ ...current, [key]: `${event.target.value}-${current[key]?.split("-")[1] ?? ""}` }))} className="mt-1 block min-h-11 w-full min-w-0 rounded-lg border border-zinc-300 bg-white px-2 text-sm text-zinc-900" /></label>
               <label className="min-w-0 text-xs text-zinc-600">Closes<input type="time" required value={draft[key]?.split("-")[1] ?? ""} onChange={(event) => setDraft((current) => ({ ...current, [key]: `${current[key]?.split("-")[0] ?? ""}-${event.target.value}` }))} className="mt-1 block min-h-11 w-full min-w-0 rounded-lg border border-zinc-300 bg-white px-2 text-sm text-zinc-900" /></label>
-            </div>}
+              </div>}
+              <p className="text-xs leading-5 text-zinc-500">Closing can be after midnight. For 24-hour opening, use 00:00–23:59.</p>
+            </>}
           </fieldset>
         ) : (
           <label key={key} className="block text-sm font-medium">{label(key)}

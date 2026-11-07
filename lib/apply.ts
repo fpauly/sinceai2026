@@ -4,6 +4,7 @@ import { isDeepStrictEqual } from "node:util";
 import type { Collection, UpdateFilter } from "mongodb";
 import { z } from "zod";
 import { collections } from "@/lib/db";
+import { isValidHours } from "@/lib/hours";
 import { validateSuggestion } from "@/lib/validate";
 import { publishChange } from "@/lib/yext";
 import type { AppliedResult, Issue, LearnedDecision, Preferences, Suggestion } from "@/types";
@@ -27,11 +28,7 @@ export const decisionRequestSchema = z.object({
   }
 });
 
-const hours = z.string().refine((value) => {
-  if (value === "closed") return true;
-  const match = /^([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-3]):[0-5]\d$/.exec(value);
-  return !!match && value.slice(0, 5) < value.slice(6);
-}, "Invalid opening hours");
+const hours = z.string().refine((value) => value.trim().length > 0 && isValidHours(value), "Invalid opening hours");
 const date = z.iso.date();
 const changes = z.discriminatedUnion("field", [
   z.object({ field: z.literal("holiday_hours"), value: z.record(date, hours).refine((v) => Object.keys(v).length > 0) }),

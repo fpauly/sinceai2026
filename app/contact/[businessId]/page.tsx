@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { showHours } from "@/lib/hours";
 import type { IssueType } from "@/types";
 import type { OwnerViewResponse, SuggestionWithIssue } from "@/types/api";
 
@@ -33,7 +34,7 @@ function label(key: string): string {
 function valueText(value: unknown): string {
   if (value === null || value === undefined) return "Not set";
   if (value === "closed") return "Closed";
-  if (typeof value === "string") return value.replace(/(\d{2}:\d{2})-(\d{2}:\d{2})/, "$1–$2");
+  if (typeof value === "string") return value.trim() ? showHours(value, "Closed") : value;
   if (Array.isArray(value)) return value.map(valueText).join("; ");
   if (typeof value === "object") return Object.entries(value).map(([key, item]) => `${label(key)}: ${valueText(item)}`).join("; ");
   return String(value);
