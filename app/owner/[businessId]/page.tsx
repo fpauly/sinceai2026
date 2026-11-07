@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { AutomaticallyApplied, contactChannel, contactLanguage, contactName, decisionLabel, groupTitle, sortByDate } from "@/app/owner/contact-details";
 import ChannelSyncRow from "@/components/ChannelSyncRow";
+import Reveal from "@/components/Reveal";
 import type { AppliedResult } from "@/types";
 import NotificationCard from "@/components/NotificationCard";
 import type { DecideResponse, OwnerViewResponse } from "@/types/api";
@@ -82,8 +83,8 @@ function BusinessView({ businessId }: { businessId: string }) {
       {data.business.contact && <p className="mb-4 text-xs text-zinc-500">Contact channel: {contactChannel(data.business)} · Language: {{ en: "English", fi: "Finnish", sv: "Swedish", nb: "Norwegian" }[contactLanguage(data.business)]}</p>}
       {data.business.contact?.opted_out && <p className="mb-4 rounded-xl bg-zinc-100 p-3 text-sm">Not contacted. You have opted out of suggestion messages.</p>}
       {!!data.automatically_applied?.length && <div className="mb-4"><AutomaticallyApplied suggestions={sortByDate(data.automatically_applied)} language={contactLanguage(data.business)} /></div>}
-      {notice && <p role="status" className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm leading-6 text-emerald-900">{notice}</p>}
-      {publication && <ChannelSyncRow key={publication.id} changeLabel={publication.label} applied={publication.applied} receivedAt={publication.receivedAt} business={data.business} />}
+      {notice && <Reveal key={notice}><p role="status" className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm leading-6 text-emerald-900">{notice}</p></Reveal>}
+      {publication && <Reveal key={publication.id}><ChannelSyncRow key={publication.id} changeLabel={publication.label} applied={publication.applied} receivedAt={publication.receivedAt} business={data.business} /></Reveal>}
       {suggestions.length ? (
         <section aria-label="Suggestions to review" className="space-y-4 rounded-2xl border border-zinc-200 bg-zinc-100 p-3">
           <h2 className="px-1 text-lg font-semibold">{groupTitle(suggestions)}</h2>

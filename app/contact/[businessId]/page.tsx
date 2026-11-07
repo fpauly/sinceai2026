@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { AutomaticallyApplied, ContactWindow, OwnerMessage, contactChannel, contactLanguage, contactName, decisionLabel, formatDate, groupTitle, sortByDate } from "@/app/owner/contact-details";
 import ReplyBox from "@/app/contact/ReplyBox";
 import ChannelSyncRow from "@/components/ChannelSyncRow";
+import Reveal from "@/components/Reveal";
 import { showHours } from "@/lib/hours";
 import type { IssueType, Language } from "@/types";
 import type { DecideResponse, OwnerViewResponse, SuggestionWithIssue } from "@/types/api";
@@ -132,9 +133,9 @@ function BusinessChat({ businessId }: { businessId: string }) {
   const optedOut = data.business.contact?.opted_out;
   return <>
     <p className="rounded-lg bg-white/80 px-3 py-2 text-center text-xs text-zinc-600">For {contactName(data.business)} · {data.business.name}<br />{channel} preview · No message has been sent.</p>
-    {lastDecision && (lastDecision.result.suggestion.decision === "ignored"
+    {lastDecision && <Reveal key={lastDecision.result.suggestion._id}>{lastDecision.result.suggestion.decision === "ignored"
       ? <p role="status" className="rounded-xl bg-white p-3 text-sm">{decisionLabel(lastDecision.result.suggestion)}: suggestion declined. Your information was not changed.</p>
-      : <ChannelSyncRow key={lastDecision.result.suggestion._id} changeLabel={decisionLabel(lastDecision.result.suggestion)} applied={lastDecision.result.suggestion.applied} receivedAt={lastDecision.receivedAt} business={data.business} />)}
+      : <ChannelSyncRow key={lastDecision.result.suggestion._id} changeLabel={decisionLabel(lastDecision.result.suggestion)} applied={lastDecision.result.suggestion.applied} receivedAt={lastDecision.receivedAt} business={data.business} />}</Reveal>}
     {optedOut ? <div className="rounded-2xl bg-white p-4 text-sm leading-6"><h2 className="font-semibold">Not contacted</h2><p className="mt-2">This owner has opted out of suggestion messages.</p></div> : suggestions.length || automatic.length ? (
       <article aria-label={`${channel} message`} className="min-w-0 space-y-4 rounded-2xl bg-white p-4 shadow-sm">
         {channel === "Email" && <p className="border-b border-zinc-100 pb-2 text-sm font-semibold">Subject: Your business hours</p>}
