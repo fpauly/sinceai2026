@@ -7,7 +7,8 @@ import type { Issue, Preferences, Suggestion } from "@/types";
 // A private copy of one demo business for each visitor (the QR code in the video opens /try).
 // Each visitor answers their own copy, so many people can try it at once and every scan starts
 // fresh. Copies have ids starting with "try-", are hidden from the dashboard and the daily check,
-// never link to Yext, and are deleted by MongoDB 6 hours after creation (TTL index on expires_at).
+// keep the template's Yext link (only Kahvila Aurora has one, so Aurora copies publish to the real
+// Yext sandbox for step 5, #105), and are deleted by MongoDB 6 hours after creation (TTL on expires_at).
 
 export const COPY_PREFIX = "try-";
 export const isDemoCopy = (businessId: string) => businessId.startsWith(COPY_PREFIX);
@@ -48,7 +49,7 @@ export async function createDemoCopy(templateId: (typeof TRY_TEMPLATES)[number])
     preferences: [{
       _id: id, business_id: id, ignored_fingerprints: [], notes: [], ...(templatePrefs ? { learned: templatePrefs.learned ?? [], standing_permissions: templatePrefs.standing_permissions ?? [] } : {}), expires_at,
     }],
-    businesses: [{ ...business, _id: id, yext_entity_id: null, demo_copy_of: templateId, expires_at }],
+    businesses: [{ ...business, _id: id, yext_entity_id: business.yext_entity_id ?? null, demo_copy_of: templateId, expires_at }],
     profiles: [{ ...profile, _id: id, business_id: id, expires_at }],
     holiday_history: fonectaDemo.holiday_history
       .filter((h) => h.business_id === templateId)
