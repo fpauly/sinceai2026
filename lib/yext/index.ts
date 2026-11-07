@@ -1,7 +1,9 @@
 import "server-only";
 import { isDeepStrictEqual } from "node:util";
-import type { Business, Day, Hours } from "@/types";
+import { toYextDay, type YextHolidayHours } from "@/lib/hours";
+import type { Business, Day } from "@/types";
 import type { PublishChange, TypedProposedChange } from "@/types/api";
+import { publishedTo } from "./publishers";
 
 // Step 5 (Apply): write an accepted change to our Yext sandbox. Owned by lane B (DESIGN 10b).
 //
@@ -13,10 +15,6 @@ const API_VERSION = "20261107";
 const READ_TIMEOUT_MS = 8000;
 const WRITE_TIMEOUT_MS = 20000; // sandbox writes usually take 2-4 s, with slower spikes
 
-// What the owner is told after a publish. Yext's own publisher list for Finnish locations is in
-// DESIGN 10b (the sandbox has no live listings to read this from); Finder is updated by us.
-const PUBLISHED_TO = ["Google", "Apple Maps", "Bing", "Facebook", "Finder"];
-
 const YEXT_DAYS: Record<Day, string> = {
   mon: "monday",
   tue: "tuesday",
@@ -27,9 +25,7 @@ const YEXT_DAYS: Record<Day, string> = {
   sun: "sunday",
 };
 
-type YextDayHours = { isClosed: true } | { openIntervals: { start: string; end: string }[] };
-type YextHoliday = YextDayHours & { date: string };
-type YextHours = Record<string, unknown> & { holidayHours?: YextHoliday[] };
+type YextHours = Record<string, unknown> & { holidayHours?: YextHolidayHours[] };
 type YextEntity = Record<string, unknown> & { hours?: YextHours };
 type YextBody = { meta?: { errors?: { message?: string }[] }; response?: YextEntity };
 
@@ -42,14 +38,6 @@ function inTurn<T>(entityId: string, work: () => Promise<T>): Promise<T> {
   const turn = (writeQueues.get(entityId) ?? Promise.resolve()).then(work);
   writeQueues.set(entityId, turn.catch(() => {}));
   return turn;
-}
-
-/** Our "10:00-18:00" | "closed" -> Yext's day format. */
-function toYextDay(hours: Hours): YextDayHours {
-  if (hours === "closed") return { isClosed: true };
-  const match = /^(\d{2}:\d{2})-(\d{2}:\d{2})$/.exec(hours);
-  if (!match) throw new Error(`invalid hours value "${hours}"`);
-  return { openIntervals: [{ start: match[1], end: match[2] }] };
 }
 
 async function yextRequest(entityId: string, init?: RequestInit): Promise<YextBody> {
@@ -117,7 +105,7 @@ export const publishChange: PublishChange = async (business: Business, change) =
       } catch (err) {
         if (err instanceof YextRefused || !(await isSaved(entityId, update))) throw err;
       }
-      return { yext: true, published_to: PUBLISHED_TO };
+      return { yext: true, published_to: publishedTo(business) };
     } catch (err) {
       return failed(err instanceof Error ? err.message : "Yext request failed");
     }
