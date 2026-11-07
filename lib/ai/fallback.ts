@@ -53,6 +53,7 @@ const CATEGORY: Record<Category, { en: string; fi: string }> = {
   bookshop: { en: "bookshops", fi: "kirjakaupat" },
   gym: { en: "gyms", fi: "kuntosalit" },
   bakery: { en: "bakeries", fi: "leipomot" },
+  other: { en: "similar businesses", fi: "vastaavat yritykset" },
 };
 
 const SOURCE_EN: Record<Source, string> = { finder: "Finder", google: "Google", website: "your website" };
@@ -391,5 +392,8 @@ export function fallbackSuggestion(
       return staleField(business, issue, listings);
     case "review_signal":
       return reviewSignal(business, issue, listings);
+    case "special_day_hours":
+    case "needs_human":
+      throw new Error(`no template for ${issue.type} yet (stage A11)`);
   }
 }

@@ -7,6 +7,10 @@ import type {
   Issue,
   Suggestion,
   Preferences,
+  Profile,
+  HolidayHistoryEntry,
+  SpecialDay,
+  PeerBenchmark,
 } from "@/types";
 
 // Singleton MongoClient, reused across hot reloads in dev.
@@ -42,6 +46,11 @@ export async function collections(): Promise<{
   issues: Collection<Issue>;
   suggestions: Collection<Suggestion>;
   preferences: Collection<Preferences>;
+  // v2 (Fonecta dataset, DESIGN 0 "v2"); filled by the importer (C10)
+  profiles: Collection<Profile>;
+  holiday_history: Collection<HolidayHistoryEntry>;
+  special_days: Collection<SpecialDay>;
+  peers: Collection<PeerBenchmark>;
 }> {
   const db = await getDb();
   return {
@@ -51,5 +60,9 @@ export async function collections(): Promise<{
     issues: db.collection<Issue>("issues"),
     suggestions: db.collection<Suggestion>("suggestions"),
     preferences: db.collection<Preferences>("preferences"),
+    profiles: db.collection<Profile>("profiles"),
+    holiday_history: db.collection<HolidayHistoryEntry>("holiday_history"),
+    special_days: db.collection<SpecialDay>("special_days"),
+    peers: db.collection<PeerBenchmark>("peers"),
   };
 }
