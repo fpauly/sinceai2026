@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
+import VoiceButton from "@/components/VoiceButton";
 import { EditConfirmation } from "@/components/NotificationCard";
 import type { ApiError, DecideRequest, DecideResponse, IntentResult, SuggestionWithIssue } from "@/types/api";
 
@@ -14,16 +15,17 @@ export default function ReplyBox({ suggestion, onDecidedAction }: {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uncertainSave, setUncertainSave] = useState(false);
+  const [via, setVia] = useState<"tap" | "voice">("tap");
   const submitting = useRef(false);
   const ownerUrl = `/owner/${encodeURIComponent(suggestion.business_id)}`;
 
-  async function interpret() {
+  async function interpret(reply = text) {
     if (submitting.current) return;
     submitting.current = true;
     setBusy(true); setError(null); setIntent(null);
     try {
       const response = await fetch(`/api/suggestions/${encodeURIComponent(suggestion._id)}/reply`, {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }),
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: reply }),
       });
       const result: IntentResult | ApiError = await response.json();
       if (!response.ok || "error" in result) throw new Error("error" in result ? result.error : "Could not read the reply");
@@ -39,7 +41,7 @@ export default function ReplyBox({ suggestion, onDecidedAction }: {
     setBusy(true); setError(null);
     const request: DecideRequest = {
       decision: intent.intent === "accept" ? "accepted" : intent.intent === "ignore" ? "ignored" : "edited",
-      via: "tap", ...(intent.intent === "edit" ? { edited_value: intent.edited_value } : {}),
+      via, ...(intent.intent === "edit" ? { edited_value: intent.edited_value } : {}),
     };
     try {
       const response = await fetch(`/api/suggestions/${encodeURIComponent(suggestion._id)}/decide`, {
@@ -57,9 +59,10 @@ export default function ReplyBox({ suggestion, onDecidedAction }: {
   return <div className="mt-4 rounded-xl border border-zinc-200 p-3">
     {!uncertainSave && !intent && <form onSubmit={(event) => { event.preventDefault(); void interpret(); }}>
       <label className="block text-sm font-medium">Reply to this suggestion
-        <textarea required maxLength={2000} rows={2} disabled={busy} value={text} onChange={(event) => setText(event.target.value)} placeholder="Yes, no thanks, or your preferred hours" className="mt-2 block w-full rounded-lg border border-zinc-300 bg-white p-2 font-normal disabled:opacity-50" />
+        <textarea required maxLength={2000} rows={2} disabled={busy} value={text} onChange={(event) => { setText(event.target.value); setVia("tap"); }} placeholder="Yes, no thanks, or your preferred hours" className="mt-2 block w-full rounded-lg border border-zinc-300 bg-white p-2 font-normal disabled:opacity-50" />
       </label>
       <button disabled={busy || !text.trim()} type="submit" className="mt-2 min-h-11 rounded-lg bg-emerald-700 px-3 text-sm font-medium text-white disabled:opacity-50">{busy ? "Reading reply…" : "Review reply"}</button>
+      <VoiceButton disabled={busy} onTranscriptAction={(spoken) => { setText(spoken); setVia("voice"); void interpret(spoken); }} />
       <p className="mt-2 text-xs leading-5 text-zinc-500">Reply applies only to the suggestion above. Nothing is saved until you confirm.</p>
     </form>}
     {!uncertainSave && intent && <>
