@@ -5,6 +5,7 @@ import type { SuggestionDraft } from "@/types/api";
 import { fallbackSuggestion } from "@/lib/ai/fallback";
 import { generateJson, geminiConfigured } from "@/lib/ai/gemini";
 import { validateSuggestion } from "@/lib/validate";
+import { ownerLanguage } from "@/lib/ai/specialDay";
 
 // Step 2 (Suggest), DESIGN 9.1 + 9.4: one suggestion for one issue.
 //
@@ -56,6 +57,8 @@ export async function generateSuggestion(
 ): Promise<SuggestResult> {
   const base = fallbackSuggestion(business, issue, listings, prefs);
 
+  if (issue.type === "special_day_hours") return specialDay(business, issue, listings, base);
+
   if (geminiConfigured()) {
     try {
       const words = await generateJson({ system: SYSTEM, prompt: buildPrompt(business, issue, listings, base), schema: Words });
@@ -79,6 +82,78 @@ export async function generateSuggestion(
     console.warn(`[suggest] issue ${issue._id}: template draft invalid too (${validation.problems.join("; ")})`);
   }
   return { draft, source: "fallback", validation };
+}
+
+// ---------- v2: special day hours (stage A11) ----------
+
+const WordsV2 = z.object({
+  reason: z.string().min(1),
+  message: z.object({ en: z.string().min(1), local: z.string().min(1) }),
+});
+
+const LANG_NAME = { fi: "Finnish", sv: "Swedish", nb: "Norwegian (Bokmål)" } as const;
+
+const SYSTEM_V2 = `You are Fonecta Connect. You write a short message to a small business owner about their opening hours on ONE special day (a holiday, an eve, an event night or a school break).
+
+Our code has already decided everything: the date, what Google shows now, the proposed hours and what the proposal is based on (last year's hours, the shopping centre, similar businesses, or the owner's own earlier edit). Never change, add or calculate any date, time or number. Only use the facts you are given.
+
+Return JSON:
+- reason: ONE short English sentence for the owner card: what Google shows now and what the proposal is based on.
+- message.en: the message in English.
+- message.local: the same message in the owner's language (given as owner_language).
+
+Each message has exactly this shape, like example_en / example_local:
+  sentence 1: greet the owner by first name, name the day and its date, and say what Google shows now.
+  sentence 2: what the proposal is based on, in plain words (for example "Last year you were open 7.30–13", "Kauppakeskus Revontuli is open 10–13 that day", "most similar businesses nearby are closed that day"). If confidence is "low", make sentence 2 a friendly question.
+  last line: starts with "We suggest:" (Finnish "Ehdotamme:", Swedish "Vi föreslår:", Norwegian "Vi foreslår:") followed by the day, date and the proposed hours, exactly as in the example.
+At most these 2 sentences plus the last line. Each sentence ends with one ".", "?" or "!" and has none inside it.
+Write dates exactly as in the examples ("24 Dec", "24.12", "24/12"); never put a dot after a date. Keep the hours exactly as in the examples. Plain, warm language, no emojis, no abbreviations with dots.
+The examples are correct; you may make them friendlier, but keep every fact.`;
+
+/** A special-day suggestion: the template has the facts; Gemini may rewrite the words; code validates. */
+async function specialDay(
+  business: Business,
+  issue: Issue,
+  listings: Listing[],
+  base: SuggestionDraft,
+): Promise<SuggestResult> {
+  const lang = ownerLanguage(business);
+  if (geminiConfigured()) {
+    try {
+      const words = await generateJson({
+        system: SYSTEM_V2,
+        prompt: JSON.stringify(
+          {
+            owner_first_name: business.contact?.first_name ?? business.owner_name,
+            owner_language: LANG_NAME[lang],
+            business: { name: business.name, type: business.segment, city: business.city },
+            evidence: issue.evidence,
+            confidence: base.confidence,
+            why_this_proposal: base.reason,
+            example_en: base.message.en,
+            example_local: base.message[lang],
+          },
+          null,
+          2,
+        ),
+        schema: WordsV2,
+      });
+      const draft: SuggestionDraft = {
+        proposed_change: base.proposed_change,
+        confidence: base.confidence,
+        reason: words.reason.trim(),
+        message: { en: words.message.en.trim(), [lang]: words.message.local.trim() },
+      };
+      const validation = validateSuggestion(draft, issue, listings);
+      if (validation.ok) return { draft, source: "gemini", validation };
+      console.warn(`[suggest] issue ${issue._id}: Gemini draft invalid, using template (${validation.problems.join("; ")})`);
+    } catch (err) {
+      console.warn(`[suggest] issue ${issue._id}: Gemini failed, using template (${err instanceof Error ? err.message : err})`);
+    }
+  }
+  const validation = validateSuggestion(base, issue, listings);
+  if (!validation.ok) console.warn(`[suggest] issue ${issue._id}: template draft invalid too (${validation.problems.join("; ")})`);
+  return { draft: validation.ok ? base : { ...base, confidence: "low" }, source: "fallback", validation };
 }
 
 /** The data Gemini needs, as JSON. Only the field this issue is about, per listing. */
