@@ -10,6 +10,8 @@ import type {
   HolidayHistoryEntry,
   PeerBenchmark,
   Profile,
+  PublisherSuggestion,
+  Review,
   SpecialDay,
 } from "@/types";
 
@@ -21,12 +23,16 @@ export interface FonectaDemo {
     holiday_history: number;
     special_days: number;
     peers: number;
+    reviews: number;
+    publisher_suggestions: number;
   };
   businesses: Business[];
   profiles: Profile[];
   holiday_history: HolidayHistoryEntry[];
   special_days: SpecialDay[];
   peers: PeerBenchmark[];
+  reviews: Review[];
+  publisher_suggestions: PublisherSuggestion[];
 }
 
 // The JSON has plain strings where the types use unions (category, country, channel, …); the

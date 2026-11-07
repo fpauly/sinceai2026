@@ -209,13 +209,19 @@ to it). What it changes for us:
   counted as `NO_ACTION`; it also reports `search_views_protected_pct` and
   `closed_door_views_prevented_pct`. `evaluation/targets_2026.csv` has 41,755 rows (dev/test/demo
   splits; only test is scored by the organisers).
-- **Two stages unblock:** C6 (importer: dataset → our collections, `data/seed.ts` stays the
-  fallback) and A6 (scoring adapter: our detect + suggest → that CSV).
-- **One blocker to agree on first:** the dataset does not fit `types/index.ts` as it stands — 33
-  `c_segment` values vs our 8 categories, hours with several intervals
-  (`10:00-14:00,17:00-22:00`) and past midnight (`18:00-02:00`), and publisher rows that carry a
-  status but no per-channel hours. Importing it needs a shared type/data-model change (CONTRIBUTING
-  §5: lane A or B), so C6 starts only after that design update.
-- **What does not change:** the mock Turku businesses stay the scripted demo (`DESIGN.md` §13), and
-  `DEMO_DATE` still drives detection, so the demo remains deterministic while the importer and the
-  scoring adapter work off the real files.
+- **Two stages unblocked and done:** C10 (importer: the demo cast into `data/fonecta/demo.json`,
+  loaded by `/api/seed?source=fonecta`) and A10 (`lib/predict` + `predictions_2026.csv`, 61.6 on dev
+  vs 54.5 baseline). The score and the app share one prediction module.
+- **The data-model blocker was resolved by V1:** `types/` gained country, segment, contact, publishers,
+  one `Profile` per business (multi-interval and past-midnight hours), special days, exception history
+  and peer rows; `lib/hours.ts` is the one hours parser. C10 imports the 17 demo storylines plus the
+  15 shopping centres into MongoDB, and `C11` turns `lib/predict`'s answer into `special_day_hours`
+  issues (SUGGEST) and `needs_human` flags (FLAG).
+- **Closure signals are real, not guessed.** `reviews.json` and `publisher_suggestions.json` are in the
+  extract (reviews → the `reviews` collection, publisher user edits → `publisher_suggestions`).
+  `lib/predict` reads them and flags `FI-D0011` Pizzeria Torni as `closed_for_good` from five recent
+  reviews ("lopettanut", "closed down permanently", …) plus a `field: "closed"` publisher edit, so
+  C11 never sends the owner a suggestion for a business that has closed.
+- **What does not change:** the mock Turku businesses stay the scripted demo (`DESIGN.md` §13) until
+  the V2 switch, and `DEMO_DATE` still drives detection, so the demo stays deterministic while the
+  importer and the scoring adapter work off the real files.
