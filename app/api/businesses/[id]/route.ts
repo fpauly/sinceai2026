@@ -22,7 +22,9 @@ export async function GET(_request: Request, ctx: RouteContext<"/api/businesses/
     const suggestions: SuggestionWithIssue[] = [];
     for (const suggestion of pending) {
       const issue = byId.get(suggestion.issue_id);
-      if (issue) suggestions.push({ ...suggestion, issue });
+      const publicSuggestion = { ...suggestion };
+      delete (publicSuggestion as typeof suggestion & { _decision?: unknown })._decision;
+      if (issue) suggestions.push({ ...publicSuggestion, issue });
     }
 
     return Response.json({ business, listings, suggestions } satisfies OwnerViewResponse, {
