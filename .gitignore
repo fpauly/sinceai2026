@@ -46,3 +46,6 @@ next-env.d.ts
 /*.jpeg
 /*.png
 /*.heic
+
+# provided hackathon material: large, kept local (see docs/data-sources.md)
+/FONECTA/
