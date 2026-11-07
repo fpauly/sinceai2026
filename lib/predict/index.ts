@@ -16,11 +16,13 @@ import { displayedHours, normalizeHours, sameHours, weekdayOf } from "../hours";
 //                                the centre's regular hours on that weekday             -> SHOPPING_CENTRE
 //   3. last year                 what the owner entered for the same day last season,
 //                                else the season before                                 -> LAST_YEAR
+//      event night / school break: the owner's latest entry for that kind of day
+//                                (same weekday preferred), e.g. the autumn break         -> LAST_YEAR
 //   4. peers                     most similar businesses close that day                 -> PEERS ("closed" only)
 // The result is a SUGGEST only when it differs from what Google shows today.
 //
 // Measured with Fonecta's scorer (evaluation/evaluate.py, dev split):
-//   2026 season 61.6 (baseline 54.5) · 2025 back-test 56.7 (baseline 53.2). See docs/predict.md.
+//   2026 season 62.1 (baseline 54.5) · 2025 back-test 61.0 (baseline 53.2). See docs/predict.md.
 
 /** Words in reviews that mean "closed for good" (fi, sv, nb, en); same list as Fonecta's baseline. */
 const CLOSED_FOR_GOOD = ["lopettanut", "pysyvästi", "stängt för gott", "permanent", "lagt ned", "stengt for godt", "closed down"];
@@ -30,7 +32,8 @@ const REVIEW_WINDOW_DAYS = 150;
 const PEER_MIN_CLOSED_AMONG_ENTERED = 0.7;
 const PEER_MIN_SHARE_CLOSED = 0.15;
 
-/** Day keys without a fixed counterpart last year (different events / break dates). */
+/** Day keys without a fixed counterpart last year (different events / break dates each year):
+ *  for these the owner's most recent entry for the same kind of day is used instead (rule 3b). */
 const NO_LAST_YEAR = new Set(["EVENT", "SCHOOL_BREAK"]);
 
 export function predict(ctx: PredictContext): Prediction {
@@ -103,6 +106,21 @@ function propose(ctx: PredictContext, regular: Hours, shown: Hours): Proposal | 
     }
   }
 
+  // 3b. Event nights and school breaks: the last time the owner entered hours for that kind of day.
+  if (NO_LAST_YEAR.has(day.day_key)) {
+    const entry = latestOfKind(ctx.history, day.day_key, day.date, today);
+    if (entry && !entry.is_regular) {
+      const hours = normalizeHours(entry.hours);
+      return {
+        hours,
+        basis: "LAST_YEAR",
+        detail: { last_year: { date: entry.date, hours, entered_at: entry.entered_at } },
+        confidence: "medium",
+      };
+    }
+    if (entry) return null; // the owner said "regular hours" last time: nothing to change
+  }
+
   // 4. Peers: only "closed", and only when similar businesses clearly close that day.
   const peer = peerRow(ctx.peers, day.day_key);
   if (
@@ -163,6 +181,21 @@ function lastSeasonEntry(
     if (entry) return entry;
   }
   return null;
+}
+
+/** The latest earlier entry for an event night / school break, preferring the same weekday. */
+function latestOfKind(history: HolidayHistoryEntry[], dayKey: string, date: string, today: string): HolidayHistoryEntry | null {
+  const weekday = weekdayOf(date);
+  let best: HolidayHistoryEntry | null = null;
+  let bestSame: HolidayHistoryEntry | null = null;
+  const newer = (a: HolidayHistoryEntry, b: HolidayHistoryEntry | null) =>
+    !b || a.date > b.date || (a.date === b.date && a.entered_at > b.entered_at);
+  for (const e of history) {
+    if (e.day_key !== dayKey || !(e.date < today) || !(e.entered_at < today)) continue;
+    if (newer(e, best)) best = e;
+    if (weekdayOf(e.date) === weekday && newer(e, bestSame)) bestSame = e;
+  }
+  return bestSame ?? best;
 }
 
 function peerRow(peers: PeerBenchmark[], dayKey: string): PeerBenchmark | null {
