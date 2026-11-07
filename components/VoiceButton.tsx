@@ -26,8 +26,19 @@ export default function VoiceButton({ onTranscriptAction, disabled = false }: {
     () => !!navigator.mediaDevices?.getUserMedia && typeof MediaRecorder !== "undefined",
     () => false,
   );
+  // Shown only when the server can transcribe (no key on this site: no button at all).
+  const [available, setAvailable] = useState(false);
   const recorder = useRef<MediaRecorder | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    fetch("/api/voice/transcribe", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : { available: false }))
+      .then((body: { available?: boolean }) => { if (live) setAvailable(body.available === true); })
+      .catch(() => { if (live) setAvailable(false); });
+    return () => { live = false; };
+  }, []);
 
   useEffect(() => {
     return () => { if (timer.current) clearTimeout(timer.current); recorder.current?.stream.getTracks().forEach((t) => t.stop()); };
@@ -76,7 +87,7 @@ export default function VoiceButton({ onTranscriptAction, disabled = false }: {
     if (recorder.current?.state === "recording") recorder.current.stop();
   }
 
-  if (!supported) return null;
+  if (!supported || !available) return null;
   const label = state === "recording" ? "Stop and send" : state === "reading" ? "Listening…" : "Reply by voice";
   return <div className="mt-2">
     <button type="button" disabled={disabled || state === "reading"} aria-pressed={state === "recording"}

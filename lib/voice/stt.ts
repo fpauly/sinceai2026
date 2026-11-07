@@ -7,6 +7,9 @@ import "server-only";
 const TIMEOUT_MS = 20000;
 export const MAX_AUDIO_BYTES = 5 * 1024 * 1024; // about a minute of compressed speech
 
+/** Voice replies work only when the server has an ElevenLabs key. */
+export const voiceAvailable = () => !!process.env.ELEVENLABS_API_KEY;
+
 export type Transcript = { ok: true; text: string } | { ok: false; error: string };
 
 export async function transcribe(audio: Blob): Promise<Transcript> {

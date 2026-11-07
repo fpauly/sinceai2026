@@ -1,5 +1,12 @@
-import { MAX_AUDIO_BYTES, transcribe } from "@/lib/voice/stt";
+import { connection } from "next/server";
+import { MAX_AUDIO_BYTES, transcribe, voiceAvailable } from "@/lib/voice/stt";
 import type { ApiError } from "@/types/api";
+
+// GET /api/voice/transcribe — { available }: the voice button shows only when this is true.
+export async function GET() {
+  await connection(); // read the key at request time, never at build time
+  return Response.json({ available: voiceAvailable() }, { headers: { "Cache-Control": "no-store" } });
+}
 
 // POST /api/voice/transcribe — multipart form with one `audio` file → { ok: true, text }.
 // Transcription only: the text then goes through /api/suggestions/[id]/reply like a typed reply,

@@ -40,7 +40,7 @@ const PROBES = {
   decide: "/api/suggestions/_probe/decide",
   reply: "/api/suggestions/_probe/reply",
   tts: "/api/suggestions/_probe/tts",
-  voiceReply: "/api/voice/reply",
+  voiceReply: "/api/voice/transcribe",
   dashboardPage: "/dashboard",
   ownerPage: `/owner/${DEMO}`,
   contactPage: `/contact/${DEMO}`,
