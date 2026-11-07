@@ -5,6 +5,7 @@ import type { Issue } from "@/types";
 import type { DraftIssue, Rule, RuleContext } from "@/types/api";
 import { crossPlatformConflict } from "./crossPlatformConflict";
 import { missingHolidayHours } from "./missingHolidayHours";
+import { staleField } from "./staleField";
 
 // Detection entry point (step 1 of the demo). Loads the data once, runs every rule for every
 // business, and stores the new issues. Rules stay pure (ctx in, drafts out); all DB access is here.
@@ -13,8 +14,8 @@ import { missingHolidayHours } from "./missingHolidayHours";
 // DESIGN 7) or already exists as an open/suggested issue, so running the check twice creates
 // nothing new (TASKS.md acceptance test).
 
-/** Every rule, in the order they run. New rules are registered here (C4, C9). */
-export const rules: readonly Rule[] = [missingHolidayHours, crossPlatformConflict];
+/** Every rule, in the order they run. New rules are registered here (C9). */
+export const rules: readonly Rule[] = [missingHolidayHours, crossPlatformConflict, staleField];
 
 function groupByBusiness<T extends { business_id: string }>(rows: T[]): Map<string, T[]> {
   const byId = new Map<string, T[]>();
