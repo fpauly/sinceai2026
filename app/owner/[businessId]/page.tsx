@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { AutomaticallyApplied, contactChannel, contactLanguage, contactName } from "@/app/owner/contact-details";
 import NotificationCard from "@/components/NotificationCard";
 import type { DecideResponse, OwnerViewResponse } from "@/types/api";
 
@@ -28,7 +29,7 @@ function BusinessView({ businessId }: { businessId: string }) {
       ? "Suggestion ignored. We will remember your choice."
       : applied?.yext
         ? `Change saved and published via Yext to: ${applied.published_to.join(", ")}.`
-        : "Change saved to your demo listings. Yext was not reached; external publication is not confirmed.");
+        : "Change saved locally. Yext was not reached; external publication is not confirmed.");
     setState((current) => current.status === "ready" ? {
       status: "ready", data: { ...current.data, suggestions: current.data.suggestions.filter((item) => item._id !== result.suggestion._id) },
     } : current);
@@ -73,16 +74,19 @@ function BusinessView({ businessId }: { businessId: string }) {
       <header className="mb-6">
         <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700">Fonecta Connect</p>
         <p className="mt-5 text-sm text-zinc-500">{data.business.name}</p>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight">Hi {data.business.owner_name}!</h1>
-        <p className="mt-2 text-sm leading-6 text-zinc-600">{data.suggestions.length ? "A few details need your attention. You decide what changes." : "Your business information is looking good."}</p>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight">Hi {contactName(data.business)}!</h1>
+        <p className="mt-2 text-sm leading-6 text-zinc-600">{data.suggestions.length ? "A few details need your attention. You decide what changes." : "There are no suggestions waiting for your review."}</p>
       </header>
+      {data.business.contact && <p className="mb-4 text-xs text-zinc-500">Contact channel: {contactChannel(data.business)} · Language: {contactLanguage(data.business)}</p>}
+      {data.business.contact?.opted_out && <p className="mb-4 rounded-xl bg-zinc-100 p-3 text-sm">Not contacted. You have opted out of suggestion messages.</p>}
+      <div className="mb-4"><AutomaticallyApplied suggestions={data.automatically_applied ?? []} language={contactLanguage(data.business)} /></div>
       {notice && <p role="status" className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm leading-6 text-emerald-900">{notice}</p>}
       {data.suggestions.length ? (
         <section aria-label="Suggestions to review" className="space-y-4">
-          {data.suggestions.map((suggestion) => <NotificationCard key={suggestion._id} suggestion={suggestion} listings={data.listings} onDecidedAction={decided} />)}
+          {data.suggestions.map((suggestion) => <NotificationCard key={suggestion._id} suggestion={suggestion} listings={data.listings} profile={data.profile} language={contactLanguage(data.business)} onDecidedAction={decided} />)}
         </section>
       ) : (
-        <section className="rounded-2xl border border-emerald-200 bg-white px-4 py-10 text-center"><h2 className="text-xl font-semibold">Everything is up to date ✅</h2><p className="mt-2 text-sm leading-6 text-zinc-600">There is nothing to review right now.</p></section>
+        <section className="rounded-2xl border border-emerald-200 bg-white px-4 py-10 text-center"><h2 className="text-xl font-semibold">Nothing waiting for review</h2><p className="mt-2 text-sm leading-6 text-zinc-600">There is nothing to review right now.</p></section>
       )}
       <footer className="mt-8 text-center text-xs leading-5 text-zinc-500">Your business. Your decision.<br />Connect helps you keep everyone informed.</footer>
     </>

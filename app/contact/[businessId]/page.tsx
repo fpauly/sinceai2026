@@ -3,8 +3,9 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { AutomaticallyApplied, ContactWindow, OwnerMessage, contactChannel, contactLanguage, contactName } from "@/app/owner/contact-details";
 import { showHours } from "@/lib/hours";
-import type { IssueType } from "@/types";
+import type { IssueType, Language } from "@/types";
 import type { OwnerViewResponse, SuggestionWithIssue } from "@/types/api";
 
 const titles: Record<IssueType, string> = {
@@ -62,12 +63,12 @@ function evidenceLines(suggestion: SuggestionWithIssue): string[] {
   }
 }
 
-function Message({ suggestion, businessId }: { suggestion: SuggestionWithIssue; businessId: string }) {
+function Message({ suggestion, language }: { suggestion: SuggestionWithIssue; language: Language }) {
   const lines = evidenceLines(suggestion);
   return (
-    <article className="min-w-0 rounded-2xl rounded-tl-sm bg-white p-4 text-sm leading-6 shadow-sm">
+    <section className="min-w-0 border-b border-zinc-100 pb-4 text-sm leading-6 last:border-0">
       <h2 className="font-semibold text-emerald-800">{titles[suggestion.issue.type]}</h2>
-      <p className="mt-2 whitespace-pre-wrap break-words">{suggestion.message.en}</p>
+      <OwnerMessage message={suggestion.message} language={language} />
       <div className="mt-3 border-l-2 border-emerald-600 pl-3">
         <h3 className="text-xs font-semibold text-emerald-800">Proposed change · {label(suggestion.proposed_change.field)}</h3>
         <p className="mt-1 break-words">{valueText(suggestion.proposed_change.value)}</p>
@@ -79,12 +80,7 @@ function Message({ suggestion, businessId }: { suggestion: SuggestionWithIssue; 
         <summary className="cursor-pointer py-1 font-medium">The data behind this</summary>
         <ul className="mt-1 space-y-2 break-words">{lines.map((line, index) => <li key={index}>{line}</li>)}</ul>
       </details>}
-      <Link href={`/owner/${encodeURIComponent(businessId)}`} className="mt-4 flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-3 py-2 text-center font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
-        Review in 10 seconds →
-      </Link>
-      <p className="mt-2 text-center text-xs text-zinc-500">No login needed. You decide what changes.</p>
-      <details className="mt-3 text-xs text-zinc-500"><summary className="cursor-pointer py-1">Also available in Finnish</summary><p lang="fi" className="mt-1 whitespace-pre-wrap break-words">{suggestion.message.fi}</p></details>
-    </article>
+    </section>
   );
 }
 
@@ -119,14 +115,23 @@ function BusinessChat({ businessId }: { businessId: string }) {
     <div className="rounded-xl bg-white p-4 text-sm"><h2 className="font-semibold">Business not found</h2><p className="mt-2">Please check your link.</p><Link href="/" className="mt-3 inline-flex min-h-11 items-center text-emerald-800 underline">Back to demo</Link></div>
   );
   const { data } = state;
-  return (
-    <>
-      <p className="mx-auto max-w-full rounded-lg bg-white/80 px-3 py-1 text-center text-xs text-zinc-600">For {data.business.owner_name} · {data.business.name}</p>
-      {data.suggestions.length ? data.suggestions.map((suggestion) => <Message key={suggestion._id} suggestion={suggestion} businessId={businessId} />) : (
-        <div className="rounded-2xl bg-white p-4 text-sm leading-6 shadow-sm"><h2 className="font-semibold">Everything is up to date ✅</h2><p className="mt-2">There are no suggestions waiting for your review, so no message is needed.</p><Link href={`/owner/${encodeURIComponent(businessId)}`} className="mt-3 inline-flex min-h-11 items-center font-medium text-emerald-800 underline">View your business →</Link></div>
-      )}
-    </>
-  );
+  const channel = contactChannel(data.business);
+  const language = contactLanguage(data.business);
+  const automatic = data.automatically_applied ?? [];
+  const optedOut = data.business.contact?.opted_out;
+  return <>
+    <p className="rounded-lg bg-white/80 px-3 py-2 text-center text-xs text-zinc-600">For {contactName(data.business)} · {data.business.name}<br />{channel} preview · No message has been sent.</p>
+    {optedOut ? <div className="rounded-2xl bg-white p-4 text-sm leading-6"><h2 className="font-semibold">Not contacted</h2><p className="mt-2">This owner has opted out of suggestion messages.</p></div> : data.suggestions.length || automatic.length ? (
+      <article aria-label={`${channel} message`} className="min-w-0 space-y-4 rounded-2xl bg-white p-4 shadow-sm">
+        {channel === "Email" && <p className="border-b border-zinc-100 pb-2 text-sm font-semibold">Subject: Your business hours</p>}
+        <AutomaticallyApplied suggestions={automatic} language={language} />
+        {data.suggestions.map((suggestion) => <Message key={suggestion._id} suggestion={suggestion} language={language} />)}
+        <Link href={`/owner/${encodeURIComponent(businessId)}`} className="flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-3 py-2 text-center text-sm font-semibold text-white">{data.suggestions.length ? "Review your dates →" : "View your updated hours →"}</Link>
+        <p className="text-center text-xs text-zinc-500">No login needed. You decide what changes.</p>
+        <ContactWindow business={data.business} />
+      </article>
+    ) : <div className="rounded-2xl bg-white p-4 text-sm leading-6"><h2 className="font-semibold">No message needed</h2><p className="mt-2">There are no suggestions waiting for review or automatic changes to report.</p></div>}
+  </>;
 }
 
 function ContactChat() {
@@ -139,8 +144,8 @@ export default function ContactPage() {
     <main className="min-h-screen bg-zinc-50 px-3 py-6 text-zinc-900 sm:py-10">
       <div className="mx-auto w-full max-w-[390px]">
         <h1 className="text-center text-xl font-semibold tracking-tight">Your message from Connect</h1>
-        <p className="mb-5 mt-2 text-center text-xs leading-5 text-zinc-500">Simulated WhatsApp preview · No message has been sent.</p>
-        <section aria-label="WhatsApp conversation preview" className="overflow-hidden rounded-[2.5rem] border-[6px] border-zinc-900 bg-zinc-900 shadow-xl">
+        <p className="mb-5 mt-2 text-center text-xs leading-5 text-zinc-500">Simulated contact preview · No message has been sent.</p>
+        <section aria-label="Contact conversation preview" className="overflow-hidden rounded-[2.5rem] border-[6px] border-zinc-900 bg-zinc-900 shadow-xl">
           <div aria-hidden="true" className="mx-auto my-3 h-1.5 w-20 rounded-full bg-zinc-600" />
           <header className="flex items-center gap-3 bg-emerald-900 px-4 py-4 text-white">
             <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-700 text-lg font-semibold">C</span>
