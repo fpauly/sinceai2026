@@ -94,7 +94,7 @@ export async function generateJson<T>(opts: GenerateJsonOptions<T>): Promise<T> 
     } catch (err) {
       lastError = controller.signal.aborted ? `timed out after ${timeoutMs} ms` : describe(err);
       console.warn(`[gemini] attempt ${attempt}/${ATTEMPTS} with ${model} failed: ${lastError}`);
-      if (isPermanent(err)) break; // bad key, unknown model, bad request: a retry cannot help
+      if (isPermanent(err)) break; // bad key/model/request or quota used up: an instant retry cannot help
     } finally {
       clearTimeout(timer);
     }
@@ -113,10 +113,11 @@ function toJsonSchema(schema: z.ZodType): unknown {
   }
 }
 
-/** HTTP 400/401/403/404 from the API. 429 and 5xx (e.g. 503 "high demand") are worth a retry. */
+/** HTTP 400/401/403/404, and 429 (free-tier requests-per-minute quota: retrying at once only burns
+ *  another request). 5xx such as 503 "high demand" is worth a retry. */
 function isPermanent(err: unknown): boolean {
   const status = (err as { status?: unknown })?.status;
-  return typeof status === "number" && [400, 401, 403, 404].includes(status);
+  return typeof status === "number" && [400, 401, 403, 404, 429].includes(status);
 }
 
 /** Short error text that never contains the API key. */

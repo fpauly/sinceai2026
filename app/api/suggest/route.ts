@@ -1,13 +1,16 @@
 import { randomUUID } from "node:crypto";
 import { collections } from "@/lib/db";
-import { fallbackSuggestion } from "@/lib/ai/fallback";
+import { generateSuggestion } from "@/lib/ai/suggest";
 import type { Business, Issue, Listing, Preferences, Suggestion } from "@/types";
 import type { ApiError, SuggestResponse } from "@/types/api";
 
 // POST /api/suggest[?businessId=] — step 2 (Suggest).
-// For every `open` issue: build a suggestion, store it, and mark the issue `suggested`.
-// For now the suggestion comes from the fallback templates (lib/ai/fallback.ts); Gemini and
-// lib/validate.ts are added in stage A4, learning and standing permissions in A5.
+// For every `open` issue: build a suggestion (Gemini words + code-picked value, checked by
+// lib/validate.ts, template as fallback), store it with `source` and `validation`, and mark the
+// issue `suggested`. Learning and standing permissions are added in stage A5.
+
+const CONCURRENCY = 4; // Gemini calls in flight at once
+
 export async function POST(req: Request) {
   try {
     const businessId = new URL(req.url).searchParams.get("businessId");
@@ -25,16 +28,25 @@ export async function POST(req: Request) {
       c.listings.find({ business_id: { $in: ids } }).toArray(),
       c.preferences.find({ business_id: { $in: ids } }).toArray(),
     ]);
-    const businessById = new Map<string, Business>(businesses.map((b) => [b._id, b]));
-    const prefsById = new Map<string, Preferences>(prefs.map((p) => [p.business_id, p]));
-    const listingsById = new Map<string, Listing[]>();
-    for (const l of listings) listingsById.set(l.business_id, [...(listingsById.get(l.business_id) ?? []), l]);
+    const ctx: Ctx = {
+      businessById: new Map<string, Business>(businesses.map((b) => [b._id, b])),
+      prefsById: new Map<string, Preferences>(prefs.map((p) => [p.business_id, p])),
+      listingsById: new Map<string, Listing[]>(),
+    };
+    for (const l of listings) ctx.listingsById.set(l.business_id, [...(ctx.listingsById.get(l.business_id) ?? []), l]);
 
-    const created: Suggestion[] = [];
-    for (const issue of issues) {
-      const suggestion = await suggestOne(issue, businessById, listingsById, prefsById);
-      if (suggestion) created.push(suggestion);
-    }
+    // Keep the order of `issues` in the response, whatever order the calls finish in.
+    const results: (Suggestion | null)[] = new Array(issues.length).fill(null);
+    let next = 0;
+    const worker = async () => {
+      while (next < issues.length) {
+        const i = next++;
+        results[i] = await suggestOne(issues[i], ctx);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(CONCURRENCY, issues.length) }, worker));
+
+    const created = results.filter((s): s is Suggestion => s !== null);
     return Response.json({ ok: true, created } satisfies SuggestResponse);
   } catch (err) {
     console.error("[suggest] failed", err);
@@ -45,23 +57,16 @@ export async function POST(req: Request) {
   }
 }
 
-async function suggestOne(
-  issue: Issue,
-  businessById: Map<string, Business>,
-  listingsById: Map<string, Listing[]>,
-  prefsById: Map<string, Preferences>,
-): Promise<Suggestion | null> {
-  const business = businessById.get(issue.business_id);
+interface Ctx {
+  businessById: Map<string, Business>;
+  listingsById: Map<string, Listing[]>;
+  prefsById: Map<string, Preferences>;
+}
+
+async function suggestOne(issue: Issue, ctx: Ctx): Promise<Suggestion | null> {
+  const business = ctx.businessById.get(issue.business_id);
   if (!business) {
     console.warn(`[suggest] issue ${issue._id}: business ${issue.business_id} not found, skipped`);
-    return null;
-  }
-
-  let draft;
-  try {
-    draft = fallbackSuggestion(business, issue, listingsById.get(business._id) ?? [], prefsById.get(business._id) ?? null);
-  } catch (err) {
-    console.error(`[suggest] issue ${issue._id}: fallback failed, skipped`, err);
     return null;
   }
 
@@ -70,23 +75,31 @@ async function suggestOne(
   const claimed = await c.issues.updateOne({ _id: issue._id, status: "open" }, { $set: { status: "suggested" } });
   if (claimed.modifiedCount === 0) return null;
 
-  const suggestion: Suggestion = {
-    _id: randomUUID(),
-    issue_id: issue._id,
-    business_id: business._id,
-    ...draft,
-    source: "fallback",
-    audio_url: null,
-    decision: null,
-    decided_via: null,
-    decided_at: null,
-    applied: null,
-  };
   try {
+    const { draft, source, validation } = await generateSuggestion(
+      business,
+      issue,
+      ctx.listingsById.get(business._id) ?? [],
+      ctx.prefsById.get(business._id) ?? null,
+    );
+    const suggestion: Suggestion = {
+      _id: randomUUID(),
+      issue_id: issue._id,
+      business_id: business._id,
+      ...draft,
+      source,
+      validation,
+      audio_url: null,
+      decision: null,
+      decided_via: null,
+      decided_at: null,
+      applied: null,
+    };
     await c.suggestions.insertOne(suggestion);
+    return suggestion;
   } catch (err) {
     await c.issues.updateOne({ _id: issue._id }, { $set: { status: "open" } }); // release the claim
-    throw err;
+    console.error(`[suggest] issue ${issue._id}: failed, left open`, err);
+    return null;
   }
-  return suggestion;
 }
