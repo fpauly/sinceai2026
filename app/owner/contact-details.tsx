@@ -1,6 +1,38 @@
 import { showHours } from "@/lib/hours";
-import type { Business, Language, Messages } from "@/types";
+import type { Business, Language, Messages, Suggestion } from "@/types";
 import type { SuggestionWithIssue } from "@/types/api";
+
+/** Presentation only: keep the API order and stored suggestions unchanged. */
+export function sortByDate(suggestions: SuggestionWithIssue[]) {
+  return [...suggestions].sort((a, b) => suggestionDate(a).localeCompare(suggestionDate(b)));
+}
+
+function suggestionDate(suggestion: SuggestionWithIssue): string {
+  const date = suggestion.issue.evidence.date;
+  return typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : "9999-12-31";
+}
+
+export function formatDate(value: unknown): string | null {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) return null;
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(date);
+}
+
+export function groupTitle(suggestions: SuggestionWithIssue[]) {
+  const count = suggestions.length;
+  const special = suggestions.every((suggestion) => suggestion.issue.type === "special_day_hours");
+  return `${count} ${special ? count === 1 ? "special day needs" : "special days need" : count === 1 ? "update needs" : "updates need"} your OK`;
+}
+
+export function decisionLabel(suggestion: Suggestion): string {
+  const value = suggestion.proposed_change.value;
+  if (suggestion.proposed_change.field === "holiday_hours" && value && typeof value === "object") {
+    const dates = Object.keys(value).sort().map(formatDate).filter(Boolean);
+    if (dates.length) return dates.join(", ");
+  }
+  return ({ opening_hours: "Opening hours", holiday_hours: "Holiday hours", phone: "Phone number", description: "Business description" } as Record<string, string>)[suggestion.proposed_change.field] ?? "Business information";
+}
 
 export function contactName(business: Business) {
   return business.contact?.first_name || business.owner_name;
@@ -49,7 +81,7 @@ export function AutomaticallyApplied({ suggestions, language = "en" }: { suggest
       nb: "Endringene ble lagret med din forhåndstillatelse. Du trenger ikke godkjenne dem på nytt.",
     }[language]}</p>
     <ul className="mt-2 space-y-3">{suggestions.map((suggestion) => <li key={suggestion._id} className="break-words">
-      {Object.entries(suggestion.proposed_change.value ?? {}).map(([date, hours]) => <p key={date}>{date}: <strong>{typeof hours === "string" ? showHours(hours, "Closed") : String(hours)}</strong></p>)}
+      {Object.entries(suggestion.proposed_change.value ?? {}).map(([date, hours]) => <p key={date}>{formatDate(date) ?? "Special day"}: <strong>{typeof hours === "string" ? showHours(hours, "Closed") : String(hours)}</strong></p>)}
       <p className="text-xs text-zinc-600">{suggestion.applied?.yext
         ? `Published via Yext to: ${suggestion.applied.published_to.join(", ")}.`
         : "Saved locally. External publication is not confirmed."}</p>
