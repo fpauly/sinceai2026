@@ -281,6 +281,7 @@ export interface BusinessSummary {
     field: string;
     decided_at: string;
   } | null;
+  needs_human?: { count: number; reasons: string[] }; // v2: open needs_human flags, for Connect staff
 }
 
 export type BusinessesResponse = BusinessSummary[];

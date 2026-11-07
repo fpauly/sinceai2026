@@ -148,6 +148,19 @@ async function v2() {
   const again = await call("POST", "/api/detect");
   check((again.json?.created ?? []).length === 0, "second v2 /api/detect creates 0 new issues");
 
+  // C7: the dashboard lists needs_human flags for staff, separately from the owner's issues.
+  const summary = await call("GET", "/api/businesses");
+  const rows = Array.isArray(summary.json) ? summary.json : [];
+  const torniRow = rows.find((row) => row?.business?._id === "FI-D0011");
+  check(
+    torniRow?.needs_human?.count === 1 && torniRow.needs_human.reasons.includes("closed_for_good"),
+    "GET /api/businesses flags FI-D0011 for a person",
+  );
+  const torniOpen = torniRow ? torniRow.open_issues.high + torniRow.open_issues.medium + torniRow.open_issues.low : -1;
+  check(torniOpen === 0, "FI-D0011's flag is not counted as an owner issue");
+  const auroraRow = rows.find((row) => row?.business?._id === "FI-D0001");
+  check(!auroraRow?.needs_human, "FI-D0001 has no staff flag");
+
   // Leave the database on the demo data: Fonecta's dataset since V2.
   await call("POST", "/api/seed");
 }
