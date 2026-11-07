@@ -188,15 +188,28 @@ function lastSeasonEntry(
   return null;
 }
 
-/** The latest earlier entry for an event night / school break, preferring the same weekday. */
+/** Days between two dates' month-days, ignoring the year (12-28 and 01-03 are 6 apart). */
+export function seasonGap(a: string, b: string): number {
+  const doy = (d: string) => (Date.UTC(2001, Number(d.slice(5, 7)) - 1, Number(d.slice(8, 10))) - Date.UTC(2001, 0, 1)) / 864e5;
+  const g = Math.abs(doy(a) - doy(b));
+  return Math.min(g, 365 - g);
+}
+
+/** Within this many days of the same time of year, a school-break entry belongs to the same break. */
+export const SAME_BREAK_DAYS = 21;
+
+/** The latest earlier entry for an event night / school break, preferring the same weekday.
+ *  School breaks differ (autumn, Christmas, winter): an entry from the same break wins if there is one. */
 function latestOfKind(history: HolidayHistoryEntry[], dayKey: string, date: string, today: string): HolidayHistoryEntry | null {
   const weekday = weekdayOf(date);
+  const all = history.filter((e) => e.day_key === dayKey && e.date < today && e.entered_at < today);
+  const sameBreak = dayKey === "SCHOOL_BREAK" ? all.filter((e) => seasonGap(e.date, date) <= SAME_BREAK_DAYS) : [];
+  const pool = sameBreak.length ? sameBreak : all;
   let best: HolidayHistoryEntry | null = null;
   let bestSame: HolidayHistoryEntry | null = null;
   const newer = (a: HolidayHistoryEntry, b: HolidayHistoryEntry | null) =>
     !b || a.date > b.date || (a.date === b.date && a.entered_at > b.entered_at);
-  for (const e of history) {
-    if (e.day_key !== dayKey || !(e.date < today) || !(e.entered_at < today)) continue;
+  for (const e of pool) {
     if (newer(e, best)) best = e;
     if (weekdayOf(e.date) === weekday && newer(e, bestSame)) bestSame = e;
   }

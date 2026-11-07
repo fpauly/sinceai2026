@@ -1,7 +1,7 @@
 import type { Business, Day, Hours, Issue } from "@/types";
 import type { SpecialDayHoursEvidence, SuggestionDraft } from "@/types/api";
 import { parseHours, formatHours } from "@/lib/hours";
-import { cycleOf } from "@/lib/predict";
+import { cycleOf, SAME_BREAK_DAYS, seasonGap } from "@/lib/predict";
 
 // v2 messages for `special_day_hours` (DESIGN 0 "v2", stage A11), without an LLM.
 // Fonecta's style (their quickstart example): the day and date, what Google shows now, what the
@@ -110,14 +110,18 @@ const DAY_NAMES: Partial<Record<string, Record<OwnerLang, string>>> = {
 const EN_NAMES: Partial<Record<string, string>> = { DEC23: "the day before Christmas Eve", INTERDAY: "the day between Christmas and New Year" };
 
 function dayName(ev: SpecialDayHoursEvidence, lang: "en" | OwnerLang): string {
-  if (lang === "en") return EN_NAMES[ev.day_key] ?? ev.day_name.en;
+  if (lang === "en") {
+    // Event nights and school breaks carry a name of their own ("Ice hockey home game"): inside a sentence, "the ice hockey home game".
+    if (ev.day_key === "EVENT" || ev.day_key === "SCHOOL_BREAK") return `the ${lower(ev.day_name.en)}`;
+    return EN_NAMES[ev.day_key] ?? ev.day_name.en;
+  }
   return DAY_NAMES[ev.day_key]?.[lang] ?? lower(ev.day_name.local);
 }
 
 // ---------- the basis sentence ----------
 
 type Basis =
-  | { kind: "last_year"; hours: Hours; when: "last_year" | { year: number } | { event: string; date: string } }
+  | { kind: "last_year"; hours: Hours; when: "last_year" | { year: number } | { event: string; date: string; same: boolean } }
   | { kind: "centre"; name: string; hours: Hours }
   | { kind: "peers" }
   | { kind: "owner"; hours: Hours };
@@ -131,7 +135,8 @@ function basisOf(ev: SpecialDayHoursEvidence): Basis {
   if (ev.basis === "LAST_YEAR" && d.last_year) {
     const ly = d.last_year;
     if (ev.day_key === "EVENT" || ev.day_key === "SCHOOL_BREAK") {
-      return { kind: "last_year", hours: ly.hours, when: { event: ev.day_key, date: ly.date } };
+      const same = ev.day_key === "SCHOOL_BREAK" && seasonGap(ly.date, ev.date) <= SAME_BREAK_DAYS;
+      return { kind: "last_year", hours: ly.hours, when: { event: ev.day_key, date: ly.date, same } };
     }
     const back = cycleOf(ev.date) - cycleOf(ly.date);
     return { kind: "last_year", hours: ly.hours, when: back <= 1 ? "last_year" : { year: Number(ly.date.slice(0, 4)) } };
@@ -183,6 +188,15 @@ function basisSentence(b: Basis, lang: "en" | OwnerLang): string {
   }
   const event = w.event === "EVENT";
   const when = dateText(w.date, lang);
+  if (w.same) {
+    const year = w.date.slice(0, 4);
+    return {
+      en: `During the same school holiday in ${year} (${when}) you were ${state(b.hours, "en")}.`,
+      fi: `Samalla koululomalla vuonna ${year} (${when}) olitte ${state(b.hours, "fi")}.`,
+      sv: `Under samma skollov ${year} (${when}) hade ni ${state(b.hours, "sv")}.`,
+      nb: `I samme skoleferie i ${year} (${when}) hadde dere ${state(b.hours, "nb")}.`,
+    }[lang];
+  }
   return {
     en: `On your last ${event ? "event night" : "school-holiday day"} (${when}) you were ${state(b.hours, "en")}.`,
     fi: `${event ? "Edellisenä tapahtumailtana" : "Edellisellä koululomalla"} (${when}) olitte ${state(b.hours, "fi")}.`,
@@ -255,6 +269,7 @@ function reasonOf(ev: SpecialDayHoursEvidence): string {
     case "last_year":
       if (b.when === "last_year") return `${now}, and last year you ${entered(b.hours)} on the same day.`;
       if ("year" in b.when) return `${now}, and in ${b.when.year} you ${entered(b.hours)} on the same day.`;
+      if (b.when.same) return `${now}, and during the same school holiday in ${b.when.date.slice(0, 4)} you were ${state(b.hours, "en")}.`;
       return `${now}, and on your last ${b.when.event === "EVENT" ? "event night" : "school-holiday day"} you were ${state(b.hours, "en")}.`;
   }
 }

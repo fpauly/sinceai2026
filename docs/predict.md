@@ -19,7 +19,7 @@ It uses only data entered before "today" (6 Nov 2026; 6 Nov 2025 for the back-te
 | 1 | `OWNER_EDIT` | The owner edited this calendar day before, in Connect → their hours | high |
 | 2 | `SHOPPING_CENTRE` | The centre has entered hours for the date **and** the store normally keeps the centre's hours on that weekday → the centre's hours | high |
 | 3 | `LAST_YEAR` | What the owner entered for the same day last season; if nothing, the season before | high / medium |
-| 3b | `LAST_YEAR` | **Event nights and school breaks** (different dates every year): the owner's latest entry for that kind of day, same weekday preferred (for example the autumn break, or the last arena night) | medium |
+| 3b | `LAST_YEAR` | **Event nights and school breaks** (different dates every year): the owner's latest entry for that kind of day, same weekday preferred (for example the last arena night). For school breaks, an entry from the **same break** (within 3 weeks of the same time of year) wins: a ski rental closed in the autumn break but open in the Christmas break (`FI-D0005`) | medium |
 | 4 | `PEERS` | No history: when ≥ 70 % of similar businesses (same type, country, city size) that entered something were closed, and ≥ 15 % of all of them entered "closed" → **closed** | low |
 
 The result is a suggestion only when it differs from what Google shows now. Otherwise it is NO_ACTION.
