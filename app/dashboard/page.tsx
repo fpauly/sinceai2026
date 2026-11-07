@@ -85,6 +85,7 @@ export default function DashboardPage() {
     (sum, row) => sum + row.open_issues.high + row.open_issues.medium + row.open_issues.low,
     0,
   );
+  const flagged = rows.filter((row) => (row.needs_human?.count ?? 0) > 0);
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
@@ -92,6 +93,7 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-semibold tracking-tight">Fonecta dashboard</h1>
         <p className="mt-1 text-zinc-600 dark:text-zinc-400">
           One row per business. Run the daily check to detect what is out of date and write the suggestions.
+          Staff-only flags (for example a business that has closed for good) are listed as “needs a person” and are never sent to the owner.
         </p>
       </header>
 
@@ -113,6 +115,7 @@ export default function DashboardPage() {
         {state.status === "ready" && (
           <span className="text-sm text-zinc-500">
             {rows.length} businesses · {totalOpen} open issue(s) at {withIssues.length} business(es)
+            {flagged.length > 0 ? ` · ${flagged.length} need a person` : ""}
           </span>
         )}
       </div>
@@ -134,11 +137,12 @@ export default function DashboardPage() {
 
       {state.status === "ready" && rows.length > 0 && (
         <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
-          <table className="w-full min-w-[680px] text-sm">
+          <table className="w-full min-w-[800px] text-sm">
             <thead className="bg-zinc-50 text-left text-xs uppercase tracking-wide text-zinc-500 dark:bg-zinc-900">
               <tr>
                 <th className="p-3 font-medium">Business</th>
                 <th className="p-3 font-medium">Open issues</th>
+                <th className="p-3 font-medium">Needs a person</th>
                 <th className="p-3 font-medium">Last decision</th>
                 <th className="p-3" />
               </tr>
@@ -175,6 +179,16 @@ export default function DashboardPage() {
                               </span>
                             ))}
                         </span>
+                      )}
+                    </td>
+                    <td className="p-3">
+                      {row.needs_human ? (
+                        <span className="rounded bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-950 dark:text-red-300">
+                          {row.needs_human.count} ·{" "}
+                          {row.needs_human.reasons.map((reason) => reason.replace(/_/g, " ")).join(", ")}
+                        </span>
+                      ) : (
+                        <span className="text-zinc-400">—</span>
                       )}
                     </td>
                     <td className="p-3">
