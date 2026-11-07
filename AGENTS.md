@@ -21,7 +21,7 @@ Rules:
 - Code detects, AI explains, the human decides. Never ask an LLM to compare dates or numbers.
 - Gemini/ElevenLabs only via `lib/ai` / `lib/voice` wrappers with fallbacks; never from client components.
 - TypeScript strict, Tailwind for styling, mobile-first owner view (~390px).
-- Mock data only. Do not add features outside DESIGN.md.
+- Mock data or Fonecta's synthetic dataset only (`FONECTA/`, not committed; DESIGN.md section 0). Do not add features outside DESIGN.md.
 - Before a push: `npm run check` (pre-push hook runs it; never use `--no-verify`). After API/DB changes: `npm run dev` + `npm run smoke` (CONTRIBUTING.md section 8).
 - Commits: `<lane>: <summary>`, no Co-Authored-By or AI footers. Commit/push only when the human asks.
 - **`next` / `start` / `继续` / `下一步` → autopilot (CONTRIBUTING.md §9):** build one stage of the lane in `AJANTASA_LANE` (`.env.local`): branch → build → `npm run check` + `npm run smoke` → PR → tell the human what to check, then stop. **`merge` → merge that PR** (CI green). Never merge without `merge`.

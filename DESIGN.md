@@ -37,12 +37,33 @@ These come from Fonecta's slides and **override everything below**.
 - **Yext sandbox works** (tested read-only on 2026-11-06), details in section 10b.
 - **The demo is in English.** All UI text, customer messages, voice and the video are in English (`DEMO_LANGUAGE=en`). Finnish messages are still generated (`message.fi`) and shown as "also available in Finnish", but they are not part of the demo.
 
-### Open questions (waiting for Fonecta, marked **TBD** below)
-1. **Dataset files** provided by Fonecta (format, fields), and whether to replace our mock data with them. **Expected on 2026-11-06 at ~19:30.** Then: update this doc, `types/`, and stages C6 / A6.
-2. **Scoring script**: how it calls us (HTTP, function, file) and the exact input/output format for suggestions.
+### Open questions
+1. ~~Dataset files~~ → received 2026-11-07, see **Fonecta dataset** below.
+2. ~~Scoring script~~ → a Python script that scores a CSV file, see section 9.5.
 3. ~~Yext sandbox access~~ → answered, see section 10b.
 
-Until these are answered, we build on our own mock data and keep the data shapes easy to adapt (one importer, one scoring adapter).
+### Fonecta dataset (received 2026-11-07)
+**"Connect Suggests – Customer Approves · Nordic opening-hours simulator v1.1"** by Since AI ry. All data is synthetic. Licence: code MIT, data CC BY 4.0 (attribution: "Connect Suggests simulator, Since AI ry 2026").
+
+- **Where:** unzip it to `FONECTA/FONECTA_CONNECT_SUGGESTS_2026/` in your clone (download link from the kickoff / team chat). It is about 82 MB, so it is **not committed** (`FONECTA/` is in `.gitignore`). Start with its `START_HERE.md`, `docs/DATA_DICTIONARY.md` and `docs/DEMO_SCENARIOS.md`.
+- **Scenario:** today is **Fri 6 Nov 2026** (data up to 5 Nov). 3,032 businesses and shopping centres in **FI, SE and NO**. For every business and special day from **7 Nov 2026 to 6 Jan 2027**, decide `SUGGEST` + hours, `NO_ACTION` (Google is already right) or `FLAG` (needs a human, e.g. closed for good).
+- **Main files** (all in Yext API shapes): `entities.json` (regular + holiday hours already entered), `holiday_hours_history.jsonl` (every exception since 2024, with source), `peer_benchmarks.csv` (what similar businesses entered per holiday), `pilot_decision_log_2025.csv` (3,031 suggestions and what owners did), `customer_contacts.csv` (channel, language, **standing permission**, **opt-out**), `listings.json` (publishers + typical update speed, for the step 5 confirmation), `reviews.json` (60k, fi/sv/nb/en), `publisher_suggestions.json` (Google user edits, half noise), `analytics_daily.parquet` (search views, to prioritise), `calendar_special_days.csv` (FI/SE/NO holidays, eves, observances, commercial days, 2024–2027), plus school breaks, local events and weather.
+- **Also included:** a local Yext mock API with an owner simulator (`mock_api/server.py`, Python), a baseline and the scorer. Fonecta: *use the mock for detection and the sandbox to demo the write path* (the sandbox has the same API but no history).
+- **17 demo businesses** (`FI-D0001` … `FI-D0017`, not scored) with ready storylines, e.g. `FI-D0001` Kahvila Aurora (Fonecta's own example), `FI-D0017` Kahvila Kipinä (**the no-history case Fonecta names**), `FI-D0011` Pizzeria Torni (closed for good: flag, don't suggest), `FI-D0012` (standing permission: apply, then inform), `FI-D0013` (already right: stay quiet).
+
+**How it differs from our seed (section 13):**
+| Our model | Fonecta dataset |
+|---|---|
+| 8 Turku businesses, `DEMO_DATE` 2026-12-10 | 3,032 businesses in FI/SE/NO, today 2026-11-06 |
+| 6 hardcoded holidays (Dec–Jan) | ~30 day types: Father's Day, Black Friday, Lucia, Dec 23, the days between Christmas and New Year, New Year's Eve, local events, school breaks |
+| Hours `"10:00-18:00"` or `"closed"` | also split (`10:00-14:00,17:00-22:00`), past midnight (`18:00-02:00`) and 24 h (`00:00-23:59`) |
+| 3 listings per business (Finder, Google, website) that can disagree | one entity per business; disagreement shows up as reviews and Google user edits instead |
+| Outcomes: a suggestion per issue | per day: `SUGGEST` / `NO_ACTION` / `FLAG` |
+
+**Plan (proposed, team to confirm):** keep the working chain on our seed so the demo never breaks, and add the dataset in two places:
+1. **C6:** import a handful of the demo businesses (at least `FI-D0001` and `FI-D0017`) into our collections, so the demo can show Fonecta's own example and their no-history case. Rye & Shine stays the Yext sandbox entity for the write path.
+2. **A6:** an offline script that reads the dataset directly and writes `predictions_2026.csv` for the scorer (section 9.5). It is optional for submission but it is the objective "suggestion quality" score.
+Wider changes (more day types, multi-interval hours, a second `DEMO_DATE`) only if the team agrees; a complete chain comes first.
 
 ## 1. Problem
 
@@ -87,7 +108,7 @@ Demo persona: **Liisa**, owner of **Rye & Shine Bakery** on Eerikinkatu in Turku
 
 ### In scope (must have)
 - All **five steps** working end to end for the demo business (section 0)
-- Mock businesses in Turku with 3 listing sources each (`finder`, `google`, `website`), replaced or extended by **Fonecta's dataset** once known (**TBD**)
+- Mock businesses in Turku with 3 listing sources each (`finder`, `google`, `website`), extended with some of **Fonecta's dataset** demo businesses (section 0)
 - Detection rules (section 8), each recording the data that triggered it
 - Gemini suggestions with structured JSON, plus a **validation layer** and fallback templates
 - **Customer with no history:** sensible, clearly low-confidence suggestion that asks the owner instead of guessing (section 9.1)
@@ -96,7 +117,7 @@ Demo persona: **Liisa**, owner of **Rye & Shine Bakery** on Eerikinkatu in Turku
 - **Apply to the Yext sandbox** (section 10b) and show where the change will appear
 - **Learning:** remember edits and ignores, use them in the next suggestion; **standing permission** per change type
 - Fonecta dashboard (minimal): list of businesses and a "Run daily check" button
-- A **scoring adapter** exposing suggestions in the format of Fonecta's scoring script (**TBD**)
+- A **scoring adapter**: `predictions_2026.csv` in the format of Fonecta's scoring script (section 9.5)
 
 ### Should have (extras, in this order)
 - ElevenLabs voice: TTS of the message as a Contact channel, voice reply (STT → Gemini intent)
@@ -300,8 +321,14 @@ Answers the judges' question "how are wrong suggestions prevented?". Every sugge
 
 If a Gemini suggestion fails, use the fallback template instead. If the fallback also fails, keep it but force confidence `low` and show the problems to the owner. Invalid suggestions are **never** auto-applied by a standing permission.
 
-### 9.5 Scoring adapter (**TBD**)
-Fonecta's scoring script measures suggestion quality on hidden test data. As soon as the format is known, we add one adapter (route or CLI) that maps their input to our detect + suggest pipeline and returns their expected output. The pipeline itself must stay callable without the UI.
+### 9.5 Scoring adapter (`predictions_2026.csv`)
+Fonecta's scorer is `FONECTA/FONECTA_CONNECT_SUGGESTS_2026/evaluation/evaluate.py` (Python, standard library, MIT). It does not call us: it scores a CSV file.
+- **Input rows:** `evaluation/targets_2026.csv` (`entity_id, date, day_key, day_type, event_id, country, split`). Organisers score the hidden **test** split; `dev` rows have labels in `labels/` for our own checks.
+- **Our output:** `predictions_2026.csv` in the repository root with `entity_id,date,action,hours[,confidence]`; `action` is `SUGGEST` | `NO_ACTION` | `FLAG`; `hours` is `closed` or `HH:MM-HH:MM[,HH:MM-HH:MM]` (required for `SUGGEST`). Rows left out count as `NO_ACTION`.
+- **Points per row:** needs a change: exact +1, same state and both ends within 30 min +0.6, same state +0.2, wrong open/closed state −1, `FLAG` +0.05. Already correct: `NO_ACTION` 0, `FLAG` −0.1, `SUGGEST` −0.1 to −1. Closed for good: `FLAG` +1. Score = 100 × points / rows that need action. It also reports the share of search views protected.
+- **Baseline to beat** (copy last year → shopping centre → peers): 54.5 on dev 2026, exact precision 0.90, recall 0.59. About 40 % of needed changes have no usable history.
+- **Check:** `python FONECTA/FONECTA_CONNECT_SUGGESTS_2026/evaluation/evaluate.py --predictions predictions_2026.csv` (dev rows). Back-test honestly: when simulating 6 Nov 2025, use only rows with timestamps before it.
+- The same rule as everywhere: code decides the hours; the LLM does not compare dates or numbers.
 
 ## 10. ElevenLabs usage (extra)
 
@@ -336,7 +363,7 @@ Fonecta's scoring script measures suggestion quality on hidden test data. As soo
 | POST | `/api/suggestions/[id]/decide` | Body `{ decision, edited_value?, via, standing_permission? }` → apply + learn |
 | POST | `/api/suggestions/[id]/tts` | Generate/return audio for a suggestion (extra) |
 | POST | `/api/voice/reply` | Multipart audio + `suggestionId` → transcript + parsed intent (extra) |
-| ? | scoring adapter | **TBD** (section 9.5) |
+| – | scoring adapter | not a route: a script writes `predictions_2026.csv` (section 9.5) |
 
 Applying a decision:
 - `accepted` / `edited` → `publishChange` to Yext, write the value to all three listings, update `field_updated_at`, set issue `resolved`, store `applied`; add an entry to `preferences.learned`; if `standing_permission` is true, add `{issue_type, field}` to `preferences.standing_permissions`
@@ -370,7 +397,7 @@ Applying a decision:
 
 ## 13. Mock data (`data/seed.ts`)
 
-8 Turku businesses until Fonecta's dataset is known (**TBD**; then an importer loads their files and our seed stays as a fallback).
+8 Turku businesses. This stays the demo data and the fallback. Fonecta's dataset (section 0) is added on top: C6 imports some of its demo businesses, and A6 reads it directly for the scorer.
 
 | Business | Category | Planted problems |
 |---|---|---|
@@ -448,12 +475,15 @@ If time runs short, cut from the bottom.
 
 ## 18. Submission checklist (Fonecta)
 
+Submit in the Since AI app by the event deadline. Fonecta asks us to use the dataset's `docs/README_TEMPLATE.md` as the structure of our README (run it, the five steps, 3–5 data sources, what didn't work, no-history customer, final messages, live source, licences).
+
 | Deliverable | Where | Owner |
 |---|---|---|
-| Working demo of the five steps, **2–3 minute video** | link in README | B (all record) |
-| Code repository with a README: how to run it, data sources, libraries and licences | `README.md` | B |
-| **3–5 key data sources**: where Connect would get them in production, and what didn't work | `docs/data-sources.md` | C + A |
-| **Final customer messages as text** | `docs/customer-messages.md` (exported from real suggestions) | A |
-| **How it behaves for a customer with no history** | `docs/no-history.md` + demo moment | A |
-| Short pitch deck | link in README | B (all) |
-| Bonus: one dataset file replaced with a live source, and what we learned | `docs/data-sources.md` | C |
+| Working demo of the five steps, **2–3 minute video** (live is also allowed) | link in README | B (all record) |
+| Code repository with a README following `README_TEMPLATE.md`: how to run it, data sources, libraries and licences (incl. the dataset: CC BY 4.0 / MIT) | `README.md` | B |
+| **3–5 key data sources**: how we used them, where Connect would get them in production, and what didn't work | `docs/data-sources.md` | C + A |
+| **Final customer messages as text**: at least one per supported language, plus the approve / edit / decline follow-ups | `docs/customer-messages.md` (exported from real suggestions) | A |
+| **How it behaves for a customer with no history / no previous actions**; Fonecta names `FI-D0017` Kahvila Kipinä | `docs/no-history.md` + demo moment | A |
+| Short pitch deck: problem, solution, how it learns, results, next steps | link in README | B (all) |
+| Bonus: one dataset file replaced with a live source; what we learned about coverage, quality, gaps (see the dataset's `docs/LIVE_SOURCES.md`) | `docs/data-sources.md` | C |
+| Optional: `predictions_2026.csv` for the scorer (section 9.5) | repository root | A |

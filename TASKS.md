@@ -16,7 +16,7 @@ Lanes C and D are deterministic code with clear specs (good for free models). La
 
 **Contracts** between lanes are in **`types/api.ts`** and **`types/index.ts`**: API shapes, issue `evidence` per type (C → A, D), `proposed_change` per field (A → D), `ValidateSuggestion` (C → A), `PublishChange` / `YextPublishResult` (B → D), `LearnedDecision` / `StandingPermission` (D writes, A reads).
 
-**TBD (waiting for Fonecta, DESIGN §0):** dataset format, scoring script format. **Yext sandbox: confirmed** (DESIGN §10b). **WhatsApp is a valid Contact channel.** **The demo is in English.** Stages marked **TBD** start when we know more; everything else can start now.
+**Fonecta dataset received** (DESIGN §0): unzip it to `FONECTA/FONECTA_CONNECT_SUGGESTS_2026/` (not committed). The scorer reads a `predictions_2026.csv` file (DESIGN §9.5). **Yext sandbox: confirmed** (DESIGN §10b). **WhatsApp is a valid Contact channel.** **The demo is in English.** Stages marked **TBD** start when we know more; everything else can start now.
 
 ---
 
@@ -40,7 +40,7 @@ Each stage = one branch = one PR, about 1–2 hours. Do them **in order**. "Need
 
 ### Lane A – AI (Gemini)
 
-Files you own: `lib/ai/*`, `app/api/suggest/route.ts`, the scoring adapter (TBD), `docs/customer-messages.md`, `docs/no-history.md`
+Files you own: `lib/ai/*`, `app/api/suggest/route.ts`, `scripts/predict.*` + `predictions_2026.csv` (scoring), `scripts/export-messages.mjs`, `docs/customer-messages.md`, `docs/no-history.md`
 
 | Stage | Branch | What | Needs | Done when |
 |---|---|---|---|---|
@@ -49,7 +49,7 @@ Files you own: `lib/ai/*`, `app/api/suggest/route.ts`, the scoring adapter (TBD)
 | **A3** | `a/gemini-wrapper` | `lib/ai/gemini.ts`: the single wrapper. It reads `GEMINI_API_KEY`/`GEMINI_MODEL`, requests JSON output, validates with zod, has a timeout, retries once, then throws. | A1 | A valid JSON call works; an empty key throws cleanly |
 | **A4** | `a/gemini-suggest` | `lib/ai/suggest.ts`: Gemini first (prompt rules DESIGN §9.1), then `validateSuggestion`; if invalid or on error → fallback. Store `source` + `validation`. | A2, A3, C3 | Rye & Shine gets valid, readable English suggestions (FI also filled) that name their data; works with the key empty |
 | **A5** | `a/learning` | Feed `preferences.learned` + `standing_permissions` into the prompt and the fallback (use the owner's last edit). In `/api/suggest`: a **valid** suggestion that matches a standing permission is applied right away via D's `applyDecision` (`decision: "auto"`). | A4, D5 | Edit Boxing Day to 11:00 → reset issues → next suggestion proposes 11:00; with standing permission it auto-applies |
-| **A6** TBD | `a/scoring-adapter` | Adapter for Fonecta's scoring script (DESIGN §9.5). | format known, C6 | Their sample input → our output in their format |
+| **A6** | `a/scoring-adapter` | Script that reads the Fonecta dataset directly and writes `predictions_2026.csv` (DESIGN §9.5): last year's exception → shopping centre → peers, `FLAG` for closed-for-good, `NO_ACTION` when Google is already right. Code decides; no LLM. | – | `evaluate.py` on dev rows beats the baseline (54.5) |
 | **A7** | `a/docs-messages` | `docs/customer-messages.md` (final messages as text, exported from real suggestions) + `docs/no-history.md`. | A4 | Files exist and match the demo |
 | A8 (extra) | `a/review-classifier` | `lib/ai/reviews.ts` `classifyReviews` (DESIGN §9.2) with fallback `{signal:false}`. | A3 | Rye & Shine and Pizzeria → signal |
 | A9 (extra) | `a/intent` | `lib/ai/intent.ts` `parseIntent` (DESIGN §9.3) with fallback `unclear`. | A3 | "yes" / "ignore it" / "yes but 11 on the 26th" parse correctly |
@@ -74,7 +74,7 @@ Ongoing for B: after merges, run the full demo flow on `main`. If `main` breaks,
 
 ### Lane C – Detect + validation
 
-Files you own: `lib/holidays.ts`, `lib/rules/*`, `lib/validate.ts`, `app/api/detect`, `app/api/businesses/route.ts`, `app/dashboard/*`, the dataset importer (TBD), `docs/data-sources.md`
+Files you own: `lib/holidays.ts`, `lib/rules/*`, `lib/validate.ts`, `app/api/detect`, `app/api/businesses/route.ts`, `app/dashboard/*`, the dataset importer (`scripts/import-fonecta.*`), `docs/data-sources.md`
 
 | Stage | Branch | What | Needs | Done when |
 |---|---|---|---|---|
@@ -83,7 +83,7 @@ Files you own: `lib/holidays.ts`, `lib/rules/*`, `lib/validate.ts`, `app/api/det
 | **C3** | `c/validate` | `lib/validate.ts`: `validateSuggestion` (type `ValidateSuggestion`, DESIGN §9.4). Pure code, with a test script covering good and bad drafts (bad hours format, close before open, invented dates, a value not seen in any source). | – | Test script passes; A uses it |
 | **C4** | `c/rule-stale` | `lib/rules/staleField.ts`: `field_updated_at` > 365 days before `ctx.today`. | C1 | smoke: all 8 issues pass, Leipomo has 0 |
 | **C5** | `c/data-sources-doc` | `docs/data-sources.md`: our 3–5 key data sources (holiday calendar, last year's hours, cross-channel listings, reviews, owner decisions), where Connect would get them in production, and what didn't work. | C4 | Doc reviewed by the team |
-| **C6** TBD | `c/dataset-import` | Importer for Fonecta's dataset files → our collections (seed stays as a fallback). Adjust the rules if fields differ. | format known | Their data loads; rules run on it |
+| **C6** | `c/dataset-import` | Importer: some Fonecta demo businesses (at least `FI-D0001` Kahvila Aurora and `FI-D0017` Kahvila Kipinä, no history) → our collections, Yext hours converted to our format (seed stays). Scope beyond that needs a team decision (DESIGN §0 plan). | – | `FI-D0001` and `FI-D0017` load; detect + suggest run on them |
 | **C7** | `c/dashboard` | `GET /api/businesses` (`await connection()`) + `/dashboard` (`"use client"`): table, **Run daily check** (`/api/detect` then `/api/suggest`), rows link to `/contact/[id]`. | C1 | Board M8 complete |
 | C8 (extra) | `c/live-holidays` | Bonus: holidays from a live public source instead of the hardcoded list (keep the list as a fallback); write what we learned in `docs/data-sources.md`. | C1 | Detection still passes smoke |
 | C9 (extra) | `c/review-signal` | `lib/rules/reviewSignal.ts` (async): last 30 days of reviews → A's `classifyReviews`. | A8 | Rye & Shine + Pizzeria get `review_signal` |
