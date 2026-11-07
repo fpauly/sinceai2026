@@ -1,18 +1,58 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import NotificationCard from "@/components/NotificationCard";
-import { ownerMocks } from "./mock";
+import type { OwnerViewResponse } from "@/types/api";
+
+type LoadState =
+  | { status: "loading" }
+  | { status: "ready"; data: OwnerViewResponse }
+  | { status: "not-found" }
+  | { status: "error" };
 
 function OwnerView() {
   const { businessId } = useParams<{ businessId: string }>();
-  const data = ownerMocks[businessId];
+  return <BusinessView key={businessId} businessId={businessId} />;
+}
 
-  if (!data) return (
-    <div className="py-12"><h1 className="text-2xl font-semibold">Business not found</h1><p className="mt-3 text-sm text-zinc-600">This business is not included in the owner preview.</p><Link href="/owner/rye_shine" className="mt-4 inline-block underline">Open Rye &amp; Shine Bakery</Link></div>
+function BusinessView({ businessId }: { businessId: string }) {
+  const [state, setState] = useState<LoadState>({ status: "loading" });
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function load() {
+      try {
+        const response = await fetch(`/api/businesses/${encodeURIComponent(businessId)}`, {
+          cache: "no-store", signal: controller.signal,
+        });
+        if (response.status === 404) {
+          setState({ status: "not-found" });
+          return;
+        }
+        if (!response.ok) throw new Error("Request failed");
+        const data: OwnerViewResponse = await response.json();
+        if (!controller.signal.aborted) setState({ status: "ready", data });
+      } catch {
+        if (!controller.signal.aborted) setState({ status: "error" });
+      }
+    }
+    void load();
+    return () => controller.abort();
+  }, [businessId, attempt]);
+
+  if (state.status === "loading") return <p role="status" className="py-12">Loading your business…</p>;
+  if (state.status === "error") return (
+    <div className="py-12"><h1 className="text-2xl font-semibold">Unable to load your business</h1><p role="alert" className="mt-3 text-sm text-zinc-600">Please check your connection and try again.</p><button type="button" onClick={() => { setState({ status: "loading" }); setAttempt((value) => value + 1); }} className="mt-4 min-h-11 rounded-xl bg-emerald-700 px-4 text-sm font-medium text-white">Try again</button></div>
   );
+
+  if (state.status === "not-found") return (
+    <div className="py-12"><h1 className="text-2xl font-semibold">Business not found</h1><p className="mt-3 text-sm text-zinc-600">Check the link or return to the demo.</p><Link href="/" className="mt-4 inline-block underline">Back to demo</Link></div>
+  );
+
+  const { data } = state;
 
   return (
     <>
@@ -22,7 +62,7 @@ function OwnerView() {
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">Hi {data.business.owner_name}!</h1>
         <p className="mt-2 text-sm leading-6 text-zinc-600">{data.suggestions.length ? "A few details need your attention. You decide what changes." : "Your business information is looking good."}</p>
       </header>
-      <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">Demo preview · Sample suggestions. No changes will be published.</div>
+      <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">Demo preview · Suggestions loaded from demo data. Decision buttons are not connected yet.</div>
       {data.suggestions.length ? (
         <section aria-label="Suggestions to review" className="space-y-4">
           {data.suggestions.map((suggestion) => <NotificationCard key={suggestion._id} suggestion={suggestion} listings={data.listings} />)}
