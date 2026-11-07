@@ -3,7 +3,14 @@
 
 import type {
   Business,
+  Confidence,
   Day,
+  DayKey,
+  HolidayHistoryEntry,
+  LearnedDecision,
+  PeerBenchmark,
+  Profile,
+  SpecialDay,
   Decision,
   DecidedVia,
   HolidayHours,
@@ -59,11 +66,79 @@ export interface ReviewSignalEvidence {
   reviews: Pick<Review, "_id" | "date" | "rating" | "text">[];
 }
 
+// ---------- v2 evidence (DESIGN 0 "v2"; written by lane C from lib/predict, read by A and D) ----------
+
+/** ONE issue per business and special day where what Google shows is likely wrong.
+ *  fingerprint: `${business_id}:special_day_hours:${date}` */
+export interface SpecialDayHoursEvidence {
+  date: string;
+  day_key: DayKey;
+  day_name: { en: string; local: string }; // "Christmas Eve" / "Jouluaatto"
+  weekday: Day;
+  displayed_hours: Hours; // what Google shows now
+  displayed_from: "exception" | "regular"; // an entered exception, or the regular weekday hours
+  proposed_hours: Hours; // decided by code (lib/predict); the suggestion proposes exactly this
+  basis: PredictBasis;
+  basis_detail: BasisDetail;
+  confidence: Confidence;
+  expected_search_views?: number; // priority (analytics), optional
+}
+
+/** ONE issue per business and reason; shown to Connect staff, never sent to the owner.
+ *  fingerprint: `${business_id}:needs_human:${reason}` */
+export interface NeedsHumanEvidence {
+  reason: "closed_for_good" | "seasonal_closure" | "other";
+  summary: string; // one sentence for staff
+  signals: string[]; // the data behind it, e.g. "3 reviews in Oct say the place is closed"
+  dates?: string[]; // special days affected, if any
+}
+
 export type IssueEvidence =
   | MissingHolidayHoursEvidence
   | CrossPlatformConflictEvidence
   | StaleFieldEvidence
-  | ReviewSignalEvidence;
+  | ReviewSignalEvidence
+  | SpecialDayHoursEvidence
+  | NeedsHumanEvidence;
+
+// ---------- v2 prediction contract (lib/predict, lane A; used by detection C11 and the scorer A10) ----------
+
+/** The scorer's actions (DESIGN 9.5). */
+export type PredictAction = "SUGGEST" | "NO_ACTION" | "FLAG";
+
+/** Where the proposed hours come from, strongest first. */
+export type PredictBasis = "OWNER_EDIT" | "LAST_YEAR" | "SHOPPING_CENTRE" | "PEERS" | "REGULAR";
+
+/** The data behind a prediction, for the message and the "why" line. Only the used part is set. */
+export interface BasisDetail {
+  owner_edit?: { date: string; hours: Hours }; // the owner's own past decision (learning)
+  last_year?: { date: string; hours: Hours; entered_at: string };
+  shopping_centre?: { business_id: string; name: string; hours: Hours };
+  peers?: { n: number; share_closed: number; share_special: number; hours: Hours | null };
+}
+
+export interface Prediction {
+  action: PredictAction;
+  hours?: Hours; // required for SUGGEST
+  basis?: PredictBasis;
+  detail?: BasisDetail;
+  confidence?: Confidence;
+  flag_reason?: NeedsHumanEvidence["reason"]; // for FLAG
+}
+
+/** Everything lib/predict may look at for ONE business and ONE special day. Pure: no DB, no clock. */
+export interface PredictContext {
+  today: string; // DEMO_DATE; only data entered before it may be used
+  business: Business;
+  profile: Profile;
+  day: SpecialDay;
+  history: HolidayHistoryEntry[]; // this business's exception history
+  centre?: { business: Business; profile: Profile; history: HolidayHistoryEntry[] } | null;
+  peers: PeerBenchmark[]; // rows for this business's country, city tier and segment
+  learned?: LearnedDecision[]; // preferences.learned (the owner's past edits / declines)
+}
+
+export type Predict = (ctx: PredictContext) => Prediction;
 
 // ---------- Proposed change (written by lane A, applied by lane D) ----------
 // `value` is MERGED into each listing's field (holiday/opening hours) or REPLACES it (phone/description).

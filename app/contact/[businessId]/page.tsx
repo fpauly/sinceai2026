@@ -11,6 +11,8 @@ const titles: Record<IssueType, string> = {
   cross_platform_conflict: "Different details across channels",
   stale_field: "A detail worth checking",
   review_signal: "A customer noticed a change",
+  special_day_hours: "Your hours for a special day",
+  needs_human: "A detail worth checking",
 };
 const labels: Record<string, string> = {
   mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday",
@@ -54,6 +56,8 @@ function evidenceLines(suggestion: SuggestionWithIssue): string[] {
     case "review_signal":
       return Array.isArray(evidence.reviews) ? evidence.reviews.map((review: { date?: string; text?: string }) =>
         `${review.date ? `${label(review.date)}: ` : ""}${review.text ?? ""}`) : [];
+    default:
+      return [];
   }
 }
 

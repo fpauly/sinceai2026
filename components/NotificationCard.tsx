@@ -9,6 +9,8 @@ const titles: Record<IssueType, string> = {
   cross_platform_conflict: "Match your opening hours",
   stale_field: "Check your business information",
   review_signal: "A customer noticed a change",
+  special_day_hours: "Check your hours for a special day",
+  needs_human: "Please check your business details",
 };
 const confidenceStyles = {
   high: "bg-emerald-50 text-emerald-800",
