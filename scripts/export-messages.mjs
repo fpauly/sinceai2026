@@ -214,7 +214,7 @@ for (const { s, issue, business } of rows) {
   }
   const e = issue.evidence;
   const v = s.validation;
-  const views = typeof e.expected_search_views === "number" ? ` · about ${e.expected_search_views} searches expected that day` : "";
+  const views = typeof e.expected_search_views === "number" ? ` · seen ${e.expected_search_views} times on Google on the same day last year` : "";
   out.push(
     `### ${e.day_name.en}, ${WEEKDAY[e.weekday] ?? e.weekday} ${date(e.date)}`,
     "",

@@ -1,11 +1,11 @@
 import "server-only";
 import { z } from "zod";
 import type { Business, Issue, Listing, Preferences, Suggestion, ValidationResult } from "@/types";
-import type { SuggestionDraft } from "@/types/api";
+import type { SpecialDayHoursEvidence, SuggestionDraft } from "@/types/api";
 import { fallbackSuggestion } from "@/lib/ai/fallback";
 import { generateJson, geminiConfigured } from "@/lib/ai/gemini";
 import { validateSuggestion } from "@/lib/validate";
-import { nordicTimes, ownerLanguage } from "@/lib/ai/specialDay";
+import { nordicTimes, ownerLanguage, stakesViews } from "@/lib/ai/specialDay";
 
 // Step 2 (Suggest), DESIGN 9.1 + 9.4: one suggestion for one issue.
 //
@@ -108,7 +108,19 @@ Each message has exactly this shape, like example_en / example_local:
   last line: starts with "We suggest:" (Finnish "Ehdotamme:", Swedish "Vi föreslår:", Norwegian "Vi foreslår:") followed by the day, date and the proposed hours, exactly as in the example.
 At most these 2 sentences plus the last line. Each sentence ends with one ".", "?" or "!" and has none inside it.
 Write dates exactly as in the examples ("24 Dec", "24.12", "24/12"); never put a dot after a date. Keep the hours exactly as in the examples. Plain, warm language, no emojis, no abbreviations with dots.
+If the example's first sentence has a part in brackets about how often the listing was seen on Google, keep it, with exactly that number.
 The examples are correct; you may make them friendlier, but keep every fact.`;
+
+/** Every number in Gemini's text must also be in the template's (same value; "07" = "7"), and the
+ *  search-views number must be there when the template has it (A13). Numbers come from code only. */
+function numbersProblem(text: string, template: string, required: number | null): string | null {
+  const nums = (t: string) => new Set((t.match(/\d+/g) ?? []).map(Number));
+  const allowed = nums(template);
+  const extra = [...nums(text)].filter((n) => !allowed.has(n));
+  if (extra.length) return `has numbers not in the facts: ${extra.join(", ")}`;
+  if (required !== null && !nums(text).has(required)) return `leaves out the search views (${required})`;
+  return null;
+}
 
 /** A special-day suggestion: the template has the facts; Gemini may rewrite the words; code validates. */
 async function specialDay(
@@ -144,9 +156,13 @@ async function specialDay(
         reason: words.reason.trim(),
         message: { en: words.message.en.trim(), [lang]: nordicTimes(words.message.local.trim()) },
       };
+      const views = stakesViews(issue.evidence as unknown as SpecialDayHoursEvidence);
+      const numbers = (["en", lang] as const)
+        .map((l) => numbersProblem(draft.message[l] ?? "", base.message[l] ?? "", views))
+        .filter((p): p is string => p !== null);
       const validation = validateSuggestion(draft, issue, listings);
-      if (validation.ok) return { draft, source: "gemini", validation };
-      console.warn(`[suggest] issue ${issue._id}: Gemini draft invalid, using template (${validation.problems.join("; ")})`);
+      if (validation.ok && !numbers.length) return { draft, source: "gemini", validation };
+      console.warn(`[suggest] issue ${issue._id}: Gemini draft invalid, using template (${[...validation.problems, ...numbers].join("; ")})`);
     } catch (err) {
       console.warn(`[suggest] issue ${issue._id}: Gemini failed, using template (${err instanceof Error ? err.message : err})`);
     }

@@ -191,6 +191,30 @@ function basisSentence(b: Basis, lang: "en" | OwnerLang): string {
   }[lang];
 }
 
+// ---------- what's at stake (A13) ----------
+
+/** Below this, the number does not say much, so the message leaves it out. */
+export const MIN_STAKES_VIEWS = 5;
+
+/** Google search views on the same special day last season (C14, analytics), when worth saying. */
+export function stakesViews(ev: SpecialDayHoursEvidence): number | null {
+  const n = ev.expected_search_views;
+  return typeof n === "number" && Number.isInteger(n) && n >= MIN_STAKES_VIEWS ? n : null;
+}
+
+/** " (on the same day last year, your listing was seen 29 times on Google)": part of sentence 1, so the
+ *  message keeps its 2 sentences + suggestion line. The number comes from code, never from the LLM. */
+function stakes(ev: SpecialDayHoursEvidence, lang: "en" | OwnerLang): string {
+  const n = stakesViews(ev);
+  if (n === null) return "";
+  return {
+    en: ` (on the same day last year, your listing was seen ${n} times on Google)`,
+    fi: ` (viime vuonna samana päivänä tietonne nähtiin Googlessa ${n} kertaa)`,
+    sv: ` (samma dag förra året visades ni ${n} gånger på Google)`,
+    nb: ` (samme dag i fjor ble dere vist ${n} ganger på Google)`,
+  }[lang];
+}
+
 // ---------- the message ----------
 
 function message(business: Business, ev: SpecialDayHoursEvidence, lang: "en" | OwnerLang): string {
@@ -201,10 +225,10 @@ function message(business: Business, ev: SpecialDayHoursEvidence, lang: "en" | O
   const regular = ev.displayed_from === "regular";
   const shown = state(ev.displayed_hours, lang);
   const first = {
-    en: `Hi ${name}, ${day} is on ${wd} ${date} and Google now shows ${regular ? "your regular hours" : "the special hours you entered"}, ${shown}.`,
-    fi: `Hei ${name}, ${day} on ${wd} ${date} ja Google näyttää nyt ${regular ? "tavalliset aukioloaikanne" : "merkitsemänne poikkeusajat"}: ${shown}.`,
-    sv: `Hej ${name}, ${day} infaller ${wd} ${date} och Google visar nu ${regular ? "era vanliga öppettider" : "de avvikande tider ni lagt in"}: ${shown}.`,
-    nb: `Hei ${name}, ${day} er ${wd} ${date} og Google viser nå ${regular ? "de vanlige åpningstidene deres" : "de avvikende tidene dere la inn"}: ${shown}.`,
+    en: `Hi ${name}, ${day} is on ${wd} ${date} and Google now shows ${regular ? "your regular hours" : "the special hours you entered"}, ${shown}${stakes(ev, "en")}.`,
+    fi: `Hei ${name}, ${day} on ${wd} ${date} ja Google näyttää nyt ${regular ? "tavalliset aukioloaikanne" : "merkitsemänne poikkeusajat"}: ${shown}${stakes(ev, "fi")}.`,
+    sv: `Hej ${name}, ${day} infaller ${wd} ${date} och Google visar nu ${regular ? "era vanliga öppettider" : "de avvikande tider ni lagt in"}: ${shown}${stakes(ev, "sv")}.`,
+    nb: `Hei ${name}, ${day} er ${wd} ${date} og Google viser nå ${regular ? "de vanlige åpningstidene deres" : "de avvikende tidene dere la inn"}: ${shown}${stakes(ev, "nb")}.`,
   }[lang];
   const suggest = {
     en: `We suggest: ${day} ${date} ${state(ev.proposed_hours, "en")}.`,
