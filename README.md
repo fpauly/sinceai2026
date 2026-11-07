@@ -9,6 +9,16 @@ Built in 48 hours at Since AI Hackathon 2026 (Turku) for Fonecta's challenge *Co
 - Live demo: https://ajantasa.vercel.app (no login)
 - Try it yourself: https://ajantasa.vercel.app/try gives you a private copy of an owner's chat. Reply by text or by voice; Kahvila Aurora (`/try?b=FI-D0001`) publishes to our real Yext sandbox. Copies are deleted after 6 hours, so many people can try it at once.
 
+### Built with
+
+| Technology | What it does in Ajantasa |
+|---|---|
+| **Google Gemini** (`gemini-3.5-flash-lite`, `@google/genai`) | Writes every customer message in English and in the owner's own language (Finnish, Swedish or Norwegian): 62 of 64 messages in the demo, about $0.0012 each. Reads the owner's free-text and voice replies ("yes", "24.12 8–12", "no thanks") as accept, edit or decline. JSON output checked with zod; code validates every draft (date, hours, numbers) and falls back to a template, so the LLM never decides hours. Also classifies customer reviews (`lib/rules/reviewSignal.ts`, built and tested, off in the demo). |
+| **MongoDB Atlas** | The live demo's database: businesses, profiles, exception history, issues, suggestions and the owner's learned decisions. **TTL indexes** delete every visitor's private `/try` copy after 6 hours, so any number of judges can try the demo at once without touching each other's data. |
+| **ElevenLabs** (Scribe speech to text) | Voice replies: the owner taps "Reply by voice", says "yes" or "open 8 to 12", and the transcript goes through the same reply check as typed text before a one-tap confirm. Hidden when no key is set. |
+| **Yext** (our sandbox) | Step 5: an approved change is written to the real Yext sandbox entity (Kahvila Aurora) and shown as published to 9 channels: Google, Apple Maps, Bing, Finder.fi, Fonecta Caller and more. |
+| **Next.js 16 on Vercel** | App and API routes; every external API is called only from server code. |
+
 ## Run it
 
 You need Node 22.18+ (we use 24; scripts run `lib/` TypeScript directly) and MongoDB (Atlas, or local Docker: `docker run -d -p 27017:27017 mongo:7`).
