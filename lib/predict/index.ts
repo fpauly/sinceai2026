@@ -45,6 +45,11 @@ export function predict(ctx: PredictContext): Prediction {
     return { action: "FLAG", flag_reason: "closed_for_good", confidence: "medium" };
   }
 
+  // 0b. The owner already set this date in Connect (approved, edited or applied by standing permission):
+  //     their decision stands, so nothing to suggest. (The demo clock is frozen, so `at` is not compared.)
+  const decided = decidedInConnect(ctx);
+  if (decided) return { action: "NO_ACTION", basis: "OWNER_EDIT", detail: { owner_edit: decided } };
+
   const shown = displayedHours(profile, day.date).hours;
   const regular = regularOn(profile.regular_hours, day.date);
   const proposal = propose(ctx, regular, shown);
@@ -200,6 +205,18 @@ function latestOfKind(history: HolidayHistoryEntry[], dayKey: string, date: stri
 
 function peerRow(peers: PeerBenchmark[], dayKey: string): PeerBenchmark | null {
   return peers.find((p) => p.day_key === dayKey) ?? null;
+}
+
+/** The hours the owner (or their standing permission) set in Connect for exactly this date, newest decision first. */
+function decidedInConnect(ctx: PredictContext): NonNullable<BasisDetail["owner_edit"]> | null {
+  const decisions = (ctx.learned ?? [])
+    .filter((l) => l.field === "holiday_hours" && l.decision !== "ignored")
+    .sort((a, b) => (a.at < b.at ? 1 : -1));
+  for (const l of decisions) {
+    const hours = l.final && typeof l.final === "object" ? (l.final as Record<string, unknown>)[ctx.day.date] : undefined;
+    if (typeof hours === "string") return { date: ctx.day.date, hours: normalizeHours(hours) };
+  }
+  return null;
 }
 
 /** The owner's own edit for the same calendar day (MM-DD) in an earlier season, newest first. */
