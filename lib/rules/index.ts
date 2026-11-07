@@ -3,6 +3,7 @@ import { collections } from "@/lib/db";
 import { demoDate } from "@/lib/config";
 import type { Issue } from "@/types";
 import type { DraftIssue, Rule, RuleContext } from "@/types/api";
+import { crossPlatformConflict } from "./crossPlatformConflict";
 import { missingHolidayHours } from "./missingHolidayHours";
 
 // Detection entry point (step 1 of the demo). Loads the data once, runs every rule for every
@@ -12,8 +13,8 @@ import { missingHolidayHours } from "./missingHolidayHours";
 // DESIGN 7) or already exists as an open/suggested issue, so running the check twice creates
 // nothing new (TASKS.md acceptance test).
 
-/** Every rule, in the order they run. New rules are registered here (C2, C4, C9). */
-export const rules: readonly Rule[] = [missingHolidayHours];
+/** Every rule, in the order they run. New rules are registered here (C4, C9). */
+export const rules: readonly Rule[] = [missingHolidayHours, crossPlatformConflict];
 
 function groupByBusiness<T extends { business_id: string }>(rows: T[]): Map<string, T[]> {
   const byId = new Map<string, T[]>();
