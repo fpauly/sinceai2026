@@ -16,7 +16,7 @@ Lanes C and D are deterministic code with clear specs (good for free models). La
 
 **Contracts** between lanes are in **`types/api.ts`** and **`types/index.ts`**: API shapes, issue `evidence` per type (C → A, D), `proposed_change` per field (A → D), `ValidateSuggestion` (C → A), `PublishChange` / `YextPublishResult` (B → D), `LearnedDecision` / `StandingPermission` (D writes, A reads).
 
-**Fonecta dataset received** (DESIGN §0): unzip it to `FONECTA/FONECTA_CONNECT_SUGGESTS_2026/` (not committed). The scorer reads a `predictions_2026.csv` file (DESIGN §9.5). **Yext sandbox: confirmed** (DESIGN §10b). **WhatsApp is a valid Contact channel.** **The demo is in English.** Stages marked **TBD** start when we know more; everything else can start now.
+**Fonecta dataset received, and the app moves onto it (DESIGN §0 "v2", stages in "v2: dataset" below).** Unzip it to `FONECTA/FONECTA_CONNECT_SUGGESTS_2026/` (not committed). The scorer reads a `predictions_2026.csv` file (DESIGN §9.5). **Yext sandbox: confirmed** (DESIGN §10b). **WhatsApp is a valid Contact channel.** **The demo is in English.** Stages marked **TBD** start when we know more; everything else can start now.
 
 ---
 
@@ -49,7 +49,7 @@ Files you own: `lib/ai/*`, `app/api/suggest/route.ts`, `scripts/predict.*` + `pr
 | **A3** | `a/gemini-wrapper` | `lib/ai/gemini.ts`: the single wrapper. It reads `GEMINI_API_KEY`/`GEMINI_MODEL`, requests JSON output, validates with zod, has a timeout, retries once, then throws. | A1 | A valid JSON call works; an empty key throws cleanly |
 | **A4** | `a/gemini-suggest` | `lib/ai/suggest.ts`: Gemini first (prompt rules DESIGN §9.1), then `validateSuggestion`; if invalid or on error → fallback. Store `source` + `validation`. | A2, A3, C3 | Rye & Shine gets valid, readable English suggestions (FI also filled) that name their data; works with the key empty |
 | **A5** | `a/learning` | Feed `preferences.learned` + `standing_permissions` into the prompt and the fallback (use the owner's last edit). In `/api/suggest`: a **valid** suggestion that matches a standing permission is applied right away via D's `applyDecision` (`decision: "auto"`). | A4, D5 | Edit Boxing Day to 11:00 → reset issues → next suggestion proposes 11:00; with standing permission it auto-applies |
-| **A6** | `a/scoring-adapter` | Script that reads the Fonecta dataset directly and writes `predictions_2026.csv` (DESIGN §9.5): last year's exception → shopping centre → peers, `FLAG` for closed-for-good, `NO_ACTION` when Google is already right. Code decides; no LLM. | – | `evaluate.py` on dev rows beats the baseline (54.5) |
+| ~~A6~~ | – | **Replaced by v2 stage A10** (`lib/predict` + `predictions_2026.csv`), see "v2: dataset" below. | – | – |
 | **A7** | `a/docs-messages` | `docs/customer-messages.md` (final messages as text, exported from real suggestions) + `docs/no-history.md`. | A4 | Files exist and match the demo |
 | A8 (extra) | `a/review-classifier` | `lib/ai/reviews.ts` `classifyReviews` (DESIGN §9.2) with fallback `{signal:false}`. | A3 | Rye & Shine and Pizzeria → signal |
 | A9 (extra) | `a/intent` | `lib/ai/intent.ts` `parseIntent` (DESIGN §9.3) with fallback `unclear`. | A3 | "yes" / "ignore it" / "yes but 11 on the 26th" parse correctly |
@@ -83,7 +83,7 @@ Files you own: `lib/holidays.ts`, `lib/rules/*`, `lib/validate.ts`, `app/api/det
 | **C3** | `c/validate` | `lib/validate.ts`: `validateSuggestion` (type `ValidateSuggestion`, DESIGN §9.4). Pure code, with a test script covering good and bad drafts (bad hours format, close before open, invented dates, a value not seen in any source). | – | Test script passes; A uses it |
 | **C4** | `c/rule-stale` | `lib/rules/staleField.ts`: `field_updated_at` > 365 days before `ctx.today`. | C1 | smoke: all 8 issues pass, Leipomo has 0 |
 | **C5** | `c/data-sources-doc` | `docs/data-sources.md`: our 3–5 key data sources (holiday calendar, last year's hours, cross-channel listings, reviews, owner decisions), where Connect would get them in production, and what didn't work. | C4 | Doc reviewed by the team |
-| **C6** | `c/dataset-import` | Importer: some Fonecta demo businesses (at least `FI-D0001` Kahvila Aurora and `FI-D0017` Kahvila Kipinä, no history) → our collections, Yext hours converted to our format (seed stays). Scope beyond that needs a team decision (DESIGN §0 plan). | – | `FI-D0001` and `FI-D0017` load; detect + suggest run on them |
+| ~~C6~~ | – | **Replaced by v2 stage C10** (dataset importer), see "v2: dataset" below. | – | – |
 | **C7** | `c/dashboard` | `GET /api/businesses` (`await connection()`) + `/dashboard` (`"use client"`): table, **Run daily check** (`/api/detect` then `/api/suggest`), rows link to `/contact/[id]`. | C1 | Board M8 complete |
 | C8 (extra) | `c/live-holidays` | Bonus: holidays from a live public source instead of the hardcoded list (keep the list as a fallback); write what we learned in `docs/data-sources.md`. | C1 | Detection still passes smoke |
 | C9 (extra) | `c/review-signal` | `lib/rules/reviewSignal.ts` (async): last 30 days of reviews → A's `classifyReviews`. | A8 | Rye & Shine + Pizzeria get `review_signal` |
@@ -115,6 +115,28 @@ Files you own: `lib/apply.ts`, `app/api/businesses/[id]`, `app/api/suggestions/[
 | **D4** | `d/contact-preview` | `/contact/[businessId]`: phone-shaped frame with the simulated **WhatsApp chat** from Fonecta Connect (SMS/email optional) (what, **why**, the data), and a no-login link "Review in 10 seconds →" to `/owner/[id]`. | D2 | Board "Contact page" green |
 | **D5** | `d/edit-learn` | ✏️ Edit with a final confirm tap → `decision: "edited"`. In `applyDecision`: append `LearnedDecision` to `preferences.learned`; if the checkbox was ticked, add a `StandingPermission`. The confirm step is reusable for voice (B8). | D3 | Edit holiday hours → confirm → listings updated, `learned` has the entry |
 | **D6** | `d/where-it-shows` | `ChannelSyncRow`: after a decision show **"Published via Yext to: …"** from `applied.published_to`, channels turning green one by one, with an honest message when Yext was not reached. Leave a slot for `<VoiceButton>`. | D3 | Looks good in the demo flow |
+
+---
+
+## v2: dataset (DESIGN §0 "v2")
+
+The app moves from our invented seed to Fonecta's dataset. **The current chain keeps working on the seed until V2 switches the demo.** Do these stages before the remaining v1 stages, except A5/D5 (learning), which still apply.
+"Needs" works as above. Contracts first: nothing below starts before **V1** is merged, except A10 (it can start on local types).
+
+| Stage | Lane | Branch | What | Needs | Done when |
+|---|---|---|---|---|---|
+| **V0** [shared] | A | `shared/fonecta-dataset` | This design (DESIGN §0 v2, §9.5, §18) | – | Merged with a teammate's OK |
+| **V1** [shared] | A | `shared/v2-contracts` | `types/`: business with country, segment, contact (first name, channel EMAIL/SMS/WHATSAPP/APP_PUSH, language fi/sv/nb/en, contact window, standing permission, opted out); one published profile (regular week + entered exceptions); special day; exception history row; peer row; publisher; issue types `special_day_hours` + `needs_human` with their evidence; messages `en` + owner's language. `lib/hours.ts`: parse / format / compare multi-interval and past-midnight hours, convert to and from Yext. | V0 | `npm run check` green; old seed chain still works |
+| **A10** | A | `a/predict` | `lib/predict/` (pure): one business + one special day → `SUGGEST` + hours + basis + confidence, `NO_ACTION` or `FLAG`. Order: owner's past edit → last year's exception → shopping centre → peers → regular. `scripts/predict.*` runs it on the full dataset → `predictions_2026.csv`. | V0 | `evaluate.py` on dev beats the baseline (54.5), checked on the 2025 back-test too |
+| **C10** | C | `c/fonecta-import` | `scripts/import-fonecta.*` builds `data/fonecta/demo.json` (17 demo businesses + 15 centres: entities, exception history, contacts, publishers, calendar FI/SE/NO, peer rows for their segments; committed). `/api/seed?source=fonecta` loads it into MongoDB (the old seed stays the default until V2). | V1 | Seeded DB has the 17 demo businesses with profiles and contacts |
+| **C11** | C | `c/rule-special-days` | Detection v2: for each special day 7 Nov 2026 – 6 Jan 2027 in the business's country, call `lib/predict`; `SUGGEST` → `special_day_hours` issue with evidence (date, day, what Google shows, proposal, basis, confidence); `FLAG` → `needs_human` issue. | C10, A10 | `FI-D0013` and `NO-D0015` get 0 issues, `FI-D0011` is flagged, `FI-D0001` and `FI-D0017` get suggestions |
+| **C12** | C | `c/validate-v2` | `validateSuggestion` for multi-interval / past-midnight hours, the issue's date only, at most 2 sentences + the "We suggest" line, both languages present. | V1 | `validate-check` covers the new cases |
+| **A11** | A | `a/suggest-v2` | Template + Gemini for `special_day_hours`, Fonecta's message style, `en` + owner's language (fi/sv/nb); no message when opted out. | V1, C11 | `FI-D0001` message names what Google shows and last year's hours; `SE-D0008` has Swedish; all valid |
+| **B10** | B | `b/yext-v2` | Yext write with multi-interval hours; sandbox entity `SinceAI03` set up as Kahvila Aurora (`FI-D0001`'s address and regular hours); reset script restores that; "where it shows" from the business's publishers with typical update speed. | V1 | Accepting Aurora's suggestion writes to the sandbox; confirmation lists her publishers and speeds |
+| **D10** | D | `d/contact-v2` | Contact preview and owner view use the business contact: first name, channel, language; opted out → "not contacted"; standing permission → "applied, you were informed"; one message bundles a business's dates; `needs_human` is not shown to the owner. | V1, C11 | Aurora's bundled message shows on her channel; `FI-D0012` shows the applied state |
+| **C13** [shared] | C | `shared/smoke-v2` | New acceptance table in `scripts/smoke.mjs` for the demo cast (DESIGN §0 v2). | C11 | `npm run smoke` green on v2 |
+| **V2** [shared] | B | `shared/v2-switch` | Switch the demo: `DEMO_DATE=2026-11-06`, `/api/seed` defaults to the dataset, DESIGN §16 demo script rewritten for the new cast, old rules and seed retired from the demo run. | C13, A11, B10, D10 | Whole chain works on `main` with the dataset |
+| A12 | A | `a/docs-v2` | Re-export `docs/customer-messages.md` (all languages + approve / edit / decline follow-ups) and rewrite `docs/no-history.md` around `FI-D0017` (#26). | V2 | Docs match the v2 demo |
 
 ---
 

@@ -51,19 +51,42 @@ These come from Fonecta's slides and **override everything below**.
 - **Also included:** a local Yext mock API with an owner simulator (`mock_api/server.py`, Python), a baseline and the scorer. Fonecta: *use the mock for detection and the sandbox to demo the write path* (the sandbox has the same API but no history).
 - **17 demo businesses** (`FI-D0001` … `FI-D0017`, not scored) with ready storylines, e.g. `FI-D0001` Kahvila Aurora (Fonecta's own example), `FI-D0017` Kahvila Kipinä (**the no-history case Fonecta names**), `FI-D0011` Pizzeria Torni (closed for good: flag, don't suggest), `FI-D0012` (standing permission: apply, then inform), `FI-D0013` (already right: stay quiet).
 
-**How it differs from our seed (section 13):**
-| Our model | Fonecta dataset |
-|---|---|
-| 8 Turku businesses, `DEMO_DATE` 2026-12-10 | 3,032 businesses in FI/SE/NO, today 2026-11-06 |
-| 6 hardcoded holidays (Dec–Jan) | ~30 day types: Father's Day, Black Friday, Lucia, Dec 23, the days between Christmas and New Year, New Year's Eve, local events, school breaks |
-| Hours `"10:00-18:00"` or `"closed"` | also split (`10:00-14:00,17:00-22:00`), past midnight (`18:00-02:00`) and 24 h (`00:00-23:59`) |
-| 3 listings per business (Finder, Google, website) that can disagree | one entity per business; disagreement shows up as reviews and Google user edits instead |
-| Outcomes: a suggestion per issue | per day: `SUGGEST` / `NO_ACTION` / `FLAG` |
+### v2: the app runs on Fonecta's dataset (decided 2026-11-07, team to confirm in PR)
+Our own seed answered a challenge we imagined. The judges score **their** data, **their** demo storylines and **their** scorer, so from now on the dataset is the source of truth. Where this section conflicts with sections 7, 8, 9, 13 or 16, **this section wins** until those sections are rewritten.
 
-**Plan (proposed, team to confirm):** keep the working chain on our seed so the demo never breaks, and add the dataset in two places:
-1. **C6:** import a handful of the demo businesses (at least `FI-D0001` and `FI-D0017`) into our collections, so the demo can show Fonecta's own example and their no-history case. Rye & Shine stays the Yext sandbox entity for the write path.
-2. **A6:** an offline script that reads the dataset directly and writes `predictions_2026.csv` for the scorer (section 9.5). It is optional for submission but it is the objective "suggestion quality" score.
-Wider changes (more day types, multi-interval hours, a second `DEMO_DATE`) only if the team agrees; a complete chain comes first.
+**Rules for the switch**
+- **The current chain stays working** on `data/seed.ts` until the v2 chain works end to end; then the demo switches. `main` must stay runnable at every merge.
+- **Same principle:** code decides the hours (and the action), the LLM only writes messages and reads text, the owner has the last word.
+- **One prediction module for app and scorer:** `lib/predict/` (pure, no DB, no clock) decides `SUGGEST` + hours, `NO_ACTION` or `FLAG` for one business and one special day. Detection (step 1) and `predictions_2026.csv` (section 9.5) both call it, so the score measures exactly what the demo shows.
+
+**What changes**
+| Topic | Before (seed) | v2 (dataset) |
+|---|---|---|
+| Today | `DEMO_DATE` 2026-12-10 | `DEMO_DATE` **2026-11-06** (the dataset's snapshot) |
+| Window | holidays within 30 days | special days from **7 Nov 2026 to 6 Jan 2027** in the business's country (`calendar_special_days.csv`: Father's Day, Black Friday, Independence Day, Lucia, Dec 23, Christmas, the days between, New Year's Eve, Epiphany …); events and school breaks later |
+| Businesses | 8 invented Turku businesses | the 17 demo storylines `FI-D0001` … `FI-D0017` + the 15 shopping centres, imported into MongoDB |
+| Data in git | `data/seed.ts` | `data/fonecta/demo.json`: a small extract for those businesses (entities, exception history, contacts, publishers, calendar FI/SE/NO, peer rows for their segments), made by the importer and **committed** so CI and teammates without the zip still work. The full zip stays in `FONECTA/` (not committed) and is only needed for the scorer. |
+| Listings | 3 sources (Finder, Google, website) that disagree | one published profile per business (the Yext entity): regular week + exceptions already entered. "What Google shows" = the exception if entered, else the regular hours for that weekday |
+| Hours | `"10:00-18:00"` or `"closed"` | also `"10:00-14:00,17:00-22:00"`, past midnight `"18:00-02:00"`, 24 h `"00:00-23:59"`; one helper `lib/hours.ts` parses, formats, compares and converts to/from Yext |
+| Detection rules | missing holiday hours, cross-platform conflict, stale field, review signal | **special day hours**: for each special day, `lib/predict` gives the likely real hours; if they differ from what Google shows → an issue (`SUGGEST`). **Needs a human** (`FLAG`): closed for good / seasonal closure (e.g. `FI-D0011`), shown to Connect staff in the dashboard, not sent to the owner. The conflict and stale rules do not fit one-profile data and are retired for v2. |
+| Proposal basis (code) | last year → category pattern | the owner's own past edit (learning) → **last year's exception for the same day** (`holiday_hours_history`) → **shopping centre hours** (business inside a centre) → **peers** (`peer_benchmarks`: same segment, country, city tier) → regular hours (= no action). Each basis has a confidence; low confidence → the message asks instead of telling. Thresholds tuned on the 2025 back-test, not on 2026 labels. |
+| Contact | `preferred_channel` on the business | `customer_contacts.csv`: first name, channel (EMAIL / SMS / WHATSAPP / APP_PUSH), language (fi / sv / nb / en), contact window. **Opted out → no message. Standing permission → apply, then inform.** One message per business can bundle several dates (like the 2025 pilot). |
+| Messages | `message.en` + `message.fi` | `message.en` (the demo language) + the owner's language (fi, sv or nb). Style of Fonecta's example: day and date, what Google shows now, last year / centre / peers as the reason, the exact proposal, then Approve / Edit / No thanks. |
+| Apply | Rye & Shine in the Yext sandbox | the sandbox entity `SinceAI03` is renamed and set up as **`FI-D0001` Kahvila Aurora** (Fonecta allows changing the sandbox business) so the protagonist's change is really written to Yext. Other businesses: saved in MongoDB. "Where it shows" comes from `listings.json` with the typical update speed ("Google in about 2 minutes, Apple Maps within 2 days"). |
+| Learning | edits only | edits and declines from our UI, plus the 2025 pilot log as each owner's history (who edits, who never replies, who granted standing permission) |
+| Priority | – | `analytics_daily.parquet` search views decide which suggestions go first (extra) |
+
+**Demo cast (all from the dataset)**
+| Business | Shows |
+|---|---|
+| `FI-D0001` Kahvila Aurora, Helsinki | **Protagonist**, Fonecta's own example: last year's exceptions exist only partly, nothing entered for this year; written to the real Yext sandbox |
+| `FI-D0017` Kahvila Kipinä, Turku | **No history**: new customer, peers decide, confidence low, the message asks |
+| `SE-D0008` Kafé Linnea, Stockholm | Swedish message (Julafton closed, Lucia early) |
+| `FI-D0012` Tilitoimisto Otso | Standing permission: applied without asking, then informed |
+| `FI-D0011` Pizzeria Torni | Closed for good: flagged for a human, no suggestion |
+| `FI-D0013` Hammasklinikka Kallio | Already correct: stays quiet (empty state) |
+
+The stages for this switch are in `TASKS.md` under "v2: dataset".
 
 ## 1. Problem
 
@@ -108,7 +131,7 @@ Demo persona: **Liisa**, owner of **Rye & Shine Bakery** on Eerikinkatu in Turku
 
 ### In scope (must have)
 - All **five steps** working end to end for the demo business (section 0)
-- Mock businesses in Turku with 3 listing sources each (`finder`, `google`, `website`), extended with some of **Fonecta's dataset** demo businesses (section 0)
+- Businesses from **Fonecta's dataset** (the demo storylines, section 0 v2); the Turku mock seed only until v2 works
 - Detection rules (section 8), each recording the data that triggered it
 - Gemini suggestions with structured JSON, plus a **validation layer** and fallback templates
 - **Customer with no history:** sensible, clearly low-confidence suggestion that asks the owner instead of guessing (section 9.1)
@@ -397,7 +420,7 @@ Applying a decision:
 
 ## 13. Mock data (`data/seed.ts`)
 
-8 Turku businesses. This stays the demo data and the fallback. Fonecta's dataset (section 0) is added on top: C6 imports some of its demo businesses, and A6 reads it directly for the scorer.
+8 Turku businesses. **Replaced by Fonecta's dataset in v2 (section 0)**; this seed keeps the current chain working until the v2 chain works end to end.
 
 | Business | Category | Planted problems |
 |---|---|---|
