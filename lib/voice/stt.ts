@@ -20,6 +20,7 @@ export async function transcribe(audio: Blob): Promise<Transcript> {
 
   const form = new FormData();
   form.append("model_id", "scribe_v1");
+  form.append("tag_audio_events", "false"); // keep the transcript to the owner's words, no [music] or (noise) tags
   form.append("file", audio, "reply");
   try {
     const res = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
