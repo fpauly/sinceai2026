@@ -129,9 +129,11 @@ The app moves from our invented seed to Fonecta's dataset. **The current chain k
 | Lane | Queue |
 |---|---|
 | **A** | V0 → **V1** → A10 → A11 → A5 (needs D5) → A12 |
-| **B** | **B10** (needs V1) → V2 → B4 README (use the dataset's `docs/README_TEMPLATE.md`) → B5 deploy → B9 pitch + video · extras: B7, B8 |
-| **C** | **C10** (the extract script can start before V1; the seed route needs V1) → C12 → C11 → C13 → C7 dashboard (also lists `needs_human` flags) → C5 data sources (the dataset's sources) → C8 bonus: replace `calendar_special_days.csv` with a live holiday API · extra: C9 |
-| **D** | **D5** (unchanged, start now) → D10 → D6 "where it shows" (publishers + typical update speed from B10) |
+| **B** | **B10** (needs V1) → ⏸ → V2 → B4 README (use the dataset's `docs/README_TEMPLATE.md`) → B5 deploy → B9 pitch + video · extras: B7, B8 |
+| **C** | **C10** (the extract script can start before V1; the seed route needs V1) → C12 → ⏸ → C11 → C13 → C7 dashboard (also lists `needs_human` flags) → C5 data sources (the dataset's sources) → C8 bonus: replace `calendar_special_days.csv` with a live holiday API · extra: C9 |
+| **D** | **D5** (unchanged, start now) → ⏸ → D10 → D6 "where it shows" (publishers + typical update speed from B10) |
+
+**⏸ = pause point.** When everything before ⏸ in your lane is merged, **stop**: do not start the stages after it, even if they look unblocked, and do not pick up v1 or extra stages instead. Tell the human "lane X is paused at ⏸, waiting for lane A" and wait. Lane A removes the ⏸ (in a small `shared/` PR) when the lane can go on.
 
 Before every stage, also check your lane's open GitHub issues (`gh issue list`); fix those first if they are not blocked.
 Every clone needs the dataset unzipped at `FONECTA/FONECTA_CONNECT_SUGGESTS_2026/` (not committed) for C10 and A10.

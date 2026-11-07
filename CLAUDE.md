@@ -17,4 +17,4 @@ Key rules:
 - Commit messages and PRs: no Co-Authored-By or any AI attribution (CONTRIBUTING.md section 3).
 - Every stage starts on a new branch from freshly pulled `main`; shared-file changes go first in their own `shared/<topic>` PR (CONTRIBUTING.md section 1).
 - Test locally before pushing: `npm run check`, and `npm run smoke` against `npm run dev` after API/DB changes (CONTRIBUTING.md section 8). Never `--no-verify`.
-- **`next` / `start` / `继续` / `下一步` → autopilot (CONTRIBUTING.md §9):** build one stage of the lane in `AJANTASA_LANE` (`.env.local`), stop at the PR and tell the human what to check. **`merge` → merge that PR.** Never merge without `merge`. `/next` and `/merge` do the same.
+- **`next` / `start` / `继续` / `下一步` → autopilot (CONTRIBUTING.md §9):** build one stage of the lane in `AJANTASA_LANE` (`.env.local`); **stop at ⏸ in the TASKS.md queue**, stop at the PR and tell the human what to check. **`merge` → merge that PR.** Never merge without `merge`. `/next` and `/merge` do the same.
