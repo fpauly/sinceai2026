@@ -6,7 +6,7 @@ Built in 48 hours at Since AI Hackathon 2026 (Turku) for Fonecta's challenge *Co
 
 - Demo video: [link to the 2–3 minute video]
 - Pitch deck: [link to the deck]
-- Live demo: [link, if deployed]
+- Live demo: https://ajantasa.vercel.app (no login; start at `/dashboard`, `/contact/FI-D0001` or `/owner/FI-D0001`)
 
 ## Run it
 
@@ -88,7 +88,7 @@ We make more suggestions than the baseline, so the number of harmful ones (wrong
 - **Last year's drop in customer actions** (`analytics_daily.parquet`) as a sign the business was closed: real, but too weak on its own.
 - **Other peer thresholds:** either more harmful suggestions or fewer changes found; we kept the baseline's 0.7 / 0.15.
 - **Yext sandbox limits:** it has no live listings, so "where it shows" comes from the dataset's publishers; it rejects the dataset's fake phone numbers; and a slow write once made us report a saved change as failed, so we now read Yext back after a timeout.
-- **Gemini free tier:** rate limits make many messages fall back to templates. The demo still works, because the hours never come from the LLM.
+- **Gemini free tier:** rate limits made most messages fall back to templates. With a paid key, Gemini writes 62 of 64 and the code check rejects the other 2. The demo works either way, because the hours never come from the LLM.
 
 ## Customer with no history
 
@@ -100,7 +100,7 @@ When there is no history and no clear peer pattern, Connect stays quiet. Whateve
 
 ## Final customer messages
 
-Exported from the app on 7 Nov 2026 (`DEMO_DATE` 2026-11-06): 52 messages for 13 businesses, all 52 validated by code. English is the demo language; every message is also stored in the owner's language. The full export, with each message's data, is [`docs/customer-messages.md`](docs/customer-messages.md) (`node scripts/export-messages.mjs --fresh`).
+Exported from the app on 7 Nov 2026 (`DEMO_DATE` 2026-11-06): 64 messages for 13 businesses, 62 written by Gemini and 2 by templates, all 64 validated by code. English is the demo language; every message is also stored in the owner's language. The full export, with each message's data, is [`docs/customer-messages.md`](docs/customer-messages.md) (`node scripts/export-messages.mjs --fresh`).
 
 **Kahvila Aurora, Helsinki (`FI-D0001`, SMS), English and Finnish**
 > Hi Aleksi, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 07:30–18:00 (on the same day last year, your listing was seen 29 times on Google). Last year you were open 07:30–13:00, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec open 07:30–13:00.
@@ -108,10 +108,10 @@ Exported from the app on 7 Nov 2026 (`DEMO_DATE` 2026-11-06): 52 messages for 13
 > Hei Aleksi, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 7.30–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 29 kertaa). Viime vuonna olitte auki klo 7.30–13, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: jouluaatto 24.12 auki klo 7.30–13.
 
 **Kafé Linnea, Stockholm (`SE-D0008`, e-mail), Swedish: an early opening on St Lucy's Day**
-> Hej Maria, luciadagen infaller söndag 13/12 och Google visar nu era vanliga öppettider: öppet 10–17 (samma dag förra året visades ni 43 gånger på Google). År 2024 hade ni öppet 7–18, men inga avvikande tider är inlagda i år. Vi föreslår: luciadagen 13/12 öppet 7–18.
+> Hej Maria, luciadagen infaller söndag 13/12 och Google visar nu era vanliga öppettider: öppet 10-17 (samma dag förra året visades ni 43 gånger på Google). År 2024 hade ni öppet 7-18, men inga avvikande tider är inlagda i år. Vi föreslår: luciadagen 13/12 öppet 7-18.
 
 **Bakeri Fjord, Bergen (`NO-D0009`), Norwegian**
-> Hei Marte, første juledag er fredag 25.12 og Google viser nå de vanlige åpningstidene deres: åpent 7–18 (samme dag i fjor ble dere vist 13 ganger på Google). I fjor hadde dere stengt, men ingen avvikende åpningstider er lagt inn i år. Vi foreslår: første juledag 25.12 stengt.
+> Hei Marte, første juledag er fredag 25.12 og Google viser nå de vanlige åpningstidene deres: åpent 7–18 (samme dag i fjor ble dere vist 13 ganger på Google). I fjor hadde dere stengt, så vi foreslår å holde stengt. Vi foreslår: første juledag 25.12 stengt.
 
 **Follow-ups after the owner answers** (fixed texts, no LLM; Kahvila Aurora)
 
