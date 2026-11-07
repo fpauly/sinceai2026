@@ -13,7 +13,7 @@ export async function GET() {
   try {
     const c = await collections();
     const [businesses, issues, decided] = await Promise.all([
-      c.businesses.find().sort({ name: 1 }).toArray(),
+      c.businesses.find({ _id: { $not: /^try-/ } }).sort({ name: 1 }).toArray(), // visitors' /try copies are not listed
       c.issues.find({ status: { $in: ["open", "suggested"] } }).toArray(),
       c.suggestions
         .find({ decision: { $ne: null }, decided_at: { $ne: null } })
