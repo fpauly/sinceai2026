@@ -229,8 +229,10 @@ export type SuggestionWithIssue = Suggestion & { issue: Issue };
 // GET /api/businesses/[id]
 export interface OwnerViewResponse {
   business: Business;
-  listings: Listing[];
+  listings: Listing[]; // v1 seed; empty for v2 businesses
   suggestions: SuggestionWithIssue[]; // undecided only (decision === null)
+  profile?: Profile | null; // v2: the published hours (regular week + entered exceptions)
+  automatically_applied?: SuggestionWithIssue[]; // v2: decision "auto" (standing permission), to inform the owner
 }
 
 // POST /api/suggestions/[id]/decide
