@@ -88,11 +88,15 @@ function checkEditScope(issue: Issue, change: TypedProposedChange, original: Sug
   }
 }
 
-/** Shared decision handler for the owner route; lane A can reuse this orchestration. */
-export async function applyDecision(id: string, input: DecideRequest): Promise<DecideResponse> {
+/** Shared decision handler for the owner route; lane A can reuse this orchestration.
+ *  `auto`: applied under the owner's standing permission (A5, /api/suggest); only with "accepted",
+ *  recorded as decision "auto" via "standing_permission". The same validation runs. */
+export async function applyDecision(id: string, input: DecideRequest, opts: { auto?: boolean } = {}): Promise<DecideResponse> {
   const parsed = decisionRequestSchema.safeParse(input);
   if (!parsed.success) throw new DecisionError("Invalid decision request", 400);
   const request = parsed.data;
+  if (opts.auto && request.decision !== "accepted") throw new DecisionError("Only an accepted suggestion can be applied automatically", 400);
+  const recorded = opts.auto ? { decision: "auto" as const, via: "standing_permission" as const } : { decision: request.decision, via: request.via };
   const c = await collections();
   const suggestions = c.suggestions as Collection<ProcessingSuggestion>;
   const stored = await suggestions.findOne({ _id: id });
@@ -177,7 +181,7 @@ export async function applyDecision(id: string, input: DecideRequest): Promise<D
     const learned: LearnedDecision = {
       issue_type: issue.type, field: suggestion.proposed_change.field,
       proposed: suggestion.proposed_change.value, final: change?.value ?? null,
-      decision: request.decision, at,
+      decision: recorded.decision, at,
     };
     const additions: NonNullable<UpdateFilter<Preferences>["$addToSet"]> = {
       learned,
@@ -190,7 +194,7 @@ export async function applyDecision(id: string, input: DecideRequest): Promise<D
       $addToSet: additions,
     }, { upsert: true });
     await c.issues.updateOne({ _id: issue._id }, { $set: { status: request.decision === "ignored" ? "ignored" : "resolved" } });
-    const updated: Suggestion = { ...stored, decision: request.decision, decided_via: request.via, decided_at: at, applied,
+    const updated: Suggestion = { ...stored, decision: recorded.decision, decided_via: recorded.via, decided_at: at, applied,
       ...(change ? { proposed_change: change } : {}) };
     delete (updated as ProcessingSuggestion)._decision;
     const finished = await suggestions.updateOne(owned, { $set: {

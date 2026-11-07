@@ -1,13 +1,17 @@
 import { randomUUID } from "node:crypto";
 import { collections } from "@/lib/db";
 import { generateSuggestion } from "@/lib/ai/suggest";
+import { hasStandingPermission } from "@/lib/ai/learning";
+import { applyDecision } from "@/lib/apply";
 import type { Business, Issue, Listing, Preferences, Suggestion } from "@/types";
 import type { ApiError, SuggestResponse } from "@/types/api";
 
 // POST /api/suggest[?businessId=] — step 2 (Suggest).
 // For every `open` issue: build a suggestion (Gemini words + code-picked value, checked by
 // lib/validate.ts, template as fallback), store it with `source` and `validation`, and mark the
-// issue `suggested`. Learning and standing permissions are added in stage A5.
+// issue `suggested`. Learning (A5): the owner's earlier edits shape the proposal (lib/ai/learning.ts),
+// and a VALID suggestion the owner gave standing permission for is applied right away through D's
+// applyDecision (decision "auto"); the owner is still told afterwards. Invalid ones never auto-apply.
 
 const CONCURRENCY = 4; // Gemini calls in flight at once
 
@@ -75,14 +79,16 @@ async function suggestOne(issue: Issue, ctx: Ctx): Promise<Suggestion | null> {
   const claimed = await c.issues.updateOne({ _id: issue._id, status: "open" }, { $set: { status: "suggested" } });
   if (claimed.modifiedCount === 0) return null;
 
+  const prefs = ctx.prefsById.get(business._id) ?? null;
+  let suggestion: Suggestion;
   try {
     const { draft, source, validation } = await generateSuggestion(
       business,
       issue,
       ctx.listingsById.get(business._id) ?? [],
-      ctx.prefsById.get(business._id) ?? null,
+      prefs,
     );
-    const suggestion: Suggestion = {
+    suggestion = {
       _id: randomUUID(),
       issue_id: issue._id,
       business_id: business._id,
@@ -96,10 +102,20 @@ async function suggestOne(issue: Issue, ctx: Ctx): Promise<Suggestion | null> {
       applied: null,
     };
     await c.suggestions.insertOne(suggestion);
-    return suggestion;
   } catch (err) {
     await c.issues.updateOne({ _id: issue._id }, { $set: { status: "open" } }); // release the claim
     console.error(`[suggest] issue ${issue._id}: failed, left open`, err);
     return null;
   }
+
+  // Standing permission: apply a valid suggestion now; on any problem it simply waits for the owner.
+  if (suggestion.validation?.ok && hasStandingPermission(prefs, issue.type, suggestion.proposed_change.field)) {
+    try {
+      const { suggestion: applied } = await applyDecision(suggestion._id, { decision: "accepted", via: "tap" }, { auto: true });
+      return applied;
+    } catch (err) {
+      console.warn(`[suggest] issue ${issue._id}: standing permission apply failed, waiting for the owner`, err);
+    }
+  }
+  return suggestion;
 }
