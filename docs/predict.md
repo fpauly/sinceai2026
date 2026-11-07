@@ -46,6 +46,13 @@ What made the difference:
   What matters is each business's own habit, and the group average cannot see it.
 - **Last year's drop in customer actions** (`analytics_daily.parquet`) as a sign the business was closed that day: on wrong-hours days actions fall to about 0.6× normal, but on its own it predicts "closed this year" only about 40 % of the time.
 - **Other peer thresholds** (closed share 0.6–0.8, entered-closed share 0.1–0.35): either more harmful suggestions or lower recall. We kept the baseline's 0.7 / 0.15.
+- **Three seasons back** (when the last two seasons have nothing for that day, use the one before, confidence low): 64.8 on 2026 (+2.7, harmful 263 → 338).
+  The 2025 back-test cannot confirm it, because the history starts in 2023. It would also break one of Fonecta's demo scenarios: `FI-D0013` Hammasklinikka Kallio
+  has already entered correct hours ("right move: stay quiet"), but would get three "closed" suggestions for 28–30 Dec from a 2023 entry.
+  Leaving out only those days (64.1) would be a special case made for one demo business, not a rule. So we kept two seasons, which both seasons confirm.
+- **The owner's habit on the other big holidays** (closed on every one they entered last season → closed on the one they never entered): +0.2 to +0.3 on both seasons, with more harmful suggestions. Not worth a new kind of message.
+- **Copying hours from a nearby day** (New Year's Eve from Christmas Eve, Epiphany Eve from New Year's Eve, the days between Christmas and New Year from New Year's Eve): lost points on both seasons, by 50–220 points per day type.
+  Short days differ from each other even for the same business; only the same day's history works.
 
 ### Where the remaining points are
 About 1,600 dev rows still need a change we don't suggest, and almost all of them have no usable history.
