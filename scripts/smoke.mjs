@@ -75,7 +75,26 @@ async function detect() {
   check((again.json?.created ?? []).length === 0, "second /api/detect creates 0 new issues");
 }
 
-// ---------- add later milestones below (suggest, owner view, decide, dashboard) ----------
+// ---------- M8: dashboard (lane C) ----------
+async function dashboard() {
+  console.log("M8 dashboard");
+  const r = await call("GET", "/api/businesses");
+  if (r.missing) return skip("/api/businesses not implemented yet");
+  const rows = Array.isArray(r.json) ? r.json : [];
+  check(r.status === 200 && rows.length === 8, `GET /api/businesses → 8 rows (got ${r.status}, ${rows.length})`);
+  const rye = rows.find((row) => row?.business?._id === "rye_shine");
+  check(!!rye, "rye_shine is in the list");
+  check(!!rye?.open_issues && typeof rye.open_issues.high === "number", "row counts open_issues by severity");
+  check(!!rye && "last_decision" in rye, "row has last_decision");
+
+  const page = await fetch(`${BASE}/dashboard`);
+  check(
+    page.status === 200 && (page.headers.get("content-type") ?? "").includes("text/html"),
+    `GET /dashboard → 200 html (got ${page.status})`,
+  );
+}
+
+// ---------- add later milestones below (suggest, owner view, decide) ----------
 
 async function main() {
   console.log(`Smoke test against ${BASE}\n`);
@@ -87,6 +106,7 @@ async function main() {
   }
   await seed();
   await detect();
+  await dashboard();
   console.log(`\n${passed} passed, ${failed} failed, ${skipped} skipped`);
   process.exit(failed ? 1 : 0);
 }
