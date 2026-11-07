@@ -19,7 +19,7 @@ falls short.
 | 4 | Peer benchmarks | "what do similar businesses do on this day?" — the no-history case | `peer_benchmarks.csv`, `c_segment`, `cities.csv` |
 | 5 | Google search views | "what is at stake if the door is locked?" | `analytics_daily.parquet` (read with `hyparquet`) |
 | 6 | Reviews and publisher user edits | "did customers say this place is closed for good?" | `reviews.json`, `publisher_suggestions.json` |
-| 7 | Owner decisions | "what did the owner choose last time?" — learning and permission | `pilot_decision_log_2025.csv`, `customer_contacts.csv`, our `preferences` |
+| 7 | Owner decisions | "what did the owner choose last time?" — learning and permission | `customer_contacts.csv`, our `preferences` (`pilot_decision_log_2025.csv` is not used — see section 7) |
 | 8 | Publisher listings | "where will the change show, and how fast?" | `listings.json` |
 
 ---
@@ -126,8 +126,9 @@ the number makes the message concrete instead of nagging.
 entity and day. The importer reads it with `hyparquet` (MIT, devDependency, scripts only) and stores,
 per business and day key, the views on the **same special day last season** (Christmas Eve 2025 for
 Christmas Eve 2026). Detection copies the number into `evidence.expected_search_views`, so lane A's
-message can say "last Christmas Eve about 29 people found you on Google" — and the number comes from
-code, never from the LLM. `FI-D0001` Christmas Eve = 29 views.
+message can say "(on the same day last year, your listing was seen 29 times on Google)" — search
+views are not people — and the number comes from code, never from the LLM. `FI-D0001` Christmas Eve
+= 29 views.
 
 **In production:** Google Business Profile performance API (plus Finder/Connect analytics), per
 business and per day.
@@ -135,7 +136,10 @@ business and per day.
 **Did not work / limits:** the dataset only has search views (no per-channel attribution, no
 conversion data), and we do not use the file to prioritise which businesses to contact first — that
 would be a later extra. The number is last season's, so it is an honest *estimate* of what is at
-stake, not a promise.
+stake, not a promise. A second idea was tested and dropped: last year's drop in
+`GOOGLE_CUSTOMER_ACTIONS` as a sign that the business was closed that day — on its own it predicts
+"closed this year" only about 40 % of the time, so it is not used (see `docs/predict.md` →
+"Tried, did not help").
 
 ---
 
@@ -167,17 +171,20 @@ split is: **code decides that a person must look**, the person decides what to d
 **Answers:** "what did this owner do last time?" — so the next proposal uses it; and "may we just do
 it?" — the standing permission.
 
-**In the demo:** `pilot_decision_log_2025.csv` is the 2025 pilot: 3,031 suggestions and what owners
-did with them. Our own `preferences` collection stores `learned` entries (proposed vs final value,
-decision, time), `ignored_fingerprints` (a declined issue does not come back) and
-`standing_permissions`; `customer_contacts.csv` adds `standing_permission_holidays` per owner, which
+**In the demo:** learning comes from our own `preferences` collection: `learned` entries (proposed vs
+final value, decision, time), `ignored_fingerprints` (a declined issue does not come back) and
+`standing_permissions`. `customer_contacts.csv` adds `standing_permission_holidays` per owner, which
 the app treats as a standing permission for `special_day_hours` (`FI-D0012` is applied and then
 informed). `lib/predict` reads `learned` first (`OWNER_EDIT`), before last season, the centre or
-peers.
+peers, and rule 0b gives a date the owner already set in Connect no new suggestion.
 
-**In production:** Connect's customer record, the pilot log, and the Yext change history. This is
-the only source that is *ours* — no third party can provide it, which is what makes the loop
-defensible.
+`pilot_decision_log_2025.csv` (the 2025 pilot: 3,031 suggestions and what owners did with them) is
+**not used** by the app or by `lib/predict`; `docs/predict.md` lists it as a next candidate (as a
+history source for owners with no actions in our UI).
+
+**In production:** Connect's customer record and the Yext change history. The pilot log becomes
+useful once its owners are matched to live customers. This is the only source that is *ours* — no
+third party can provide it, which is what makes the loop defensible.
 
 **Did not work / limits:** the demo freezes `DEMO_DATE`, so decisions do not age; a real system needs
 enough volume per business and change type before a learned preference is trusted, and should expire
@@ -209,7 +216,7 @@ Aurora and is therefore not claimed.
 |---|---|---|
 | Real Finder / Google Business Profile APIs | real conflicts, real reviews, real views | Fonecta's synthetic dataset (CC BY 4.0); no scraping |
 | Per-publisher values and per-field timestamps | "which channel is wrong, since when?" | one profile per business; `entered_at` from the exception history |
-| A live Nordic holiday calendar | one fewer dataset file to trust | dataset calendar now; C8 tries a live public-holiday API with the dataset as fallback |
+| A live Nordic holiday calendar | one fewer dataset file to trust | official public holidays confirmed from Nager.Date at import time (C8); the dataset supplies eves, observances, events and school breaks |
 | Real WhatsApp / SMS sending | reach the owner where they are | simulated chat in the contact preview; WhatsApp is confirmed as a valid channel by Fonecta |
 | Propagation confirmation from publishers | "published everywhere" honestly | publisher list + typical update speed, with Facebook OPTED_OUT excluded |
 | Real analytics attribution / conversions | prioritise by revenue, not only views | `GOOGLE_SEARCH_VIEWS` as an honest estimate of what is at stake |
