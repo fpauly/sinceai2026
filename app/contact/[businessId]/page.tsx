@@ -4,9 +4,11 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { AutomaticallyApplied, ContactWindow, OwnerMessage, contactChannel, contactLanguage, contactName } from "@/app/owner/contact-details";
+import ReplyBox from "@/app/contact/ReplyBox";
+import ChannelSyncRow from "@/components/ChannelSyncRow";
 import { showHours } from "@/lib/hours";
 import type { IssueType, Language } from "@/types";
-import type { OwnerViewResponse, SuggestionWithIssue } from "@/types/api";
+import type { DecideResponse, OwnerViewResponse, SuggestionWithIssue } from "@/types/api";
 
 const titles: Record<IssueType, string> = {
   missing_holiday_hours: "Your holiday hours",
@@ -63,7 +65,7 @@ function evidenceLines(suggestion: SuggestionWithIssue): string[] {
   }
 }
 
-function Message({ suggestion, language }: { suggestion: SuggestionWithIssue; language: Language }) {
+function Message({ suggestion, language, allowReply, onDecidedAction }: { suggestion: SuggestionWithIssue; language: Language; allowReply: boolean; onDecidedAction: (result: DecideResponse, receivedAt: number) => void }) {
   const lines = evidenceLines(suggestion);
   return (
     <section className="min-w-0 border-b border-zinc-100 pb-4 text-sm leading-6 last:border-0">
@@ -80,6 +82,7 @@ function Message({ suggestion, language }: { suggestion: SuggestionWithIssue; la
         <summary className="cursor-pointer py-1 font-medium">The data behind this</summary>
         <ul className="mt-1 space-y-2 break-words">{lines.map((line, index) => <li key={index}>{line}</li>)}</ul>
       </details>}
+      {allowReply ? <ReplyBox suggestion={suggestion} onDecidedAction={onDecidedAction} /> : <Link href={`/owner/${encodeURIComponent(suggestion.business_id)}`} className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-emerald-800 underline">Edit in owner view →</Link>}
     </section>
   );
 }
@@ -89,6 +92,13 @@ type LoadState = { status: "loading" } | { status: "ready"; data: OwnerViewRespo
 function BusinessChat({ businessId }: { businessId: string }) {
   const [state, setState] = useState<LoadState>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
+  const [lastDecision, setLastDecision] = useState<{ result: DecideResponse; receivedAt: number } | null>(null);
+  function decided(result: DecideResponse, receivedAt: number) {
+    setLastDecision({ result, receivedAt });
+    setState((current) => current.status === "ready" ? { status: "ready", data: {
+      ...current.data, suggestions: current.data.suggestions.filter((suggestion) => suggestion._id !== result.suggestion._id),
+    } } : current);
+  }
   useEffect(() => {
     const controller = new AbortController();
     async function load() {
@@ -121,11 +131,14 @@ function BusinessChat({ businessId }: { businessId: string }) {
   const optedOut = data.business.contact?.opted_out;
   return <>
     <p className="rounded-lg bg-white/80 px-3 py-2 text-center text-xs text-zinc-600">For {contactName(data.business)} · {data.business.name}<br />{channel} preview · No message has been sent.</p>
+    {lastDecision && (lastDecision.result.suggestion.decision === "ignored"
+      ? <p role="status" className="rounded-xl bg-white p-3 text-sm">Suggestion declined. Your hours were not changed.</p>
+      : <ChannelSyncRow key={lastDecision.result.suggestion._id} applied={lastDecision.result.suggestion.applied} receivedAt={lastDecision.receivedAt} business={data.business} />)}
     {optedOut ? <div className="rounded-2xl bg-white p-4 text-sm leading-6"><h2 className="font-semibold">Not contacted</h2><p className="mt-2">This owner has opted out of suggestion messages.</p></div> : data.suggestions.length || automatic.length ? (
       <article aria-label={`${channel} message`} className="min-w-0 space-y-4 rounded-2xl bg-white p-4 shadow-sm">
         {channel === "Email" && <p className="border-b border-zinc-100 pb-2 text-sm font-semibold">Subject: Your business hours</p>}
         <AutomaticallyApplied suggestions={automatic} language={language} />
-        {data.suggestions.map((suggestion) => <Message key={suggestion._id} suggestion={suggestion} language={language} />)}
+        {data.suggestions.map((suggestion) => <Message key={suggestion._id} suggestion={suggestion} language={language} allowReply={channel === "SMS" || channel === "WhatsApp"} onDecidedAction={decided} />)}
         <Link href={`/owner/${encodeURIComponent(businessId)}`} className="flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-3 py-2 text-center text-sm font-semibold text-white">{data.suggestions.length ? "Review your dates →" : "View your updated hours →"}</Link>
         <p className="text-center text-xs text-zinc-500">No login needed. You decide what changes.</p>
         <ContactWindow business={data.business} />
