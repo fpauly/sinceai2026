@@ -4,7 +4,7 @@
 
 Built in 48 hours at Since AI Hackathon 2026 (Turku) for Fonecta's challenge *Connect Suggests – Customer Approves*. **Code detects, AI explains, the owner decides.**
 
-- Demo video: [link to the 2–3 minute video]
+- Demo video (2 min 32 s): [watch or download](https://github.com/fpauly/sinceai2026/releases/download/demo-video/ajantasa-demo.mp4) · [release page](https://github.com/fpauly/sinceai2026/releases/tag/demo-video)
 - Pitch deck: [docs/pitch-deck.pdf](docs/pitch-deck.pdf) (12 slides)
 - Live demo: https://ajantasa.vercel.app (no login)
 - Try it yourself: https://ajantasa.vercel.app/try gives you a private copy of an owner's chat. Reply by text or by voice; Kahvila Aurora (`/try?b=FI-D0001`) publishes to our real Yext sandbox. Copies are deleted after 6 hours, so many people can try it at once.
