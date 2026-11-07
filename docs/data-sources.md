@@ -46,9 +46,9 @@ maintain a Nordic calendar centrally; local events can come from city event APIs
 school breaks from the national education calendars. The dataset's `docs/LIVE_SOURCES.md` describes
 the same idea.
 
-**Did not work / limits:** the dataset is synthetic and fixed to the 2026 season; there is no live
-feed in the demo yet. The **C8 bonus** replaces the public-holiday part with a live API while keeping
-the dataset and a hardcoded fallback (see the end of this document).
+**Did not work / limits:** the dataset is synthetic and fixed to the 2026 season. The official
+public-holiday part is now confirmed by a live API (C8, see the end of this document), but eves,
+observances, commercial days, local events and school breaks still come from the dataset.
 
 ---
 
@@ -216,17 +216,24 @@ Aurora and is therefore not claimed.
 
 ## Bonus: one dataset file replaced with a live source (C8)
 
-Planned, not done yet. Candidate: **Nager.Date** (MIT,
-`https://date.nager.at/api/v3/PublicHolidays/<year>/<CC>`), which returns official public holidays
-per country and year. Plan:
+Done. The official public-holiday part of `calendar_special_days.csv` is now confirmed at import
+time by **Nager.Date** (MIT, `https://date.nager.at/api/v3/PublicHolidays/<year>/<CC>`):
 
-- the importer fetches the public holidays for FI/SE/NO for the seasons it imports, with a short
-  timeout, one retry and a cache, and uses them to **confirm or correct** the public-holiday dates
-  and names in `calendar_special_days.csv`;
-- everything the dataset knows beyond official holidays (eves, observances, commercial days, local
-  events, school breaks) stays from the dataset — a live API cannot replace those;
-- `DEMO_DATE` still defines the window, so detection stays deterministic; if the API is unreachable,
-  the dataset rows are used unchanged;
-- a short "what we learned" section will record coverage, response shape, licence, and any
-  differences from the official Finnish calendar (e.g. Christmas Eve is a de facto holiday but not
-  an official public holiday).
+- six country-years (FI/SE/NO × 2026/2027) are fetched with an 8 s timeout, one retry and a local
+  cache in `FONECTA/.../.cache/` (not committed); if the API is unreachable the dataset rows are used
+  unchanged;
+- **49 dates were confirmed and 0 needed correcting**: the dataset's official-holiday set matches
+  Nager.Date exactly, including Christmas Eve, which the API lists for FI, SE and NO (it is a de
+  facto holiday even where it is not a statutory one);
+- the live `localName` / `name` now supply `name_local` / `name_en` for those dates (e.g.
+  "Joulupäivä", "Julafton", "Julaften"), so the holiday names are not only the dataset's;
+- everything a holiday API cannot provide stays from the dataset: eves, observances, commercial days,
+  local events and school breaks.
+
+**What we learned:** a live public-holiday API is cheap and reliable (six requests, well under a
+second each) but narrow — it confirms dates and names, not opening hours, and it says nothing about
+the 27 calendar rows per country that make a season interesting (Christmas Eve eve, "between
+holidays", Black Friday, Lucia). The dataset remains the source for the calendar; the live source
+verifies the one part it can. Detection is still deterministic because the import runs once and the
+window is defined by `DEMO_DATE`; re-import before the demo if the 2027 data changes.
+

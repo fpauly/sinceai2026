@@ -27,6 +27,8 @@ export interface FonectaDemo {
     reviews: number;
     publisher_suggestions: number;
     search_views: number;
+    live_holidays: number;
+    live_holidays_corrected: number;
   };
   businesses: Business[];
   profiles: Profile[];
