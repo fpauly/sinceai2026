@@ -3,6 +3,7 @@ import type {
   CrossPlatformConflictEvidence,
   MissingHolidayHoursEvidence,
   ReviewSignalEvidence,
+  SpecialDayHoursEvidence,
   StaleFieldEvidence,
   SuggestionDraft,
   TypedProposedChange,
@@ -20,13 +21,21 @@ import type {
 //   1. the draft has a shape we can store (field, value, reason, confidence, EN + FI message)
 //   2. `field` is one of the four fields in types/api.ts, and it is the field this issue type asks for
 //   3. `value` has the right shape for that field (hours, phone, description)
-//   4. every hours value is "closed" or "HH:MM-HH:MM" with close after open
-//   5. holiday dates are exactly the dates in the issue evidence (nothing invented, nothing missing)
+//   4. every hours value is "closed" or one or more "HH:MM-HH:MM" intervals: several intervals
+//      ("10:00-14:00,17:00-22:00"), past midnight ("18:00-02:00") and "00:00-23:59" (24 h) are fine,
+//      overlapping or out-of-order intervals are not (the same grammar as lib/hours.ts)
+//   5. holiday dates are exactly the dates in the issue evidence (nothing invented, nothing missing);
+//      for a v2 special day the proposal carries exactly that date and exactly the hours lib/predict
+//      decided (the LLM explains, it never changes the numbers)
 //   6. for a conflict, the proposed value is one actually seen in the sources
-//   7. messages are non-empty and at most 2 sentences per language
+//   7. `needs_human` issues never produce an owner suggestion (they go to Connect staff)
+//   8. messages are non-empty, English plus the owner's language (fi / sv / nb), at most 2 sentences
+//      plus an optional last "We suggest …" line
 //
 // This file has no runtime imports on purpose: `node scripts/validate-check.mjs` runs it directly
 // (Node strips the type-only imports), so the pure checks are testable without a build step.
+// The hours grammar is therefore repeated here; validate-check.mjs cross-checks it against
+// lib/hours.ts on a corpus of values so the two cannot drift silently.
 
 // ---------- allowed values (module-local so the file stays import-free at runtime) ----------
 
@@ -54,11 +63,19 @@ const DAYS_SET = new Set<string>(Object.keys(DAY_KEYS));
 
 const CONFIDENCES = new Set(["high", "medium", "low"]);
 
-const HOURS_RE = /^([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-3]):[0-5]\d$/;
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 const PHONE_RE = /^\+?[\d\s\-()./]+$/;
 
 const MAX_SENTENCES = 2;
+
+/** Languages a message can use: English (always) plus the owner's (fi / sv / nb). */
+const MESSAGE_LANGS = ["en", "fi", "sv", "nb"] as const;
+const OWNER_LANGS = ["fi", "sv", "nb"] as const;
+
+/** The optional last line of a v2 message, in the languages the demo can send. */
+const SUGGESTION_LINE =
+  /^(we suggest|we recommend|ehdotamme|suosittelemme|vi föreslår|vi rekommenderar|vi foreslår|vi anbefaler)\b/i;
 
 // ---------- small helpers ----------
 
@@ -81,14 +98,54 @@ function isIsoDate(value: unknown): value is string {
   );
 }
 
+/** One open interval in minutes from midnight; past midnight makes `end` > 1440 (like lib/hours.ts). */
+interface Span {
+  start: number;
+  end: number;
+}
+
+/** Parse our hours grammar. A problem keeps the reason ("format" vs "order") for the message. */
+function parseHourSpans(value: string): { spans: Span[] } | { problem: "format" | "order" } {
+  if (value.trim() === "closed") return { spans: [] };
+  const spans: Span[] = [];
+  let previousEnd = -1;
+  for (const part of value.trim().split(",")) {
+    const [a, b, extra] = part.split("-");
+    if (extra !== undefined || !a || !b || !TIME_RE.test(a) || !TIME_RE.test(b)) {
+      return { problem: "format" };
+    }
+    const start = Number(a.slice(0, 2)) * 60 + Number(a.slice(3, 5));
+    let end = Number(b.slice(0, 2)) * 60 + Number(b.slice(3, 5));
+    if (a === "00:00" && b === "23:59") end = 1439; // 24 h, the dataset's convention
+    else if (end <= start) end += 1440; // past midnight, e.g. 18:00-02:00
+    if (start < previousEnd) return { problem: "order" }; // overlapping or out of order
+    spans.push({ start, end });
+    previousEnd = end;
+  }
+  return { spans };
+}
+
 /** null when the value is usable hours; otherwise what is wrong with it. */
 function hoursProblem(value: unknown): string | null {
   if (value === "closed") return null;
   if (typeof value !== "string") return "is not hours (expected \"HH:MM-HH:MM\" or \"closed\")";
-  const m = HOURS_RE.exec(value);
-  if (!m) return `is "${value}", not "HH:MM-HH:MM" or "closed"`;
-  if (m[2] <= m[1]) return `is "${value}", which closes before it opens`;
-  return null;
+  const parsed = parseHourSpans(value);
+  if ("spans" in parsed) return null;
+  if (parsed.problem === "order") {
+    return `is "${value}", whose intervals overlap or are out of order`;
+  }
+  return `is "${value}", not "HH:MM-HH:MM" or "closed"`;
+}
+
+/** Same hours after parsing, so "09:00-17:00" and "9:00-17:00" never pass as different. */
+function sameHourSpans(a: string, b: string): boolean {
+  const left = parseHourSpans(a);
+  const right = parseHourSpans(b);
+  if ("problem" in left || "problem" in right) return false;
+  return (
+    left.spans.length === right.spans.length &&
+    left.spans.every((span, i) => span.start === right.spans[i].start && span.end === right.spans[i].end)
+  );
 }
 
 /** null when the value looks like a phone number; otherwise what is wrong with it. */
@@ -103,13 +160,24 @@ function phoneProblem(value: unknown): string | null {
   return null;
 }
 
-/** Sentence count for the "max 2 sentences" rule. A message without punctuation counts as one.
- *  Dots between digits (dotted dates, Finnish "klo 10.00") are not sentence breaks. */
-function sentenceCount(text: string): number {
+/** Sentences for the message limit. A message without punctuation counts as one; dots between
+ *  digits (dotted dates, Finnish "klo 10.00") are not sentence breaks. */
+function sentences(text: string): string[] {
   const trimmed = text.trim().replace(/(?<=\d)\.(?=\d)/g, "");
-  if (!trimmed) return 0;
-  const enders = trimmed.match(/[.!?]+(?=\s|$)/g);
-  return Math.max(1, enders?.length ?? 0);
+  if (!trimmed) return [];
+  return trimmed.split(/(?<=[.!?])\s+/).filter((part) => part.length > 0);
+}
+
+/** null when the message respects the limit: 2 sentences, or 3 when the last one is the
+ *  "We suggest …" line (DESIGN v2 message style). */
+function sentenceLimitProblem(text: string): string | null {
+  const list = sentences(text);
+  const last = list[list.length - 1] ?? "";
+  const limit = SUGGESTION_LINE.test(last) ? MAX_SENTENCES + 1 : MAX_SENTENCES;
+  if (list.length <= limit) return null;
+  return limit === MAX_SENTENCES + 1
+    ? `has ${list.length} sentences, at most 2 plus the suggestion line are allowed`
+    : `has ${list.length} sentences, at most ${MAX_SENTENCES} are allowed`;
 }
 
 /** Compare values ignoring spacing (phone numbers are written with or without spaces). */
@@ -131,6 +199,10 @@ function expectedField(issue: Issue): TypedProposedChange["field"] | undefined {
   switch (issue.type) {
     case "missing_holiday_hours":
       return "holiday_hours";
+    case "special_day_hours":
+      return "holiday_hours";
+    case "needs_human":
+      return undefined;
     case "cross_platform_conflict": {
       const field = conflictEvidence(issue).field;
       if (field === "phone") return "phone";
@@ -241,6 +313,11 @@ export const validateSuggestion: ValidateSuggestion = (
     return { ok: false, problems: ["the suggestion is not an object"] };
   }
 
+  // 7. a flag is for Connect staff; the owner is never asked to confirm a closure
+  if (issue.type === "needs_human") {
+    problems.push("needs_human issues go to Connect staff, so no suggestion may be sent to the owner");
+  }
+
   // 1a. reason + confidence
   if (typeof draft.reason !== "string" || !draft.reason.trim()) {
     problems.push("reason is empty");
@@ -249,21 +326,27 @@ export const validateSuggestion: ValidateSuggestion = (
     problems.push(`confidence is "${String(draft.confidence)}", not high, medium or low`);
   }
 
-  // 1b. message in both languages, max 2 sentences each
+  // 1b. message in English plus the owner's language, max 2 sentences + the suggestion line
   const message: unknown = draft.message;
   if (!isPlainObject(message)) {
     problems.push("message is missing");
   } else {
-    for (const lang of ["en", "fi"] as const) {
+    const english = message.en;
+    if (typeof english !== "string" || !english.trim()) problems.push("message.en is empty");
+    const ownerLang = OWNER_LANGS.find(
+      (lang) => typeof message[lang] === "string" && (message[lang] as string).trim().length > 0,
+    );
+    if (!ownerLang) problems.push("message needs the owner's language (fi, sv or nb)");
+
+    for (const lang of MESSAGE_LANGS) {
       const text = message[lang];
+      if (text === undefined) continue;
       if (typeof text !== "string" || !text.trim()) {
-        problems.push(`message.${lang} is empty`);
+        if (lang !== "en") problems.push(`message.${lang} is empty`);
         continue;
       }
-      const n = sentenceCount(text);
-      if (n > MAX_SENTENCES) {
-        problems.push(`message.${lang} has ${n} sentences, at most ${MAX_SENTENCES} are allowed`);
-      }
+      const problem = sentenceLimitProblem(text);
+      if (problem) problems.push(`message.${lang} ${problem}`);
     }
   }
 
@@ -307,6 +390,32 @@ export const validateSuggestion: ValidateSuggestion = (
       }
       for (const date of wantedDates) {
         if (!proposed.has(date)) problems.push(`proposed_change is missing the date ${date}`);
+      }
+    }
+  }
+
+  // 5b. a v2 special day: exactly the issue's date and exactly the hours the code decided
+  if (issue.type === "special_day_hours" && field === "holiday_hours" && isPlainObject(value)) {
+    const ev = (issue.evidence ?? {}) as Partial<SpecialDayHoursEvidence>;
+    if (!isIsoDate(ev.date)) {
+      problems.push("issue evidence has no valid date for special_day_hours");
+    } else if (hoursProblem(ev.proposed_hours) !== null) {
+      problems.push("issue evidence has invalid proposed_hours for special_day_hours");
+    } else {
+      for (const date of Object.keys(value)) {
+        if (date !== ev.date) {
+          problems.push(`proposed_change invents the date ${date}; this issue is only about ${ev.date}`);
+        }
+      }
+      if (!(ev.date in value)) {
+        problems.push(`proposed_change is missing the date ${ev.date}`);
+      } else {
+        const proposed = value[ev.date];
+        if (typeof proposed !== "string" || !sameHourSpans(proposed, ev.proposed_hours as string)) {
+          problems.push(
+            `proposed_change.value["${ev.date}"] is "${String(proposed)}", but the code decided "${ev.proposed_hours}"`,
+          );
+        }
       }
     }
   }

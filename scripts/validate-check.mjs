@@ -1,12 +1,16 @@
-// Deterministic tests for lib/validate.ts (stage C3, DESIGN 9.4).
+// Deterministic tests for lib/validate.ts (stages C3 + C12, DESIGN 9.4 and 0 "v2").
 // Usage: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/validate-check.mjs
 //
 // Node 24 strips the types from lib/validate.ts on import, so this runs without a build step.
-// The fixtures mirror the seed data (data/seed.ts): rye_shine holiday hours, its Saturday
+// The v1 fixtures mirror the seed data (data/seed.ts): rye_shine holiday hours, its Saturday
 // conflict with the website, autokorjaamo's phone conflict, kukkakauppa's stale week.
-// A good draft must pass; a bad one must fail for the reason we expect.
+// The v2 fixtures mirror a special-day issue for FI-D0001 (Kahvila Aurora) and a needs_human
+// flag for FI-D0011 (Pizzeria Torni). A good draft must pass; a bad one must fail for the
+// reason we expect. The hours grammar is also cross-checked against lib/hours.ts on a corpus,
+// so the copy in validate.ts cannot drift from the one the app uses.
 
 import { validateSuggestion } from "../lib/validate.ts";
+import { isValidHours } from "../lib/hours.ts";
 
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
@@ -173,6 +177,45 @@ const reviewPhoneIssue = {
   fingerprint: "rye_shine:review_signal:wrong_phone",
 };
 
+/** v2: one likely-wrong special day for the demo protagonist (FI-D0001 Kahvila Aurora). */
+const specialDayIssue = {
+  _id: "issue_special",
+  business_id: "FI-D0001",
+  type: "special_day_hours",
+  severity: "high",
+  evidence: {
+    date: "2026-12-24",
+    day_key: "XMAS_EVE",
+    day_name: { en: "Christmas Eve", local: "Jouluaatto" },
+    weekday: "thu",
+    displayed_hours: "07:30-18:00",
+    displayed_from: "regular",
+    proposed_hours: "10:00-14:00",
+    basis: "LAST_YEAR",
+    basis_detail: { last_year: { date: "2025-12-24", hours: "10:00-14:00", entered_at: "2025-12-01T08:00:00" } },
+    confidence: "high",
+  },
+  status: "open",
+  created_at: "2026-11-06T08:00:00Z",
+  fingerprint: "FI-D0001:special_day_hours:2026-12-24",
+};
+
+/** v2: a flag for Connect staff (FI-D0011 Pizzeria Torni), never an owner suggestion. */
+const needsHumanIssue = {
+  _id: "issue_flag",
+  business_id: "FI-D0011",
+  type: "needs_human",
+  severity: "high",
+  evidence: {
+    reason: "closed_for_good",
+    summary: "Five recent reviews say the pizzeria has closed for good.",
+    signals: ["2026-09-25 review: \"This place has closed down permanently.\""],
+  },
+  status: "open",
+  created_at: "2026-11-06T08:00:00Z",
+  fingerprint: "FI-D0011:needs_human:closed_for_good",
+};
+
 /** A draft with the fallback template's shape and a valid 2-sentence message in EN and FI. */
 function draft(field, value, overrides = {}) {
   return {
@@ -223,11 +266,43 @@ const cases = [
     expect: "not \"HH:MM-HH:MM\"",
   },
   {
-    name: "bad: closes before it opens",
-    draft: draft("holiday_hours", { ...lastYearHours, "2026-12-24": "14:00-10:00" }),
+    name: "good: past midnight is a valid interval (18:00-02:00)",
+    draft: draft("holiday_hours", { ...lastYearHours, "2026-12-24": "18:00-02:00" }),
+    issue: holidayIssue,
+    ok: true,
+  },
+  {
+    name: "good: several intervals in one day",
+    draft: draft("holiday_hours", { ...lastYearHours, "2026-12-24": "10:00-14:00,17:00-22:00" }),
+    issue: holidayIssue,
+    ok: true,
+  },
+  {
+    name: "good: the 24 h convention (00:00-23:59)",
+    draft: draft("holiday_hours", { ...lastYearHours, "2026-12-24": "00:00-23:59" }),
+    issue: holidayIssue,
+    ok: true,
+  },
+  {
+    name: "bad: intervals overlap",
+    draft: draft("holiday_hours", { ...lastYearHours, "2026-12-24": "10:00-14:00,13:00-18:00" }),
     issue: holidayIssue,
     ok: false,
-    expect: "closes before it opens",
+    expect: "overlap or are out of order",
+  },
+  {
+    name: "bad: intervals are out of order",
+    draft: draft("holiday_hours", { ...lastYearHours, "2026-12-24": "17:00-22:00,10:00-14:00" }),
+    issue: holidayIssue,
+    ok: false,
+    expect: "overlap or are out of order",
+  },
+  {
+    name: "bad: hour out of range",
+    draft: draft("holiday_hours", { ...lastYearHours, "2026-12-24": "24:00-02:00" }),
+    issue: holidayIssue,
+    ok: false,
+    expect: "not \"HH:MM-HH:MM\"",
   },
   {
     name: "bad: en dash instead of a hyphen",
@@ -346,13 +421,13 @@ const cases = [
     expect: "message.en has 3 sentences",
   },
   {
-    name: "bad: Finnish message is missing",
+    name: "bad: the owner's language is missing",
     draft: draft("holiday_hours", { ...lastYearHours }, {
       message: { en: "Hi Liisa, shall I publish last year's hours?" },
     }),
     issue: holidayIssue,
     ok: false,
-    expect: "message.fi is empty",
+    expect: "owner's language",
   },
   {
     name: "bad: empty reason",
@@ -394,6 +469,86 @@ const cases = [
     ok: false,
     expect: "not a holiday hours object",
   },
+  {
+    name: "good: v2 special day with the code's hours and a suggestion line",
+    draft: draft("holiday_hours", { "2026-12-24": "10:00-14:00" }, {
+      message: {
+        en: "Christmas Eve is coming and Google still shows your regular Thursday hours. Last year you opened 10:00-14:00. We suggest 10:00-14:00 on 24 December.",
+        fi: "Jouluaatto on tulossa ja Google näyttää yhä torstain normaalit ajat. Viime vuonna avasit 10:00-14:00. Ehdotamme 10:00-14:00 ajalle 24.12.",
+      },
+    }),
+    issue: specialDayIssue,
+    ok: true,
+  },
+  {
+    name: "bad: special day invents a second date",
+    draft: draft("holiday_hours", { "2026-12-24": "10:00-14:00", "2026-12-25": "closed" }),
+    issue: specialDayIssue,
+    ok: false,
+    expect: "invents the date 2026-12-25",
+  },
+  {
+    name: "bad: special day changes the hours lib/predict decided",
+    draft: draft("holiday_hours", { "2026-12-24": "10:00-15:00" }),
+    issue: specialDayIssue,
+    ok: false,
+    expect: "but the code decided",
+  },
+  {
+    name: "bad: special day misses its date",
+    draft: draft("holiday_hours", { "2026-12-25": "closed" }),
+    issue: specialDayIssue,
+    ok: false,
+    expect: "missing the date 2026-12-24",
+  },
+  {
+    name: "bad: special day proposed as opening hours",
+    draft: draft("opening_hours", { thu: "10:00-14:00" }),
+    issue: specialDayIssue,
+    ok: false,
+    expect: "but a special_day_hours issue needs \"holiday_hours\"",
+  },
+  {
+    name: "bad: needs_human never becomes an owner suggestion",
+    draft: draft("holiday_hours", { "2026-12-24": "closed" }),
+    issue: needsHumanIssue,
+    ok: false,
+    expect: "go to Connect staff",
+  },
+  {
+    name: "good: Swedish owner language (en + sv)",
+    draft: draft("holiday_hours", { ...lastYearHours }, {
+      message: {
+        en: "Hi Aleksi, your holiday hours aren't set anywhere yet. Shall I publish the same hours as last year?",
+        sv: "Hej Aleksi, dina helgdagsöppettider är inte ifyllda ännu. Ska jag publicera samma tider som i fjol?",
+      },
+    }),
+    issue: holidayIssue,
+    ok: true,
+  },
+  {
+    name: "good: three sentences when the last one is the suggestion line",
+    draft: draft("holiday_hours", { ...lastYearHours }, {
+      message: {
+        en: "Your holiday hours aren't set anywhere yet. Last year you opened 10:00-14:00 on Christmas Eve. We suggest the same hours this year.",
+        fi: "Pyhien aukioloajat puuttuvat vielä. Viime vuonna avasit jouluaattona 10:00-14:00. Ehdotamme samoja aikoja tänä vuonna.",
+      },
+    }),
+    issue: holidayIssue,
+    ok: true,
+  },
+  {
+    name: "bad: four sentences even with the suggestion line",
+    draft: draft("holiday_hours", { ...lastYearHours }, {
+      message: {
+        en: "Hi Liisa. Your holiday hours aren't set anywhere yet. Last year you opened 10:00-14:00. We suggest the same hours this year.",
+        fi: "Hei Liisa. Pyhien aukioloajat puuttuvat. Viime vuonna avasit 10:00-14:00. Ehdotamme samoja aikoja.",
+      },
+    }),
+    issue: holidayIssue,
+    ok: false,
+    expect: "at most 2 plus the suggestion line",
+  },
 ];
 
 // ---------- runner ----------
@@ -433,6 +588,51 @@ if (dayProblems.ok) {
 } else {
   failed++;
   console.log(`  ✗ day keys rejected: ${dayProblems.problems.join(" | ")}`);
+}
+
+// The hours grammar is duplicated in validate.ts (so it stays import-free at runtime); this
+// corpus keeps the copy honest against lib/hours.ts, the parser the app actually uses.
+// validate.ts is deliberately stricter about the *written* format: it rejects "8:00-14:00" and
+// "10:00–14:00" (en dash), which lib/hours.ts normalises when reading, so the corpus only holds
+// canonical values — the ones the app writes.
+const HOURS_CORPUS = [
+  "closed",
+  "10:00-14:00",
+  "10:00-14:00,17:00-22:00",
+  "18:00-02:00",
+  "00:00-23:59",
+  "10:00-10:00",
+  "14:00-10:00",
+  "23:59-00:00",
+  "09:00-12:00,13:00-17:00",
+  "10:00-14:00,13:00-18:00",
+  "17:00-22:00,10:00-14:00",
+  "24:00-02:00",
+  "10:00-14:00,",
+  "10:00",
+  "10:00-14:00,17:00",
+];
+
+let drift = 0;
+for (const hours of HOURS_CORPUS) {
+  const result = validateSuggestion(
+    draft("holiday_hours", { ...lastYearHours, "2026-12-24": hours }),
+    holidayIssue,
+    ryeListings,
+  );
+  const validatorSays = !result.problems.some((p) => p.includes('proposed_change.value["2026-12-24"]'));
+  const libSays = isValidHours(hours);
+  if (validatorSays !== libSays) {
+    drift++;
+    failed++;
+    console.log(
+      `  ✗ hours "${hours}": validate.ts ${validatorSays ? "accepts" : "rejects"}, lib/hours.ts ${libSays ? "accepts" : "rejects"}`,
+    );
+  }
+}
+if (!drift) {
+  passed++;
+  console.log(`  ✓ the hours grammar matches lib/hours.ts on ${HOURS_CORPUS.length} values`);
 }
 
 console.log(`\n${passed} passed, ${failed} failed`);
