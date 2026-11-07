@@ -22,6 +22,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parquetMetadataAsync, parquetReadObjects } from "hyparquet";
 import {
   fromYextHoliday,
   fromYextWeek,
@@ -261,6 +262,7 @@ const history = readJsonl("holiday_hours_history.jsonl")
     a.entered_at.localeCompare(b.entered_at),
   );
 
+
 // ---------- source: calendar and peers ----------
 
 const WEEKDAY = { Monday: "mon", Tuesday: "tue", Wednesday: "wed", Thursday: "thu", Friday: "fri", Saturday: "sat", Sunday: "sun" };
@@ -282,6 +284,82 @@ const specialDays = readCsv("calendar_special_days.csv", 9).map((row) => {
     official_public_holiday: row.official_public_holiday === "1",
   };
 });
+
+// ---------- source: analytics (what is at stake on each special day, C14) ----------
+
+const SNAPSHOT = "2026-11-06"; // the dataset's "today"
+const WINDOW_END = "2027-01-06"; // DESIGN 0 "v2": special days from 7 Nov 2026 to 6 Jan 2027
+const PREVIOUS_SEASON = ["2025-11-07", "2026-01-06"];
+
+/** The date on which the same special day (country + day key) fell in the previous season. */
+function previousSeasonDate(country, dayKey) {
+  const dates = specialDays
+    .filter(
+      (day) =>
+        day.country === country &&
+        day.day_key === dayKey &&
+        day.date >= PREVIOUS_SEASON[0] &&
+        day.date <= PREVIOUS_SEASON[1],
+    )
+    .map((day) => day.date)
+    .sort();
+  return dates[dates.length - 1] ?? null;
+}
+
+/**
+ * Google search views on the same special day last season, per business and day key
+ * (analytics_daily.parquet). This is the honest "what was at stake" number for the message:
+ * it comes from code, never from the LLM.
+ */
+async function searchViewsByBusiness() {
+  const map = new Map(); // "entity|date" -> { entity, date, day_key }
+  for (const day of specialDays) {
+    if (!(day.date > SNAPSHOT && day.date <= WINDOW_END)) continue;
+    for (const entity of wanted) {
+      if (entity.meta.countryCode !== day.country) continue;
+      const date = previousSeasonDate(day.country, day.day_key);
+      if (date) map.set(`${entity.meta.id}|${date}`, { entity: entity.meta.id, date, day_key: day.day_key });
+    }
+  }
+  if (map.size === 0) return new Map();
+
+  const file = readFileSync(join(DATA, "analytics_daily.parquet"));
+  const buffer = file.buffer.slice(file.byteOffset, file.byteOffset + file.byteLength);
+  const rows = Number((await parquetMetadataAsync(buffer)).num_rows);
+  const views = new Map(); // business_id -> { day_key: views }
+  const CHUNK = 400_000;
+  for (let start = 0; start < rows; start += CHUNK) {
+    const chunk = await parquetReadObjects({
+      file: buffer,
+      columns: ["date", "entity_id", "GOOGLE_SEARCH_VIEWS"],
+      rowStart: start,
+      rowEnd: Math.min(start + CHUNK, rows),
+    });
+    for (const row of chunk) {
+      const hit = map.get(`${row.entity_id}|${row.date.toISOString().slice(0, 10)}`);
+      if (!hit) continue;
+      const byKey = views.get(row.entity_id) ?? {};
+      byKey[hit.day_key] = (byKey[hit.day_key] ?? 0) + (row.GOOGLE_SEARCH_VIEWS ?? 0);
+      views.set(row.entity_id, byKey);
+    }
+  }
+  return views;
+}
+
+const viewsByBusiness = await searchViewsByBusiness();
+let searchViewCount = 0;
+for (const business of businesses) {
+  const byKey = viewsByBusiness.get(business._id);
+  if (!byKey) continue;
+  const positive = Object.fromEntries(
+    Object.entries(byKey)
+      .filter(([, value]) => value > 0)
+      .sort(([a], [b]) => a.localeCompare(b)),
+  );
+  if (Object.keys(positive).length === 0) continue;
+  business.search_views_by_day_key = positive;
+  searchViewCount += Object.keys(positive).length;
+}
 
 // Only the (country, city tier, segment) combinations the demo cast can look up.
 const peerKeys = new Set(
@@ -338,6 +416,13 @@ if (new Set(reviews.map((row) => row._id)).size !== reviews.length) problems.pus
 if (new Set(publisherSuggestions.map((row) => row._id)).size !== publisherSuggestions.length) {
   problems.push("publisher_suggestions: duplicate _id");
 }
+if (storylineIds.size > 0) {
+  const withViews = businesses.filter((business) => business.search_views_by_day_key);
+  if (withViews.length === 0) problems.push("analytics: no business got search views");
+  if (!withViews.some((business) => business.search_views_by_day_key.XMAS_EVE > 0)) {
+    problems.push("analytics: no business has Christmas Eve search views");
+  }
+}
 if (problems.length) fail(`\n  - ${problems.join("\n  - ")}`);
 
 // ---------- write ----------
@@ -350,6 +435,7 @@ const counts = {
   peers: peers.length,
   reviews: reviews.length,
   publisher_suggestions: publisherSuggestions.length,
+  search_views: searchViewCount,
 };
 
 const extract = {

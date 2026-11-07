@@ -11,7 +11,8 @@
     "special_days": 244,
     "peers": 421,
     "reviews": 245,
-    "publisher_suggestions": 40
+    "publisher_suggestions": 40,
+    "search_views": 366
   },
   "businesses": [
     {
@@ -100,7 +101,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 20,
+        "BOXING_DAY": 56,
+        "DEC23": 13,
+        "EPIPHANY": 25,
+        "EPIPHANY_EVE": 26,
+        "FATHERS_DAY": 18,
+        "INDEPENDENCE_DAY": 13,
+        "INTERDAY": 12,
+        "NEW_YEARS_DAY": 11,
+        "NYE": 43,
+        "XMAS_DAY": 14,
+        "XMAS_EVE": 29
+      }
     },
     {
       "_id": "FI-D0002",
@@ -188,7 +203,20 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 7,
+        "BOXING_DAY": 9,
+        "DEC23": 8,
+        "EPIPHANY": 3,
+        "EPIPHANY_EVE": 4,
+        "INDEPENDENCE_DAY": 8,
+        "INTERDAY": 13,
+        "NEW_YEARS_DAY": 2,
+        "NYE": 5,
+        "XMAS_DAY": 16,
+        "XMAS_EVE": 7
+      }
     },
     {
       "_id": "FI-D0003",
@@ -276,7 +304,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 19,
+        "BOXING_DAY": 16,
+        "DEC23": 15,
+        "EPIPHANY": 10,
+        "EPIPHANY_EVE": 11,
+        "FATHERS_DAY": 10,
+        "INDEPENDENCE_DAY": 29,
+        "INTERDAY": 29,
+        "NEW_YEARS_DAY": 4,
+        "NYE": 31,
+        "XMAS_DAY": 26,
+        "XMAS_EVE": 25
+      }
     },
     {
       "_id": "FI-D0004",
@@ -364,7 +406,21 @@
           "status": "WAITING_ON_PUBLISHER",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 23,
+        "BOXING_DAY": 27,
+        "DEC23": 30,
+        "EPIPHANY": 8,
+        "EPIPHANY_EVE": 15,
+        "FATHERS_DAY": 8,
+        "INDEPENDENCE_DAY": 26,
+        "INTERDAY": 15,
+        "NEW_YEARS_DAY": 17,
+        "NYE": 22,
+        "XMAS_DAY": 10,
+        "XMAS_EVE": 20
+      }
     },
     {
       "_id": "FI-D0005",
@@ -452,7 +508,19 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BOXING_DAY": 4,
+        "DEC23": 3,
+        "EPIPHANY": 5,
+        "EPIPHANY_EVE": 3,
+        "INDEPENDENCE_DAY": 4,
+        "INTERDAY": 2,
+        "NEW_YEARS_DAY": 2,
+        "NYE": 2,
+        "XMAS_DAY": 9,
+        "XMAS_EVE": 4
+      }
     },
     {
       "_id": "FI-D0006",
@@ -540,7 +608,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 5,
+        "BOXING_DAY": 6,
+        "DEC23": 2,
+        "EPIPHANY": 3,
+        "EPIPHANY_EVE": 4,
+        "FATHERS_DAY": 2,
+        "INDEPENDENCE_DAY": 6,
+        "INTERDAY": 2,
+        "NEW_YEARS_DAY": 1,
+        "NYE": 6,
+        "XMAS_DAY": 3,
+        "XMAS_EVE": 3
+      }
     },
     {
       "_id": "FI-D0007",
@@ -628,7 +710,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 9,
+        "BOXING_DAY": 20,
+        "DEC23": 16,
+        "EPIPHANY": 13,
+        "EPIPHANY_EVE": 12,
+        "FATHERS_DAY": 6,
+        "INDEPENDENCE_DAY": 8,
+        "INTERDAY": 23,
+        "NEW_YEARS_DAY": 15,
+        "NYE": 22,
+        "XMAS_DAY": 24,
+        "XMAS_EVE": 12
+      }
     },
     {
       "_id": "FI-D0010",
@@ -716,7 +812,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 73,
+        "BOXING_DAY": 69,
+        "DEC23": 102,
+        "EPIPHANY": 30,
+        "EPIPHANY_EVE": 33,
+        "FATHERS_DAY": 21,
+        "INDEPENDENCE_DAY": 78,
+        "INTERDAY": 37,
+        "NEW_YEARS_DAY": 45,
+        "NYE": 71,
+        "XMAS_DAY": 61,
+        "XMAS_EVE": 76
+      }
     },
     {
       "_id": "FI-D0011",
@@ -804,7 +914,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 20,
+        "BOXING_DAY": 31,
+        "DEC23": 17,
+        "EPIPHANY": 9,
+        "EPIPHANY_EVE": 7,
+        "FATHERS_DAY": 8,
+        "INDEPENDENCE_DAY": 19,
+        "INTERDAY": 22,
+        "NEW_YEARS_DAY": 1,
+        "NYE": 14,
+        "XMAS_DAY": 27,
+        "XMAS_EVE": 20
+      }
     },
     {
       "_id": "FI-D0012",
@@ -892,7 +1016,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 3,
+        "BOXING_DAY": 2,
+        "DEC23": 1,
+        "EPIPHANY": 3,
+        "EPIPHANY_EVE": 5,
+        "FATHERS_DAY": 1,
+        "INDEPENDENCE_DAY": 2,
+        "INTERDAY": 7,
+        "NEW_YEARS_DAY": 4,
+        "NYE": 5,
+        "XMAS_DAY": 3,
+        "XMAS_EVE": 3
+      }
     },
     {
       "_id": "FI-D0013",
@@ -980,7 +1118,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 3,
+        "BOXING_DAY": 4,
+        "DEC23": 4,
+        "EPIPHANY": 6,
+        "EPIPHANY_EVE": 2,
+        "FATHERS_DAY": 2,
+        "INDEPENDENCE_DAY": 2,
+        "INTERDAY": 5,
+        "NEW_YEARS_DAY": 3,
+        "NYE": 8,
+        "XMAS_DAY": 3,
+        "XMAS_EVE": 2
+      }
     },
     {
       "_id": "FI-D0014",
@@ -1068,7 +1220,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 9,
+        "BOXING_DAY": 12,
+        "DEC23": 5,
+        "EPIPHANY": 5,
+        "EPIPHANY_EVE": 6,
+        "FATHERS_DAY": 10,
+        "INDEPENDENCE_DAY": 14,
+        "INTERDAY": 12,
+        "NEW_YEARS_DAY": 6,
+        "NYE": 9,
+        "XMAS_DAY": 11,
+        "XMAS_EVE": 9
+      }
     },
     {
       "_id": "FI-D0017",
@@ -1156,7 +1322,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 34,
+        "BOXING_DAY": 48,
+        "DEC23": 45,
+        "EPIPHANY": 11,
+        "EPIPHANY_EVE": 14,
+        "FATHERS_DAY": 30,
+        "INDEPENDENCE_DAY": 44,
+        "INTERDAY": 31,
+        "NEW_YEARS_DAY": 29,
+        "NYE": 23,
+        "XMAS_DAY": 33,
+        "XMAS_EVE": 38
+      }
     },
     {
       "_id": "FI-M000",
@@ -1244,7 +1424,21 @@
           "status": "OPTED_OUT",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 108,
+        "BOXING_DAY": 223,
+        "DEC23": 245,
+        "EPIPHANY": 52,
+        "EPIPHANY_EVE": 102,
+        "FATHERS_DAY": 65,
+        "INDEPENDENCE_DAY": 174,
+        "INTERDAY": 140,
+        "NEW_YEARS_DAY": 85,
+        "NYE": 115,
+        "XMAS_DAY": 153,
+        "XMAS_EVE": 83
+      }
     },
     {
       "_id": "FI-M001",
@@ -1332,7 +1526,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 254,
+        "BOXING_DAY": 233,
+        "DEC23": 170,
+        "EPIPHANY": 94,
+        "EPIPHANY_EVE": 71,
+        "FATHERS_DAY": 76,
+        "INDEPENDENCE_DAY": 234,
+        "INTERDAY": 71,
+        "NEW_YEARS_DAY": 75,
+        "NYE": 215,
+        "XMAS_DAY": 131,
+        "XMAS_EVE": 487
+      }
     },
     {
       "_id": "FI-M002",
@@ -1420,7 +1628,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 89,
+        "BOXING_DAY": 103,
+        "DEC23": 128,
+        "EPIPHANY": 69,
+        "EPIPHANY_EVE": 46,
+        "FATHERS_DAY": 26,
+        "INDEPENDENCE_DAY": 180,
+        "INTERDAY": 124,
+        "NEW_YEARS_DAY": 68,
+        "NYE": 239,
+        "XMAS_DAY": 85,
+        "XMAS_EVE": 177
+      }
     },
     {
       "_id": "FI-M003",
@@ -1508,7 +1730,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 94,
+        "BOXING_DAY": 184,
+        "DEC23": 212,
+        "EPIPHANY": 54,
+        "EPIPHANY_EVE": 42,
+        "FATHERS_DAY": 57,
+        "INDEPENDENCE_DAY": 105,
+        "INTERDAY": 83,
+        "NEW_YEARS_DAY": 72,
+        "NYE": 154,
+        "XMAS_DAY": 117,
+        "XMAS_EVE": 187
+      }
     },
     {
       "_id": "FI-M004",
@@ -1596,7 +1832,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 98,
+        "BOXING_DAY": 137,
+        "DEC23": 143,
+        "EPIPHANY": 83,
+        "EPIPHANY_EVE": 56,
+        "FATHERS_DAY": 121,
+        "INDEPENDENCE_DAY": 161,
+        "INTERDAY": 152,
+        "NEW_YEARS_DAY": 114,
+        "NYE": 168,
+        "XMAS_DAY": 94,
+        "XMAS_EVE": 178
+      }
     },
     {
       "_id": "FI-M005",
@@ -1684,7 +1934,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 107,
+        "BOXING_DAY": 215,
+        "DEC23": 274,
+        "EPIPHANY": 54,
+        "EPIPHANY_EVE": 53,
+        "FATHERS_DAY": 39,
+        "INDEPENDENCE_DAY": 82,
+        "INTERDAY": 139,
+        "NEW_YEARS_DAY": 63,
+        "NYE": 100,
+        "XMAS_DAY": 119,
+        "XMAS_EVE": 124
+      }
     },
     {
       "_id": "FI-M006",
@@ -1772,7 +2036,21 @@
           "status": "WAITING_ON_PUBLISHER",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 78,
+        "BOXING_DAY": 109,
+        "DEC23": 89,
+        "EPIPHANY": 57,
+        "EPIPHANY_EVE": 66,
+        "FATHERS_DAY": 39,
+        "INDEPENDENCE_DAY": 75,
+        "INTERDAY": 157,
+        "NEW_YEARS_DAY": 60,
+        "NYE": 143,
+        "XMAS_DAY": 269,
+        "XMAS_EVE": 200
+      }
     },
     {
       "_id": "FI-M007",
@@ -1860,7 +2138,21 @@
           "status": "LIVE",
           "typical_update_seconds": 3600
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 84,
+        "BOXING_DAY": 180,
+        "DEC23": 100,
+        "EPIPHANY": 37,
+        "EPIPHANY_EVE": 103,
+        "FATHERS_DAY": 80,
+        "INDEPENDENCE_DAY": 120,
+        "INTERDAY": 69,
+        "NEW_YEARS_DAY": 72,
+        "NYE": 157,
+        "XMAS_DAY": 86,
+        "XMAS_EVE": 175
+      }
     },
     {
       "_id": "NO-D0009",
@@ -1948,7 +2240,18 @@
           "status": "LIVE",
           "typical_update_seconds": 86400
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 17,
+        "BOXING_DAY": 21,
+        "DEC23": 11,
+        "FATHERS_DAY": 5,
+        "INTERDAY": 12,
+        "NEW_YEARS_DAY": 5,
+        "NYE": 10,
+        "XMAS_DAY": 13,
+        "XMAS_EVE": 11
+      }
     },
     {
       "_id": "NO-D0015",
@@ -2036,7 +2339,18 @@
           "status": "LIVE",
           "typical_update_seconds": 86400
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 18,
+        "BOXING_DAY": 25,
+        "DEC23": 55,
+        "FATHERS_DAY": 4,
+        "INTERDAY": 22,
+        "NEW_YEARS_DAY": 28,
+        "NYE": 20,
+        "XMAS_DAY": 38,
+        "XMAS_EVE": 25
+      }
     },
     {
       "_id": "NO-M012",
@@ -2124,7 +2438,18 @@
           "status": "LIVE",
           "typical_update_seconds": 86400
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 46,
+        "BOXING_DAY": 221,
+        "DEC23": 101,
+        "FATHERS_DAY": 74,
+        "INTERDAY": 152,
+        "NEW_YEARS_DAY": 79,
+        "NYE": 207,
+        "XMAS_DAY": 204,
+        "XMAS_EVE": 313
+      }
     },
     {
       "_id": "NO-M013",
@@ -2212,7 +2537,18 @@
           "status": "LIVE",
           "typical_update_seconds": 86400
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 98,
+        "BOXING_DAY": 213,
+        "DEC23": 510,
+        "FATHERS_DAY": 60,
+        "INTERDAY": 302,
+        "NEW_YEARS_DAY": 47,
+        "NYE": 90,
+        "XMAS_DAY": 224,
+        "XMAS_EVE": 192
+      }
     },
     {
       "_id": "NO-M014",
@@ -2300,7 +2636,18 @@
           "status": "LIVE",
           "typical_update_seconds": 86400
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 50,
+        "BOXING_DAY": 66,
+        "DEC23": 181,
+        "FATHERS_DAY": 52,
+        "INTERDAY": 252,
+        "NEW_YEARS_DAY": 54,
+        "NYE": 126,
+        "XMAS_DAY": 209,
+        "XMAS_EVE": 219
+      }
     },
     {
       "_id": "SE-D0008",
@@ -2388,7 +2735,21 @@
           "status": "LIVE",
           "typical_update_seconds": 86400
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 44,
+        "BOXING_DAY": 57,
+        "DEC23": 73,
+        "EPIPHANY": 85,
+        "EPIPHANY_EVE": 75,
+        "FATHERS_DAY": 71,
+        "INTERDAY": 33,
+        "LUCIA": 43,
+        "NEW_YEARS_DAY": 43,
+        "NYE": 100,
+        "XMAS_DAY": 69,
+        "XMAS_EVE": 118
+      }
     },
     {
       "_id": "SE-D0016",
@@ -2476,7 +2837,21 @@
           "status": "LIVE",
           "typical_update_seconds": 86400
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 5,
+        "BOXING_DAY": 16,
+        "DEC23": 7,
+        "EPIPHANY": 10,
+        "EPIPHANY_EVE": 8,
+        "FATHERS_DAY": 9,
+        "INTERDAY": 7,
+        "LUCIA": 6,
+        "NEW_YEARS_DAY": 5,
+        "NYE": 9,
+        "XMAS_DAY": 21,
+        "XMAS_EVE": 11
+      }
     },
     {
       "_id": "SE-M008",
@@ -2564,7 +2939,21 @@
           "status": "LIVE",
           "typical_update_seconds": 86400
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 132,
+        "BOXING_DAY": 307,
+        "DEC23": 249,
+        "EPIPHANY": 104,
+        "EPIPHANY_EVE": 140,
+        "FATHERS_DAY": 52,
+        "INTERDAY": 152,
+        "LUCIA": 239,
+        "NEW_YEARS_DAY": 39,
+        "NYE": 162,
+        "XMAS_DAY": 145,
+        "XMAS_EVE": 90
+      }
     },
     {
       "_id": "SE-M009",
@@ -2652,7 +3041,21 @@
           "status": "LIVE",
           "typical_update_seconds": 86400
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 117,
+        "BOXING_DAY": 400,
+        "DEC23": 281,
+        "EPIPHANY": 87,
+        "EPIPHANY_EVE": 136,
+        "FATHERS_DAY": 87,
+        "INTERDAY": 274,
+        "LUCIA": 163,
+        "NEW_YEARS_DAY": 63,
+        "NYE": 126,
+        "XMAS_DAY": 388,
+        "XMAS_EVE": 175
+      }
     },
     {
       "_id": "SE-M010",
@@ -2740,7 +3143,21 @@
           "status": "LIVE",
           "typical_update_seconds": 86400
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 71,
+        "BOXING_DAY": 101,
+        "DEC23": 207,
+        "EPIPHANY": 93,
+        "EPIPHANY_EVE": 79,
+        "FATHERS_DAY": 42,
+        "INTERDAY": 167,
+        "LUCIA": 98,
+        "NEW_YEARS_DAY": 103,
+        "NYE": 130,
+        "XMAS_DAY": 122,
+        "XMAS_EVE": 83
+      }
     },
     {
       "_id": "SE-M011",
@@ -2828,7 +3245,21 @@
           "status": "LIVE",
           "typical_update_seconds": 86400
         }
-      ]
+      ],
+      "search_views_by_day_key": {
+        "BLACK_FRIDAY": 98,
+        "BOXING_DAY": 190,
+        "DEC23": 350,
+        "EPIPHANY": 62,
+        "EPIPHANY_EVE": 101,
+        "FATHERS_DAY": 43,
+        "INTERDAY": 236,
+        "LUCIA": 149,
+        "NEW_YEARS_DAY": 61,
+        "NYE": 217,
+        "XMAS_DAY": 185,
+        "XMAS_EVE": 172
+      }
     }
   ],
   "profiles": [

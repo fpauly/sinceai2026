@@ -25,6 +25,7 @@ export interface FonectaDemo {
     peers: number;
     reviews: number;
     publisher_suggestions: number;
+    search_views: number;
   };
   businesses: Business[];
   profiles: Profile[];

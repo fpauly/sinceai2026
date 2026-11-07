@@ -222,6 +222,12 @@ to it). What it changes for us:
   `lib/predict` reads them and flags `FI-D0011` Pizzeria Torni as `closed_for_good` from five recent
   reviews ("lopettanut", "closed down permanently", …) plus a `field: "closed"` publisher edit, so
   C11 never sends the owner a suggestion for a business that has closed.
+- **What is at stake is measured, not invented.** `analytics_daily.parquet` (18 MB, 3.1M rows, read
+  with `hyparquet` in the importer only) gives each business's `GOOGLE_SEARCH_VIEWS` per day. The
+  importer takes the views on the **same special day last season** (by `day_key`, e.g. Christmas Eve
+  2025 for Christmas Eve 2026) and stores them as `Business.search_views_by_day_key`; detection
+  copies the number into `evidence.expected_search_views`. For `FI-D0001` Christmas Eve that is 29
+  search views last year — the number lane A's message may quote, with the code as its source.
 - **What does not change:** the mock Turku businesses stay the scripted demo (`DESIGN.md` §13) until
   the V2 switch, and `DEMO_DATE` still drives detection, so the demo stays deterministic while the
   importer and the scoring adapter work off the real files.
