@@ -4,6 +4,8 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { AutomaticallyApplied, contactChannel, contactLanguage, contactName } from "@/app/owner/contact-details";
+import ChannelSyncRow from "@/components/ChannelSyncRow";
+import type { AppliedResult } from "@/types";
 import NotificationCard from "@/components/NotificationCard";
 import type { DecideResponse, OwnerViewResponse } from "@/types/api";
 
@@ -23,13 +25,12 @@ function BusinessView({ businessId }: { businessId: string }) {
   const [attempt, setAttempt] = useState(0);
   const [notice, setNotice] = useState<string | null>(null);
 
+  const [publication, setPublication] = useState<{ id: string; applied: AppliedResult | null | undefined } | null>(null);
+
   function decided(result: DecideResponse) {
-    const applied = result.suggestion.applied;
-    setNotice(result.suggestion.decision === "ignored"
-      ? "Suggestion ignored. We will remember your choice."
-      : applied?.yext
-        ? `Change saved and published via Yext to: ${applied.published_to.join(", ")}.`
-        : "Change saved locally. Yext was not reached; external publication is not confirmed.");
+    const ignored = result.suggestion.decision === "ignored";
+    setNotice(ignored ? "Suggestion ignored. We will remember your choice." : null);
+    setPublication(ignored ? null : { id: result.suggestion._id, applied: result.suggestion.applied });
     setState((current) => current.status === "ready" ? {
       status: "ready", data: { ...current.data, suggestions: current.data.suggestions.filter((item) => item._id !== result.suggestion._id) },
     } : current);
@@ -81,6 +82,7 @@ function BusinessView({ businessId }: { businessId: string }) {
       {data.business.contact?.opted_out && <p className="mb-4 rounded-xl bg-zinc-100 p-3 text-sm">Not contacted. You have opted out of suggestion messages.</p>}
       <div className="mb-4"><AutomaticallyApplied suggestions={data.automatically_applied ?? []} language={contactLanguage(data.business)} /></div>
       {notice && <p role="status" className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm leading-6 text-emerald-900">{notice}</p>}
+      {publication && <ChannelSyncRow key={publication.id} applied={publication.applied} business={data.business} />}
       {data.suggestions.length ? (
         <section aria-label="Suggestions to review" className="space-y-4">
           {data.suggestions.map((suggestion) => <NotificationCard key={suggestion._id} suggestion={suggestion} listings={data.listings} profile={data.profile} businessName={data.business.name} language={contactLanguage(data.business)} onDecidedAction={decided} />)}
