@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { collections } from "@/lib/db";
 import { demoDate } from "@/lib/config";
+import { classifyReviews } from "@/lib/ai/reviews";
 import type {
   Business,
   HolidayHistoryEntry,
@@ -14,6 +15,7 @@ import type {
 import type { DraftIssue, Rule, RuleContext } from "@/types/api";
 import { crossPlatformConflict } from "./crossPlatformConflict";
 import { missingHolidayHours } from "./missingHolidayHours";
+import { makeReviewSignal } from "./reviewSignal";
 import { specialDays } from "./specialDays";
 import { staleField } from "./staleField";
 
@@ -29,8 +31,13 @@ import { staleField } from "./staleField";
 // DESIGN 7) or already exists as an open/suggested issue, so running the check twice creates
 // nothing new (TASKS.md acceptance test).
 
-/** Every v1 rule, in the order they run. */
-export const rules: readonly Rule[] = [missingHolidayHours, crossPlatformConflict, staleField];
+/** Every v1 rule, in the order they run. review_signal reads review text with Gemini (C9). */
+export const rules: readonly Rule[] = [
+  missingHolidayHours,
+  crossPlatformConflict,
+  staleField,
+  makeReviewSignal(classifyReviews),
+];
 
 /** v2 rules: used instead of `rules` when a business has a Profile. */
 export const v2Rules: readonly Rule[] = [specialDays];
