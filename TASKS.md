@@ -24,8 +24,9 @@ Lanes C and D are deterministic code with clear specs (good for free models). La
 
 1. Accept the GitHub invite, then clone: `git clone git@github.com:fpauly/sinceai2026.git && cd sinceai2026`
 2. **`npm run setup`**: asks your lane and sets up everything (`.env.local`, database, checks). Follow what it prints.
-3. `npm run dev` and open **http://localhost:3000**: the **progress board** shows what the team has built so far.
-4. Open your AI (Claude Code, OpenCode or Codex) in this folder and type **`next`**.
+3. Unzip Fonecta's dataset to `FONECTA/FONECTA_CONNECT_SUGGESTS_2026/` in your clone (download link in the team chat; never commit it).
+4. `npm run dev` and open **http://localhost:3000**: the **progress board** shows what the team has built so far.
+5. Open your AI (Claude Code, OpenCode or Codex) in this folder and type **`next`**.
    **Codex users:** Codex's sandbox may block network access by default. If `npm install`, `git push` or `gh` fail inside Codex, allow network access when it asks, or enable it in Codex's settings.
 
 The AI builds the next stage of your lane, tests it, opens a PR and tells you what to look at (CONTRIBUTING.md §9).
@@ -120,8 +121,22 @@ Files you own: `lib/apply.ts`, `app/api/businesses/[id]`, `app/api/suggestions/[
 
 ## v2: dataset (DESIGN §0 "v2")
 
-The app moves from our invented seed to Fonecta's dataset. **The current chain keeps working on the seed until V2 switches the demo.** Do these stages before the remaining v1 stages, except A5/D5 (learning), which still apply.
-"Needs" works as above. Contracts first: nothing below starts before **V1** is merged, except A10 (it can start on local types).
+The app moves from our invented seed to Fonecta's dataset. **The current chain keeps working on the seed until V2 switches the demo.**
+
+### Queue per lane: what `next` picks (in this order)
+`next` takes the **first item of your lane's queue that is not merged** and whose **Needs** are merged; if it is blocked, it takes the next one (CONTRIBUTING.md §9). Stage details are in the table below or in the lane tables above. v1 stages that are not in a queue are paused or replaced.
+
+| Lane | Queue |
+|---|---|
+| **A** | V0 → **V1** → A10 → A11 → A5 (needs D5) → A12 |
+| **B** | **B10** (needs V1) → V2 → B4 README (use the dataset's `docs/README_TEMPLATE.md`) → B5 deploy → B9 pitch + video · extras: B7, B8 |
+| **C** | **C10** (the extract script can start before V1; the seed route needs V1) → C12 → C11 → C13 → C7 dashboard (also lists `needs_human` flags) → C5 data sources (the dataset's sources) → C8 bonus: replace `calendar_special_days.csv` with a live holiday API · extra: C9 |
+| **D** | **D5** (unchanged, start now) → D10 → D6 "where it shows" (publishers + typical update speed from B10) |
+
+Before every stage, also check your lane's open GitHub issues (`gh issue list`); fix those first if they are not blocked.
+Every clone needs the dataset unzipped at `FONECTA/FONECTA_CONNECT_SUGGESTS_2026/` (not committed) for C10 and A10.
+
+### v2 stages
 
 | Stage | Lane | Branch | What | Needs | Done when |
 |---|---|---|---|---|---|
