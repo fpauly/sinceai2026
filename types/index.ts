@@ -94,9 +94,10 @@ export type DayKey =
   | "EVENT" | "SCHOOL_BREAK";
 export type DayType = "PUBLIC_HOLIDAY" | "EVE" | "OBSERVANCE" | "COMMERCIAL" | "BETWEEN_HOLIDAYS";
 
-/** One special day in one country (calendar_special_days.csv). */
+/** One special day in one country (calendar_special_days.csv), or one event/school-break day for a
+ *  single business (targets_2026.csv + local_events.json, C15). */
 export interface SpecialDay {
-  _id: string; // `${country}:${date}`
+  _id: string; // `${country}:${date}` for the calendar, `${business_id}:${date}:${event_id ?? day_key}` for events
   country: Country;
   date: string;
   weekday: Day;
@@ -106,6 +107,8 @@ export interface SpecialDay {
   name_local: string;
   name_en: string;
   official_public_holiday: boolean;
+  business_id?: string | null; // v2 (C15): set when the day applies to this business only
+  event_id?: string | null; // local_events.json @id, for EVENT rows
 }
 
 export type HistorySource = "OWNER_UI" | "CONNECT_SUGGESTION" | "FONECTA_SUPPORT" | "API_INTEGRATION";

@@ -39,6 +39,14 @@ const OUT = join(ROOT, "data/fonecta/demo.json");
 // entity SinceAI03 is set up as Kahvila Aurora). B10 owns the sandbox side.
 const YEXT_ENTITY_IDS = { "FI-D0001": "SinceAI03" };
 
+// The dataset's snapshot and scored window (DESIGN 0 "v2").
+const SNAPSHOT = "2026-11-06"; // the dataset's "today"
+const WINDOW_END = "2027-01-06"; // special days from 7 Nov 2026 to 6 Jan 2027
+const PREVIOUS_SEASON = ["2025-11-07", "2026-01-06"];
+
+/** The name of a school break in the owner's language (the calendar has no rows for these). */
+const SCHOOL_BREAK_NAME = { fi: "Koulujen loma", sv: "Skolov", nb: "Skoleferie", en: "School break" };
+
 function fail(message) {
   console.error(`import-fonecta: ${message}`);
   process.exit(1);
@@ -53,8 +61,8 @@ function readJson(name) {
 }
 
 /** CSV → array of objects. The dataset's files have no quoted commas; assert the width anyway. */
-function readCsv(name, expectedColumns) {
-  const text = readFileSync(join(DATA, name), "utf8").trim();
+function readCsv(name, expectedColumns, base = DATA) {
+  const text = readFileSync(join(base, name), "utf8").trim();
   const lines = text.split(/\r?\n/);
   const header = lines[0].split(",").map((s) => s.trim());
   if (header.length !== expectedColumns) fail(`${name}: expected ${expectedColumns} columns, got ${header.length}`);
@@ -267,7 +275,7 @@ const history = readJsonl("holiday_hours_history.jsonl")
 
 const WEEKDAY = { Monday: "mon", Tuesday: "tue", Wednesday: "wed", Thursday: "thu", Friday: "fri", Saturday: "sat", Sunday: "sun" };
 
-const specialDays = readCsv("calendar_special_days.csv", 9).map((row) => {
+const calendarDays = readCsv("calendar_special_days.csv", 9).map((row) => {
   const weekday = WEEKDAY[row.weekday];
   if (!weekday) fail(`calendar_special_days.csv: unknown weekday "${row.weekday}"`);
   if (weekdayOf(row.date) !== weekday) fail(`calendar_special_days.csv: ${row.date} is not a ${row.weekday}`);
@@ -285,11 +293,47 @@ const specialDays = readCsv("calendar_special_days.csv", 9).map((row) => {
   };
 });
 
+// Event nights and school breaks (C15): the scorers' targets say which business has one on which
+// date, and local_events.json gives the event its name. These rows apply to that business only.
+const businessesById = new Map(businesses.map((business) => [business._id, business]));
+const localEvents = new Map(readJson("local_events.json").data.map((event) => [event["@id"], event]));
+const eventDays = readCsv("targets_2026.csv", 7, join(DATASET, "evaluation"))
+  .filter(
+    (row) =>
+      storylineIds.has(row.entity_id) &&
+      (row.day_key === "EVENT" || row.day_key === "SCHOOL_BREAK") &&
+      row.date > SNAPSHOT &&
+      row.date <= WINDOW_END,
+  )
+  .map((row) => {
+    const business = businessesById.get(row.entity_id);
+    if (!business) fail(`targets_2026.csv: no business ${row.entity_id}`);
+    const event = row.event_id ? localEvents.get(row.event_id) : undefined;
+    if (row.day_key === "EVENT" && !event) fail(`targets_2026.csv: no local event ${row.event_id}`);
+    const nameLocal =
+      row.day_key === "SCHOOL_BREAK"
+        ? (SCHOOL_BREAK_NAME[business.language] ?? SCHOOL_BREAK_NAME.en)
+        : (event.name[business.language] ?? event.name.en);
+    return {
+      _id: `${row.entity_id}:${row.date}:${row.event_id || row.day_key}`,
+      country: row.country,
+      date: row.date,
+      weekday: weekdayOf(row.date),
+      day_key: row.day_key,
+      day_type: row.day_type,
+      day_class: row.day_type,
+      name_local: nameLocal,
+      name_en: row.day_key === "SCHOOL_BREAK" ? SCHOOL_BREAK_NAME.en : event.name.en,
+      official_public_holiday: false,
+      business_id: row.entity_id,
+      event_id: row.event_id || null,
+    };
+  });
+
+const specialDays = [...calendarDays, ...eventDays].sort((a, b) => a._id.localeCompare(b._id));
+
 // ---------- source: analytics (what is at stake on each special day, C14) ----------
 
-const SNAPSHOT = "2026-11-06"; // the dataset's "today"
-const WINDOW_END = "2027-01-06"; // DESIGN 0 "v2": special days from 7 Nov 2026 to 6 Jan 2027
-const PREVIOUS_SEASON = ["2025-11-07", "2026-01-06"];
 
 /** The date on which the same special day (country + day key) fell in the previous season. */
 function previousSeasonDate(country, dayKey) {
@@ -314,6 +358,7 @@ function previousSeasonDate(country, dayKey) {
 async function searchViewsByBusiness() {
   const map = new Map(); // "entity|date" -> { entity, date, day_key }
   for (const day of specialDays) {
+    if (day.business_id) continue; // event/school-break rows are business-specific and have no last-season counterpart
     if (!(day.date > SNAPSHOT && day.date <= WINDOW_END)) continue;
     for (const entity of wanted) {
       if (entity.meta.countryCode !== day.country) continue;
@@ -405,6 +450,12 @@ for (const business of businesses) {
 for (const row of history) if (!isValidHours(row.hours)) problems.push(`history ${row._id}: invalid hours "${row.hours}"`);
 if (new Set(history.map((row) => row._id)).size !== history.length) problems.push("history: duplicate _id");
 if (new Set(specialDays.map((day) => day._id)).size !== specialDays.length) problems.push("special_days: duplicate _id");
+for (const day of eventDays) {
+  if (!(day.business_id && day.date > SNAPSHOT && day.date <= WINDOW_END)) problems.push(`event day ${day._id}: outside the window`);
+  if (!day.business_id || !businessesById.has(day.business_id)) problems.push(`event day ${day._id}: unknown business`);
+  if (weekdayOf(day.date) !== day.weekday) problems.push(`event day ${day._id}: wrong weekday`);
+}
+if (eventDays.length === 0) problems.push("event days: none imported");
 if (new Set(peers.map((row) => row._id)).size !== peers.length) problems.push("peers: duplicate _id");
 for (const review of reviews) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(review.date)) problems.push(`review ${review._id}: bad date "${review.date}"`);
@@ -432,6 +483,7 @@ const counts = {
   profiles: profiles.length,
   holiday_history: history.length,
   special_days: specialDays.length,
+  event_days: eventDays.length,
   peers: peers.length,
   reviews: reviews.length,
   publisher_suggestions: publisherSuggestions.length,
