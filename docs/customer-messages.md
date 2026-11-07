@@ -5,7 +5,7 @@ The messages Fonecta Connect sends to business owners, **exported from real sugg
 
 - Demo date ("today"): **6 Nov 2026**, the dataset's snapshot
 - Exported: 2026-11-07, 52 messages for 13 businesses, in English, Finnish, Swedish, Norwegian
-- Written by: 19 × Gemini, 33 × template
+- Written by: 18 × Gemini, 34 × template
 - Validated by code (`lib/validate.ts`): 52 of 52 passed
 - Applied without asking (standing permission), then the owner is informed: 11
 - Flagged for a person, no message: Pizzeria Torni
@@ -76,57 +76,57 @@ Aleksi · cafe · Helsinki · channel: **SMS** · language: Finnish · contact w
 
 ### Christmas Eve, Thu 24 Dec 2026
 
-- Google shows: 07:30–18:00 (regular hours) · about 29 searches expected that day
+- Google shows: 07:30–18:00 (regular hours) · seen 29 times on Google on the same day last year
 - Proposal: **07:30–13:00**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: Gemini · Validation: passed
 
-> Hi Aleksi, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 07:30–18:00. Last year you were open 07:30–13:00, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec open 07:30–13:00.
+> Hi Aleksi, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 07:30–18:00 (on the same day last year, your listing was seen 29 times on Google). Last year you were open 07:30–13:00, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec open 07:30–13:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Aleksi, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 7.30–18. Viime vuonna olitte auki klo 7.30–13, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: jouluaatto 24.12 auki klo 7.30–13.
+> Hei Aleksi, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 7.30–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 29 kertaa). Viime vuonna olitte auki klo 7.30–13, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: jouluaatto 24.12 auki klo 7.30–13.
 
 </details>
 
 ### Christmas Day, Fri 25 Dec 2026
 
-- Google shows: 07:30–18:00 (regular hours) · about 14 searches expected that day
+- Google shows: 07:30–18:00 (regular hours) · seen 14 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: Gemini · Validation: passed
 
-> Hi Aleksi, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 07:30–18:00. Last year you were closed that day. We suggest: Christmas Day 25 Dec closed.
+> Hi Aleksi, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 07:30–18:00 (on the same day last year, your listing was seen 14 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: Christmas Day 25 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Aleksi, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne, auki 7.30–18. Viime vuonna olitte kyseisenä päivänä kiinni. Ehdotamme: joulupäivä 25.12 kiinni.
+> Hei Aleksi, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 7.30–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 14 kertaa). Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: joulupäivä 25.12 kiinni.
 
 </details>
 
 ### New Year's Day, Fri 1 Jan 2027
 
-- Google shows: 07:30–18:00 (regular hours) · about 11 searches expected that day
+- Google shows: 07:30–18:00 (regular hours) · seen 11 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: Gemini · Validation: passed
 
-> Hi Aleksi, New Year's Day is on Friday 1 Jan and Google now shows open 07:30–18:00. Last year you were closed that day. We suggest: New Year's Day 1 Jan closed.
+> Hi Aleksi, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 07:30–18:00 (on the same day last year, your listing was seen 11 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: New Year's Day 1 Jan closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Aleksi, uudenvuodenpäivä on perjantaina 1.1 ja Google näyttää nyt aukioloajat klo 7.30–18. Viime vuonna olitte tuolloin kiinni. Ehdotamme: uudenvuodenpäivä 1.1 kiinni.
+> Hei Aleksi, uudenvuodenpäivä on perjantaina 1.1 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 7.30–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 11 kertaa). Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: uudenvuodenpäivä 1.1 kiinni.
 
 </details>
 
 ### Epiphany, Wed 6 Jan 2027
 
-- Google shows: 07:30–18:00 (regular hours) · about 25 searches expected that day
+- Google shows: 07:30–18:00 (regular hours) · seen 25 times on Google on the same day last year
 - Proposal: **10:00–16:00**, from the owner's own hours for this day in an earlier season, confidence **medium**
 - Written by: Gemini · Validation: passed
 
-> Hi Aleksi, Epiphany is on Wednesday 6 Jan and Google now shows your regular hours 07:30–18:00. Last year you were open 10:00–16:00. We suggest: Epiphany 6 Jan open 10:00–16:00.
+> Hi Aleksi, Epiphany is on Wednesday 6 Jan and Google now shows your regular hours, open 07:30–18:00 (on the same day last year, your listing was seen 25 times on Google). In 2025 you were open 10:00–16:00, but no special hours are set for this year. We suggest: Epiphany 6 Jan open 10:00–16:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Aleksi, loppiainen on keskiviikkona 6.1 ja Google näyttää nyt normaalit aukioloaikanne 7.30–18. Viime vuonna olitte auki klo 10–16. Ehdotamme: loppiainen 6.1 auki klo 10–16.
+> Hei Aleksi, loppiainen on keskiviikkona 6.1 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 7.30–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 25 kertaa). Vuonna 2025 olitte auki klo 10–16, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: loppiainen 6.1 auki klo 10–16.
 
 </details>
 
@@ -136,85 +136,85 @@ Janne · restaurant · Tampere · channel: **EMAIL** · language: Finnish · con
 
 ### Christmas Eve, Thu 24 Dec 2026
 
-- Google shows: 16:00–22:00 (regular hours) · about 7 searches expected that day
+- Google shows: 16:00–22:00 (regular hours) · seen 7 times on Google on the same day last year
 - Proposal: **11:00–15:00**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: Gemini · Validation: passed
 
-> Hi Janne, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours 16:00–22:00. Last year you were open 11:00–15:00. We suggest: Christmas Eve 24 Dec open 11:00–15:00.
+> Hi Janne, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 16:00–22:00 (on the same day last year, your listing was seen 7 times on Google). Last year you were open 11:00–15:00, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec open 11:00–15:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Janne, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne 16–22. Viime vuonna olitte auki klo 11–15. Ehdotamme: jouluaatto 24.12 auki klo 11–15.
+> Hei Janne, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 16–22 (viime vuonna samana päivänä tietonne nähtiin Googlessa 7 kertaa). Viime vuonna olitte auki klo 11–15, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: jouluaatto 24.12 auki klo 11–15.
 
 </details>
 
 ### Christmas Day, Fri 25 Dec 2026
 
-- Google shows: 16:00–23:00 (regular hours) · about 16 searches expected that day
+- Google shows: 16:00–23:00 (regular hours) · seen 16 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: Gemini · Validation: passed
 
-> Hi Janne, Christmas Day is on Friday 25 Dec and Google now shows your regular hours 16:00-23:00. Last year you were closed on that day. We suggest: Christmas Day 25 Dec closed.
+> Hi Janne, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 16:00-23:00 (on the same day last year, your listing was seen 16 times on Google). Last year you were closed on this day. We suggest: Christmas Day 25 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Janne, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne 16-23. Viime vuonna olitte kiinni kyseisenä päivänä. Ehdotamme: joulupäivä 25.12 kiinni.
+> Hei Janne, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne, auki klo 16-23 (viime vuonna samana päivänä tietonne nähtiin Googlessa 16 kertaa). Viime vuonna olitte kiinni tänä päivänä. Ehdotamme: joulupäivä 25.12 kiinni.
 
 </details>
 
 ### Boxing Day, Sat 26 Dec 2026
 
-- Google shows: 16:00–23:00 (regular hours) · about 9 searches expected that day
+- Google shows: 16:00–23:00 (regular hours) · seen 9 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **medium**
 - Written by: Gemini · Validation: passed
 
-> Hi Janne, Boxing Day is on Saturday 26 Dec and Google now shows open 16:00–23:00. In 2024 you were closed on that day. We suggest: Boxing Day 26 Dec closed.
+> Hi Janne, Boxing Day is on Saturday 26 Dec and Google now shows your regular hours, open 16:00–23:00 (on the same day last year, your listing was seen 9 times on Google). In 2024 you were closed, but no special hours are set for this year. We suggest: Boxing Day 26 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Janne, tapaninpäivä on lauantaina 26.12 ja Google näyttää nyt aukioloaikoja 16–23. Vuonna 2024 olitte kiinni kyseisenä päivänä. Ehdotamme: tapaninpäivä 26.12 kiinni.
+> Hei Janne, tapaninpäivä on lauantaina 26.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 16–23 (viime vuonna samana päivänä tietonne nähtiin Googlessa 9 kertaa). Vuonna 2024 olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: tapaninpäivä 26.12 kiinni.
 
 </details>
 
 ### New Year's Eve, Thu 31 Dec 2026
 
-- Google shows: 16:00–22:00 (regular hours) · about 5 searches expected that day
+- Google shows: 16:00–22:00 (regular hours) · seen 5 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **medium**
 - Written by: Gemini · Validation: passed
 
-> Hi Janne, New Year's Eve is on Thursday 31 Dec and Google now shows 16:00–22:00. Last year you were closed on that day. We suggest: New Year's Eve 31 Dec closed.
+> Hi Janne, New Year's Eve is on Thursday 31 Dec and Google now shows your regular hours, open 16:00-22:00 (on the same day last year, your listing was seen 5 times on Google). Last year you were closed on this day. We suggest: New Year's Eve 31 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Janne, uudenvuodenaatto on torstaina 31.12 ja Google näyttää nyt 16–22. Viime vuonna olitte kiinni sinä päivänä. Ehdotamme: uudenvuodenaatto 31.12 kiinni.
+> Hei Janne, uudenvuodenaatto on torstaina 31.12 ja Google näyttää nyt tavalliset aukioloaikanne, auki 16-22 (viime vuonna samana päivänä tietonne nähtiin Googlessa 5 kertaa). Viime vuonna olitte kiinni tänä päivänä. Ehdotamme: uudenvuodenaatto 31.12 kiinni.
 
 </details>
 
 ### New Year's Day, Fri 1 Jan 2027
 
-- Google shows: 16:00–23:00 (regular hours) · about 2 searches expected that day
+- Google shows: 16:00–23:00 (regular hours) · seen 2 times on Google on the same day last year
 - Proposal: **closed**, from similar businesses (no history of its own), confidence **low**
 - Written by: Gemini · Validation: passed
 
-> Hi Janne, New Year's Day is on Friday 1 Jan and Google now shows open 16:00–23:00. Most similar businesses nearby are closed that day, so is that right for you too? We suggest: New Year's Day 1 Jan closed.
+> Hi Janne, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 16:00-23:00. Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: New Year's Day 1 Jan closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Janne, uudenvuodenpäivä on perjantaina 1.1 ja Google näyttää nyt aukioloaikoja 16–23. Useimmat vastaavat yritykset alueellanne ovat silloin kiinni, joten pitääkö tämä paikkansa teilläkin? Ehdotamme: uudenvuodenpäivä 1.1 kiinni.
+> Hei Janne, uudenvuodenpäivä on perjantaina 1.1 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 16-23. Useimmat vastaavat yritykset alueellanne ovat silloin kiinni, eikä teille ole merkitty poikkeusaikoja, joten pitääkö tämä paikkansa teilläkin? Ehdotamme: uudenvuodenpäivä 1.1 kiinni.
 
 </details>
 
 ### Epiphany, Wed 6 Jan 2027
 
-- Google shows: 16:00–22:00 (regular hours) · about 3 searches expected that day
+- Google shows: 16:00–22:00 (regular hours) · seen 3 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: Gemini · Validation: passed
 
-> Hi Janne, Epiphany is on Wednesday 6 Jan and Google now shows your regular hours, open 16:00-22:00. Last year you were closed on this day. We suggest: Epiphany 6 Jan closed.
+> Hi Janne, Epiphany is on Wednesday 6 Jan and Google now shows your regular hours, open 16:00–22:00. Last year you were closed, but no special hours are set for this year. We suggest: Epiphany 6 Jan closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Janne, loppiainen on keskiviikkona 6.1 ja Google näyttää nyt tavalliset aukioloaikanne auki klo 16-22. Viime vuonna olitte kiinni tänä päivänä. Ehdotamme: loppiainen 6.1 kiinni.
+> Hei Janne, loppiainen on keskiviikkona 6.1 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 16–22. Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: loppiainen 6.1 kiinni.
 
 </details>
 
@@ -224,85 +224,85 @@ Anna · florist · Turku · channel: **WHATSAPP** · language: Finnish · **stan
 
 ### Independence Day, Sun 6 Dec 2026
 
-- Google shows: closed (regular hours) · about 29 searches expected that day
+- Google shows: closed (regular hours) · seen 29 times on Google on the same day last year
 - Proposal: **10:00–14:00**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: Gemini · Validation: passed · **applied by standing permission**
 
-> Hi Anna, Independence Day is on Sunday 6 Dec and Google now shows you are closed. Last year you were open 10:00–14:00. We suggest: Independence Day 6 Dec open 10:00–14:00.
+> Hi Anna, Independence Day is on Sunday 6 Dec and Google now shows closed (last year on the same day, your listing was seen 29 times on Google). Last year you were open 10:00–14:00. We suggest: Independence Day 6 Dec open 10:00–14:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Anna, itsenäisyyspäivä on sunnuntaina 6.12 ja Google näyttää teidän olevan kiinni. Viime vuonna olitte auki 10–14. Ehdotamme: itsenäisyyspäivä 6.12 auki 10–14.
+> Hei Anna, itsenäisyyspäivä on sunnuntaina 6.12 ja Google näyttää nyt tiedon kiinni (viime vuonna samana päivänä tietonne nähtiin Googlessa 29 kertaa). Viime vuonna olitte auki 10–14. Ehdotamme: itsenäisyyspäivä 6.12 auki 10–14.
 
 </details>
 
 ### Day before Christmas Eve, Wed 23 Dec 2026
 
-- Google shows: 09:00–18:00 (regular hours) · about 15 searches expected that day
+- Google shows: 09:00–18:00 (regular hours) · seen 15 times on Google on the same day last year
 - Proposal: **09:00–20:00**, from the owner's own hours for this day in an earlier season, confidence **medium**
 - Written by: Gemini · Validation: passed · **applied by standing permission**
 
-> Hi Anna, the day before Christmas Eve is on Wednesday 23 Dec and Google now shows your regular hours, open 09:00–18:00. In 2024 you were open 09:00–20:00, but no special hours are set for this year. We suggest: the day before Christmas Eve 23 Dec open 09:00–20:00.
+> Hi Anna, the day before Christmas Eve is on Wednesday 23 Dec and Google now shows your regular hours, open 09:00–18:00 (on the same day last year, your listing was seen 15 times on Google). In 2024 you were open 09:00–20:00, but no special hours are set for this year. We suggest: the day before Christmas Eve 23 Dec open 09:00–20:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Anna, aatonaatto on keskiviikkona 23.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 9–18. Vuonna 2024 olitte auki klo 9–20, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: aatonaatto 23.12 auki klo 9–20.
+> Hei Anna, aatonaatto on keskiviikkona 23.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 9–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 15 kertaa). Vuonna 2024 olitte auki klo 9–20, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: aatonaatto 23.12 auki klo 9–20.
 
 </details>
 
 ### Christmas Eve, Thu 24 Dec 2026
 
-- Google shows: 09:00–18:00 (regular hours) · about 25 searches expected that day
+- Google shows: 09:00–18:00 (regular hours) · seen 25 times on Google on the same day last year
 - Proposal: **09:00–13:00**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: Gemini · Validation: passed · **applied by standing permission**
 
-> Hi Anna, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 09:00–18:00. Last year you were open 09:00–13:00, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec open 09:00–13:00.
+> Hi Anna, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 09:00–18:00 (on the same day last year, your listing was seen 25 times on Google). Last year you were open 09:00–13:00, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec open 09:00–13:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Anna, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 9–18. Viime vuonna olitte auki klo 9–13, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: jouluaatto 24.12 auki klo 9–13.
+> Hei Anna, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 9–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 25 kertaa). Viime vuonna olitte auki klo 9–13, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: jouluaatto 24.12 auki klo 9–13.
 
 </details>
 
 ### Christmas Day, Fri 25 Dec 2026
 
-- Google shows: 09:00–18:00 (regular hours) · about 26 searches expected that day
+- Google shows: 09:00–18:00 (regular hours) · seen 26 times on Google on the same day last year
 - Proposal: **10:00–14:00**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: Gemini · Validation: passed · **applied by standing permission**
 
-> Hi Anna, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 09:00–18:00. Last year you were open 10:00–14:00. We suggest: Christmas Day 25 Dec open 10:00–14:00.
+> Hi Anna, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 09:00–18:00 (on the same day last year, your listing was seen 26 times on Google). Last year you were open 10:00–14:00, but no special hours are set for this year. We suggest: Christmas Day 25 Dec open 10:00–14:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Anna, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 9–18. Viime vuonna olitte auki klo 10–14. Ehdotamme: joulupäivä 25.12 auki klo 10–14.
+> Hei Anna, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 9–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 26 kertaa). Viime vuonna olitte auki klo 10–14, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: joulupäivä 25.12 auki klo 10–14.
 
 </details>
 
 ### New Year's Eve, Thu 31 Dec 2026
 
-- Google shows: 09:00–18:00 (regular hours) · about 31 searches expected that day
+- Google shows: 09:00–18:00 (regular hours) · seen 31 times on Google on the same day last year
 - Proposal: **09:00–15:00**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: Gemini · Validation: passed · **applied by standing permission**
 
-> Hi Anna, New Year's Eve is on Thursday 31 Dec and Google now shows your regular hours, open 09:00-18:00. Last year you were open 09:00-15:00. We suggest: New Year's Eve 31 Dec open 09:00-15:00.
+> Hi Anna, New Year's Eve is on Thursday 31 Dec and Google now shows your regular hours, open 09:00–18:00 (on the same day last year, your listing was seen 31 times on Google). Last year you were open 09:00–15:00, but no special hours are set for this year. We suggest: New Year's Eve 31 Dec open 09:00–15:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Anna, uudenvuodenaatto on torstaina 31.12 ja Google näyttää nyt tavalliset aukioloaikanne, auki klo 9-18. Viime vuonna olitte auki klo 9-15. Ehdotamme: uudenvuodenaatto 31.12 auki klo 9-15.
+> Hei Anna, uudenvuodenaatto on torstaina 31.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 9–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 31 kertaa). Viime vuonna olitte auki klo 9–15, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: uudenvuodenaatto 31.12 auki klo 9–15.
 
 </details>
 
 ### New Year's Day, Fri 1 Jan 2027
 
-- Google shows: 09:00–18:00 (regular hours) · about 4 searches expected that day
+- Google shows: 09:00–18:00 (regular hours) · seen 4 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: Gemini · Validation: passed · **applied by standing permission**
 
-> Hi Anna, New Year's Day is on Friday 1 Jan and Google currently shows you are open 09:00-18:00. Last year you were closed on this day.
+> Hi Anna, New Year's Day is on Friday 1 Jan and Google currently shows your regular hours open 09:00–18:00. Last year you were closed that day. We suggest: New Year's Day 1 Jan closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Anna, uudenvuodenpäivä on perjantaina 1.1 ja Google näyttää nyt aukioloaikojenne olevan 9-18. Viime vuonna olitte kiinni tähän aikaan.
+> Hei Anna, uudenvuodenpäivä on perjantaina 1.1 ja Google näyttää nyt tavalliset aukioloaikanne auki klo 9–18. Viime vuonna olitte kyseisenä päivänä kiinni. Ehdotamme: uudenvuodenpäivä 1.1 kiinni.
 
 </details>
 
@@ -312,99 +312,99 @@ Matti · clothing_store · Helsinki · channel: **EMAIL** · language: Finnish �
 
 ### Day before Christmas Eve, Wed 23 Dec 2026
 
-- Google shows: 10:00–20:00 (regular hours) · about 30 searches expected that day
+- Google shows: 10:00–20:00 (regular hours) · seen 30 times on Google on the same day last year
 - Proposal: **10:00–21:00**, from the shopping centre's hours (the store keeps the centre's hours on that weekday), confidence **high**
-- Written by: template · Validation: passed
+- Written by: Gemini · Validation: passed
 
-> Hi Matti, the day before Christmas Eve is on Wednesday 23 Dec and Google now shows your regular hours, open 10:00–20:00. Kauppakeskus Revontuli is open 10:00–21:00 that day, but no special hours are set for you. We suggest: the day before Christmas Eve 23 Dec open 10:00–21:00.
+> Hi Matti, the day before Christmas Eve is on Wednesday 23 Dec and Google now shows your regular hours, open 10:00–20:00 (on the same day last year, your listing was seen 30 times on Google). Kauppakeskus Revontuli is open 10:00–21:00 that day, but no special hours are set for you. We suggest: the day before Christmas Eve 23 Dec open 10:00–21:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Matti, aatonaatto on keskiviikkona 23.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–20. Kauppakeskus Revontuli on silloin auki klo 10–21, mutta teille ei ole merkitty poikkeusaikoja. Ehdotamme: aatonaatto 23.12 auki klo 10–21.
+> Hei Matti, aatonaatto on keskiviikkona 23.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–20 (viime vuonna samana päivänä tietonne nähtiin Googlessa 30 kertaa). Kauppakeskus Revontuli on silloin auki klo 10–21, mutta teille ei ole merkitty poikkeusaikoja. Ehdotamme: aatonaatto 23.12 auki klo 10–21.
 
 </details>
 
 ### Christmas Eve, Thu 24 Dec 2026
 
-- Google shows: 10:00–20:00 (regular hours) · about 20 searches expected that day
+- Google shows: 10:00–20:00 (regular hours) · seen 20 times on Google on the same day last year
 - Proposal: **10:00–13:00**, from the shopping centre's hours (the store keeps the centre's hours on that weekday), confidence **high**
-- Written by: Gemini · Validation: passed
+- Written by: template · Validation: passed
 
-> Hi Matti, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 10:00–20:00. Kauppakeskus Revontuli is open 10:00–13:00 that day, but no special hours are set for you. We suggest: Christmas Eve 24 Dec open 10:00–13:00.
+> Hi Matti, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 10:00–20:00 (on the same day last year, your listing was seen 20 times on Google). Kauppakeskus Revontuli is open 10:00–13:00 that day, but no special hours are set for you. We suggest: Christmas Eve 24 Dec open 10:00–13:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Matti, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–20. Kauppakeskus Revontuli on silloin auki klo 10–13, mutta teille ei ole merkitty poikkeusaikoja. Ehdotamme: jouluaatto 24.12 auki klo 10–13.
+> Hei Matti, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–20 (viime vuonna samana päivänä tietonne nähtiin Googlessa 20 kertaa). Kauppakeskus Revontuli on silloin auki klo 10–13, mutta teille ei ole merkitty poikkeusaikoja. Ehdotamme: jouluaatto 24.12 auki klo 10–13.
 
 </details>
 
 ### Christmas Day, Fri 25 Dec 2026
 
-- Google shows: 10:00–20:00 (regular hours) · about 10 searches expected that day
+- Google shows: 10:00–20:00 (regular hours) · seen 10 times on Google on the same day last year
 - Proposal: **closed**, from the shopping centre's hours (the store keeps the centre's hours on that weekday), confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Matti, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 10:00–20:00. Kauppakeskus Revontuli is closed that day, but no special hours are set for you. We suggest: Christmas Day 25 Dec closed.
+> Hi Matti, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 10:00–20:00 (on the same day last year, your listing was seen 10 times on Google). Kauppakeskus Revontuli is closed that day, but no special hours are set for you. We suggest: Christmas Day 25 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Matti, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–20. Kauppakeskus Revontuli on silloin kiinni, mutta teille ei ole merkitty poikkeusaikoja. Ehdotamme: joulupäivä 25.12 kiinni.
+> Hei Matti, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–20 (viime vuonna samana päivänä tietonne nähtiin Googlessa 10 kertaa). Kauppakeskus Revontuli on silloin kiinni, mutta teille ei ole merkitty poikkeusaikoja. Ehdotamme: joulupäivä 25.12 kiinni.
 
 </details>
 
 ### Boxing Day, Sat 26 Dec 2026
 
-- Google shows: 10:00–18:00 (regular hours) · about 27 searches expected that day
+- Google shows: 10:00–18:00 (regular hours) · seen 27 times on Google on the same day last year
 - Proposal: **11:00–17:00**, from the shopping centre's hours (the store keeps the centre's hours on that weekday), confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Matti, Boxing Day is on Saturday 26 Dec and Google now shows your regular hours, open 10:00–18:00. Kauppakeskus Revontuli is open 11:00–17:00 that day, but no special hours are set for you. We suggest: Boxing Day 26 Dec open 11:00–17:00.
+> Hi Matti, Boxing Day is on Saturday 26 Dec and Google now shows your regular hours, open 10:00–18:00 (on the same day last year, your listing was seen 27 times on Google). Kauppakeskus Revontuli is open 11:00–17:00 that day, but no special hours are set for you. We suggest: Boxing Day 26 Dec open 11:00–17:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Matti, tapaninpäivä on lauantaina 26.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18. Kauppakeskus Revontuli on silloin auki klo 11–17, mutta teille ei ole merkitty poikkeusaikoja. Ehdotamme: tapaninpäivä 26.12 auki klo 11–17.
+> Hei Matti, tapaninpäivä on lauantaina 26.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 27 kertaa). Kauppakeskus Revontuli on silloin auki klo 11–17, mutta teille ei ole merkitty poikkeusaikoja. Ehdotamme: tapaninpäivä 26.12 auki klo 11–17.
 
 </details>
 
 ### New Year's Eve, Thu 31 Dec 2026
 
-- Google shows: 10:00–20:00 (regular hours) · about 22 searches expected that day
+- Google shows: 10:00–20:00 (regular hours) · seen 22 times on Google on the same day last year
 - Proposal: **10:00–18:00**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Matti, New Year's Eve is on Thursday 31 Dec and Google now shows your regular hours, open 10:00–20:00. Last year you were open 10:00–18:00, but no special hours are set for this year. We suggest: New Year's Eve 31 Dec open 10:00–18:00.
+> Hi Matti, New Year's Eve is on Thursday 31 Dec and Google now shows your regular hours, open 10:00–20:00 (on the same day last year, your listing was seen 22 times on Google). Last year you were open 10:00–18:00, but no special hours are set for this year. We suggest: New Year's Eve 31 Dec open 10:00–18:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Matti, uudenvuodenaatto on torstaina 31.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–20. Viime vuonna olitte auki klo 10–18, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: uudenvuodenaatto 31.12 auki klo 10–18.
+> Hei Matti, uudenvuodenaatto on torstaina 31.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–20 (viime vuonna samana päivänä tietonne nähtiin Googlessa 22 kertaa). Viime vuonna olitte auki klo 10–18, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: uudenvuodenaatto 31.12 auki klo 10–18.
 
 </details>
 
 ### New Year's Day, Fri 1 Jan 2027
 
-- Google shows: 10:00–20:00 (regular hours) · about 17 searches expected that day
+- Google shows: 10:00–20:00 (regular hours) · seen 17 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Matti, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 10:00–20:00. Last year you were closed, but no special hours are set for this year. We suggest: New Year's Day 1 Jan closed.
+> Hi Matti, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 10:00–20:00 (on the same day last year, your listing was seen 17 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: New Year's Day 1 Jan closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Matti, uudenvuodenpäivä on perjantaina 1.1 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–20. Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: uudenvuodenpäivä 1.1 kiinni.
+> Hei Matti, uudenvuodenpäivä on perjantaina 1.1 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–20 (viime vuonna samana päivänä tietonne nähtiin Googlessa 17 kertaa). Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: uudenvuodenpäivä 1.1 kiinni.
 
 </details>
 
 ### Epiphany, Wed 6 Jan 2027
 
-- Google shows: 10:00–20:00 (regular hours) · about 8 searches expected that day
+- Google shows: 10:00–20:00 (regular hours) · seen 8 times on Google on the same day last year
 - Proposal: **12:00–18:00**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Matti, Epiphany is on Wednesday 6 Jan and Google now shows your regular hours, open 10:00–20:00. Last year you were open 12:00–18:00, but no special hours are set for this year. We suggest: Epiphany 6 Jan open 12:00–18:00.
+> Hi Matti, Epiphany is on Wednesday 6 Jan and Google now shows your regular hours, open 10:00–20:00 (on the same day last year, your listing was seen 8 times on Google). Last year you were open 12:00–18:00, but no special hours are set for this year. We suggest: Epiphany 6 Jan open 12:00–18:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Matti, loppiainen on keskiviikkona 6.1 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–20. Viime vuonna olitte auki klo 12–18, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: loppiainen 6.1 auki klo 12–18.
+> Hei Matti, loppiainen on keskiviikkona 6.1 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–20 (viime vuonna samana päivänä tietonne nähtiin Googlessa 8 kertaa). Viime vuonna olitte auki klo 12–18, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: loppiainen 6.1 auki klo 12–18.
 
 </details>
 
@@ -432,99 +432,99 @@ Mikko · hair_salon · Oulu · channel: **SMS** · language: Finnish · contact 
 
 ### Day before Christmas Eve, Wed 23 Dec 2026
 
-- Google shows: 10:00–18:00 (regular hours) · about 16 searches expected that day
+- Google shows: 10:00–18:00 (regular hours) · seen 16 times on Google on the same day last year
 - Proposal: **10:00–20:00**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Mikko, the day before Christmas Eve is on Wednesday 23 Dec and Google now shows your regular hours, open 10:00–18:00. Last year you were open 10:00–20:00, but no special hours are set for this year. We suggest: the day before Christmas Eve 23 Dec open 10:00–20:00.
+> Hi Mikko, the day before Christmas Eve is on Wednesday 23 Dec and Google now shows your regular hours, open 10:00–18:00 (on the same day last year, your listing was seen 16 times on Google). Last year you were open 10:00–20:00, but no special hours are set for this year. We suggest: the day before Christmas Eve 23 Dec open 10:00–20:00.
 
 <details><summary>Finnish</summary>
 
-> Hei Mikko, aatonaatto on keskiviikkona 23.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18. Viime vuonna olitte auki klo 10–20, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: aatonaatto 23.12 auki klo 10–20.
+> Hei Mikko, aatonaatto on keskiviikkona 23.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 16 kertaa). Viime vuonna olitte auki klo 10–20, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: aatonaatto 23.12 auki klo 10–20.
 
 </details>
 
 ### Christmas Eve, Thu 24 Dec 2026
 
-- Google shows: 10:00–18:00 (regular hours) · about 12 searches expected that day
+- Google shows: 10:00–18:00 (regular hours) · seen 12 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Mikko, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 10:00–18:00. Last year you were closed, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec closed.
+> Hi Mikko, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 10:00–18:00 (on the same day last year, your listing was seen 12 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Mikko, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18. Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: jouluaatto 24.12 kiinni.
+> Hei Mikko, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 12 kertaa). Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: jouluaatto 24.12 kiinni.
 
 </details>
 
 ### Christmas Day, Fri 25 Dec 2026
 
-- Google shows: 10:00–18:00 (regular hours) · about 24 searches expected that day
+- Google shows: 10:00–18:00 (regular hours) · seen 24 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Mikko, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 10:00–18:00. Last year you were closed, but no special hours are set for this year. We suggest: Christmas Day 25 Dec closed.
+> Hi Mikko, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 10:00–18:00 (on the same day last year, your listing was seen 24 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: Christmas Day 25 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Mikko, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18. Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: joulupäivä 25.12 kiinni.
+> Hei Mikko, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 24 kertaa). Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: joulupäivä 25.12 kiinni.
 
 </details>
 
 ### Boxing Day, Sat 26 Dec 2026
 
-- Google shows: 09:00–14:00 (regular hours) · about 20 searches expected that day
+- Google shows: 09:00–14:00 (regular hours) · seen 20 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Mikko, Boxing Day is on Saturday 26 Dec and Google now shows your regular hours, open 09:00–14:00. Last year you were closed, but no special hours are set for this year. We suggest: Boxing Day 26 Dec closed.
+> Hi Mikko, Boxing Day is on Saturday 26 Dec and Google now shows your regular hours, open 09:00–14:00 (on the same day last year, your listing was seen 20 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: Boxing Day 26 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Mikko, tapaninpäivä on lauantaina 26.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 9–14. Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: tapaninpäivä 26.12 kiinni.
+> Hei Mikko, tapaninpäivä on lauantaina 26.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 9–14 (viime vuonna samana päivänä tietonne nähtiin Googlessa 20 kertaa). Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: tapaninpäivä 26.12 kiinni.
 
 </details>
 
 ### Between Christmas and New Year, Tue 29 Dec 2026
 
-- Google shows: 10:00–18:00 (regular hours) · about 23 searches expected that day
+- Google shows: 10:00–18:00 (regular hours) · seen 23 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Mikko, the day between Christmas and New Year is on Tuesday 29 Dec and Google now shows your regular hours, open 10:00–18:00. Last year you were closed, but no special hours are set for this year. We suggest: the day between Christmas and New Year 29 Dec closed.
+> Hi Mikko, the day between Christmas and New Year is on Tuesday 29 Dec and Google now shows your regular hours, open 10:00–18:00 (on the same day last year, your listing was seen 23 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: the day between Christmas and New Year 29 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Mikko, välipäivä on tiistaina 29.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18. Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: välipäivä 29.12 kiinni.
+> Hei Mikko, välipäivä on tiistaina 29.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 23 kertaa). Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: välipäivä 29.12 kiinni.
 
 </details>
 
 ### Between Christmas and New Year, Wed 30 Dec 2026
 
-- Google shows: 10:00–18:00 (regular hours) · about 23 searches expected that day
+- Google shows: 10:00–18:00 (regular hours) · seen 23 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: Gemini · Validation: passed
 
-> Hi Mikko, the day between Christmas and New Year is on Wednesday 30 Dec and Google now shows open 10:00–18:00. Last year you were closed on that day. We suggest: the day between Christmas and New Year 30 Dec closed.
+> Hi Mikko, the day between Christmas and New Year is on Wednesday 30 Dec and Google now shows your regular hours, open 10:00–18:00 (on the same day last year, your listing was seen 23 times on Google). Last year you were closed. We suggest: the day between Christmas and New Year 30 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Mikko, välipäivä on keskiviikkona 30.12 ja Google näyttää nyt aukioloaikaa auki klo 10–18. Viime vuonna olitte kyseisenä päivänä kiinni. Ehdotamme: välipäivä 30.12 kiinni.
+> Hei Mikko, välipäivä on keskiviikkona 30.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 23 kertaa). Viime vuonna olitte kiinni. Ehdotamme: välipäivä 30.12 kiinni.
 
 </details>
 
 ### New Year's Day, Fri 1 Jan 2027
 
-- Google shows: 10:00–18:00 (regular hours) · about 15 searches expected that day
+- Google shows: 10:00–18:00 (regular hours) · seen 15 times on Google on the same day last year
 - Proposal: **closed**, from similar businesses (no history of its own), confidence **low**
 - Written by: template · Validation: passed
 
-> Hi Mikko, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 10:00–18:00. Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: New Year's Day 1 Jan closed.
+> Hi Mikko, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 10:00–18:00 (on the same day last year, your listing was seen 15 times on Google). Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: New Year's Day 1 Jan closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Mikko, uudenvuodenpäivä on perjantaina 1.1 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18. Useimmat vastaavat yritykset alueellanne ovat silloin kiinni, eikä teille ole merkitty poikkeusaikoja, joten pitääkö tämä paikkansa teilläkin? Ehdotamme: uudenvuodenpäivä 1.1 kiinni.
+> Hei Mikko, uudenvuodenpäivä on perjantaina 1.1 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 10–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 15 kertaa). Useimmat vastaavat yritykset alueellanne ovat silloin kiinni, eikä teille ole merkitty poikkeusaikoja, joten pitääkö tämä paikkansa teilläkin? Ehdotamme: uudenvuodenpäivä 1.1 kiinni.
 
 </details>
 
@@ -534,43 +534,43 @@ Oskar · bar_pub · Helsinki · channel: **WHATSAPP** · language: Swedish · co
 
 ### Christmas Day, Fri 25 Dec 2026
 
-- Google shows: 14:00–03:00 (regular hours) · about 61 searches expected that day
+- Google shows: 14:00–03:00 (regular hours) · seen 61 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Oskar, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 14:00–03:00. Last year you were closed, but no special hours are set for this year. We suggest: Christmas Day 25 Dec closed.
+> Hi Oskar, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 14:00–03:00 (on the same day last year, your listing was seen 61 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: Christmas Day 25 Dec closed.
 
 <details><summary>Swedish</summary>
 
-> Hej Oskar, juldagen infaller fredag 25/12 och Google visar nu era vanliga öppettider: öppet 14–3. Förra året hade ni stängt, men inga avvikande tider är inlagda i år. Vi föreslår: juldagen 25/12 stängt.
+> Hej Oskar, juldagen infaller fredag 25/12 och Google visar nu era vanliga öppettider: öppet 14–3 (samma dag förra året visades ni 61 gånger på Google). Förra året hade ni stängt, men inga avvikande tider är inlagda i år. Vi föreslår: juldagen 25/12 stängt.
 
 </details>
 
 ### New Year's Day, Fri 1 Jan 2027
 
-- Google shows: 14:00–03:00 (regular hours) · about 45 searches expected that day
+- Google shows: 14:00–03:00 (regular hours) · seen 45 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Oskar, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 14:00–03:00. Last year you were closed, but no special hours are set for this year. We suggest: New Year's Day 1 Jan closed.
+> Hi Oskar, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 14:00–03:00 (on the same day last year, your listing was seen 45 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: New Year's Day 1 Jan closed.
 
 <details><summary>Swedish</summary>
 
-> Hej Oskar, nyårsdagen infaller fredag 1/1 och Google visar nu era vanliga öppettider: öppet 14–3. Förra året hade ni stängt, men inga avvikande tider är inlagda i år. Vi föreslår: nyårsdagen 1/1 stängt.
+> Hej Oskar, nyårsdagen infaller fredag 1/1 och Google visar nu era vanliga öppettider: öppet 14–3 (samma dag förra året visades ni 45 gånger på Google). Förra året hade ni stängt, men inga avvikande tider är inlagda i år. Vi föreslår: nyårsdagen 1/1 stängt.
 
 </details>
 
 ### Epiphany Eve, Tue 5 Jan 2027
 
-- Google shows: 15:00–01:00 (regular hours) · about 33 searches expected that day
+- Google shows: 15:00–01:00 (regular hours) · seen 33 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Oskar, Epiphany Eve is on Tuesday 5 Jan and Google now shows your regular hours, open 15:00–01:00. Last year you were closed, but no special hours are set for this year. We suggest: Epiphany Eve 5 Jan closed.
+> Hi Oskar, Epiphany Eve is on Tuesday 5 Jan and Google now shows your regular hours, open 15:00–01:00 (on the same day last year, your listing was seen 33 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: Epiphany Eve 5 Jan closed.
 
 <details><summary>Swedish</summary>
 
-> Hej Oskar, trettondagsafton infaller tisdag 5/1 och Google visar nu era vanliga öppettider: öppet 15–1. Förra året hade ni stängt, men inga avvikande tider är inlagda i år. Vi föreslår: trettondagsafton 5/1 stängt.
+> Hej Oskar, trettondagsafton infaller tisdag 5/1 och Google visar nu era vanliga öppettider: öppet 15–1 (samma dag förra året visades ni 33 gånger på Google). Förra året hade ni stängt, men inga avvikande tider är inlagda i år. Vi föreslår: trettondagsafton 5/1 stängt.
 
 </details>
 
@@ -580,9 +580,9 @@ Laura · accounting_office · Jyväskylä · channel: **EMAIL** · language: Fin
 
 ### Christmas Eve, Thu 24 Dec 2026
 
-- Google shows: 08:30–16:30 (regular hours) · about 3 searches expected that day
+- Google shows: 08:30–16:30 (regular hours) · seen 3 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
-- Written by: Gemini · Validation: passed · **applied by standing permission**
+- Written by: template · Validation: passed · **applied by standing permission**
 
 > Hi Laura, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 08:30–16:30. Last year you were closed, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec closed.
 
@@ -594,7 +594,7 @@ Laura · accounting_office · Jyväskylä · channel: **EMAIL** · language: Fin
 
 ### Christmas Day, Fri 25 Dec 2026
 
-- Google shows: 08:30–16:30 (regular hours) · about 3 searches expected that day
+- Google shows: 08:30–16:30 (regular hours) · seen 3 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed · **applied by standing permission**
 
@@ -608,21 +608,21 @@ Laura · accounting_office · Jyväskylä · channel: **EMAIL** · language: Fin
 
 ### New Year's Eve, Thu 31 Dec 2026
 
-- Google shows: 08:30–16:30 (regular hours) · about 5 searches expected that day
+- Google shows: 08:30–16:30 (regular hours) · seen 5 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed · **applied by standing permission**
 
-> Hi Laura, New Year's Eve is on Thursday 31 Dec and Google now shows your regular hours, open 08:30–16:30. Last year you were closed, but no special hours are set for this year. We suggest: New Year's Eve 31 Dec closed.
+> Hi Laura, New Year's Eve is on Thursday 31 Dec and Google now shows your regular hours, open 08:30–16:30 (on the same day last year, your listing was seen 5 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: New Year's Eve 31 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Laura, uudenvuodenaatto on torstaina 31.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 8.30–16.30. Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: uudenvuodenaatto 31.12 kiinni.
+> Hei Laura, uudenvuodenaatto on torstaina 31.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 8.30–16.30 (viime vuonna samana päivänä tietonne nähtiin Googlessa 5 kertaa). Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: uudenvuodenaatto 31.12 kiinni.
 
 </details>
 
 ### New Year's Day, Fri 1 Jan 2027
 
-- Google shows: 08:30–16:30 (regular hours) · about 4 searches expected that day
+- Google shows: 08:30–16:30 (regular hours) · seen 4 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed · **applied by standing permission**
 
@@ -636,7 +636,7 @@ Laura · accounting_office · Jyväskylä · channel: **EMAIL** · language: Fin
 
 ### Epiphany, Wed 6 Jan 2027
 
-- Google shows: 08:30–16:30 (regular hours) · about 3 searches expected that day
+- Google shows: 08:30–16:30 (regular hours) · seen 3 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed · **applied by standing permission**
 
@@ -654,29 +654,29 @@ Anna · indoor_playground · Kuopio · channel: **APP_PUSH** · language: Finnis
 
 ### Christmas Eve, Thu 24 Dec 2026
 
-- Google shows: 12:00–19:00 (regular hours) · about 9 searches expected that day
+- Google shows: 12:00–19:00 (regular hours) · seen 9 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **medium**
 - Written by: template · Validation: passed
 
-> Hi Anna, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 12:00–19:00. In 2024 you were closed, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec closed.
+> Hi Anna, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 12:00–19:00 (on the same day last year, your listing was seen 9 times on Google). In 2024 you were closed, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Anna, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 12–19. Vuonna 2024 olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: jouluaatto 24.12 kiinni.
+> Hei Anna, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 12–19 (viime vuonna samana päivänä tietonne nähtiin Googlessa 9 kertaa). Vuonna 2024 olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: jouluaatto 24.12 kiinni.
 
 </details>
 
 ### Christmas Day, Fri 25 Dec 2026
 
-- Google shows: 12:00–19:00 (regular hours) · about 11 searches expected that day
+- Google shows: 12:00–19:00 (regular hours) · seen 11 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Anna, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 12:00–19:00. Last year you were closed, but no special hours are set for this year. We suggest: Christmas Day 25 Dec closed.
+> Hi Anna, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 12:00–19:00 (on the same day last year, your listing was seen 11 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: Christmas Day 25 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Anna, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 12–19. Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: joulupäivä 25.12 kiinni.
+> Hei Anna, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 12–19 (viime vuonna samana päivänä tietonne nähtiin Googlessa 11 kertaa). Viime vuonna olitte kiinni, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: joulupäivä 25.12 kiinni.
 
 </details>
 
@@ -686,29 +686,29 @@ Aino · cafe · Turku · channel: **SMS** · language: Finnish · contact window
 
 ### Christmas Day, Fri 25 Dec 2026
 
-- Google shows: 08:00–17:00 (regular hours) · about 33 searches expected that day
+- Google shows: 08:00–17:00 (regular hours) · seen 33 times on Google on the same day last year
 - Proposal: **closed**, from similar businesses (no history of its own), confidence **low**
 - Written by: template · Validation: passed
 
-> Hi Aino, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 08:00–17:00. Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: Christmas Day 25 Dec closed.
+> Hi Aino, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 08:00–17:00 (on the same day last year, your listing was seen 33 times on Google). Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: Christmas Day 25 Dec closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Aino, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 8–17. Useimmat vastaavat yritykset alueellanne ovat silloin kiinni, eikä teille ole merkitty poikkeusaikoja, joten pitääkö tämä paikkansa teilläkin? Ehdotamme: joulupäivä 25.12 kiinni.
+> Hei Aino, joulupäivä on perjantaina 25.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 8–17 (viime vuonna samana päivänä tietonne nähtiin Googlessa 33 kertaa). Useimmat vastaavat yritykset alueellanne ovat silloin kiinni, eikä teille ole merkitty poikkeusaikoja, joten pitääkö tämä paikkansa teilläkin? Ehdotamme: joulupäivä 25.12 kiinni.
 
 </details>
 
 ### New Year's Day, Fri 1 Jan 2027
 
-- Google shows: 08:00–17:00 (regular hours) · about 29 searches expected that day
+- Google shows: 08:00–17:00 (regular hours) · seen 29 times on Google on the same day last year
 - Proposal: **closed**, from similar businesses (no history of its own), confidence **low**
 - Written by: template · Validation: passed
 
-> Hi Aino, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 08:00–17:00. Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: New Year's Day 1 Jan closed.
+> Hi Aino, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 08:00–17:00 (on the same day last year, your listing was seen 29 times on Google). Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: New Year's Day 1 Jan closed.
 
 <details><summary>Finnish</summary>
 
-> Hei Aino, uudenvuodenpäivä on perjantaina 1.1 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 8–17. Useimmat vastaavat yritykset alueellanne ovat silloin kiinni, eikä teille ole merkitty poikkeusaikoja, joten pitääkö tämä paikkansa teilläkin? Ehdotamme: uudenvuodenpäivä 1.1 kiinni.
+> Hei Aino, uudenvuodenpäivä on perjantaina 1.1 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 8–17 (viime vuonna samana päivänä tietonne nähtiin Googlessa 29 kertaa). Useimmat vastaavat yritykset alueellanne ovat silloin kiinni, eikä teille ole merkitty poikkeusaikoja, joten pitääkö tämä paikkansa teilläkin? Ehdotamme: uudenvuodenpäivä 1.1 kiinni.
 
 </details>
 
@@ -718,29 +718,29 @@ Marte · bakery · Bergen · channel: **SMS** · language: Norwegian · contact 
 
 ### Christmas Day, Fri 25 Dec 2026
 
-- Google shows: 07:00–18:00 (regular hours) · about 13 searches expected that day
+- Google shows: 07:00–18:00 (regular hours) · seen 13 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Marte, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 07:00–18:00. Last year you were closed, but no special hours are set for this year. We suggest: Christmas Day 25 Dec closed.
+> Hi Marte, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 07:00–18:00 (on the same day last year, your listing was seen 13 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: Christmas Day 25 Dec closed.
 
 <details><summary>Norwegian</summary>
 
-> Hei Marte, første juledag er fredag 25.12 og Google viser nå de vanlige åpningstidene deres: åpent 7–18. I fjor hadde dere stengt, men ingen avvikende åpningstider er lagt inn i år. Vi foreslår: første juledag 25.12 stengt.
+> Hei Marte, første juledag er fredag 25.12 og Google viser nå de vanlige åpningstidene deres: åpent 7–18 (samme dag i fjor ble dere vist 13 ganger på Google). I fjor hadde dere stengt, men ingen avvikende åpningstider er lagt inn i år. Vi foreslår: første juledag 25.12 stengt.
 
 </details>
 
 ### New Year's Day, Fri 1 Jan 2027
 
-- Google shows: 07:00–18:00 (regular hours) · about 5 searches expected that day
+- Google shows: 07:00–18:00 (regular hours) · seen 5 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **medium**
 - Written by: template · Validation: passed
 
-> Hi Marte, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 07:00–18:00. In 2025 you were closed, but no special hours are set for this year. We suggest: New Year's Day 1 Jan closed.
+> Hi Marte, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 07:00–18:00 (on the same day last year, your listing was seen 5 times on Google). In 2025 you were closed, but no special hours are set for this year. We suggest: New Year's Day 1 Jan closed.
 
 <details><summary>Norwegian</summary>
 
-> Hei Marte, første nyttårsdag er fredag 1.1 og Google viser nå de vanlige åpningstidene deres: åpent 7–18. I 2025 hadde dere stengt, men ingen avvikende åpningstider er lagt inn i år. Vi foreslår: første nyttårsdag 1.1 stengt.
+> Hei Marte, første nyttårsdag er fredag 1.1 og Google viser nå de vanlige åpningstidene deres: åpent 7–18 (samme dag i fjor ble dere vist 5 ganger på Google). I 2025 hadde dere stengt, men ingen avvikende åpningstider er lagt inn i år. Vi foreslår: første nyttårsdag 1.1 stengt.
 
 </details>
 
@@ -750,71 +750,71 @@ Maria · cafe · Stockholm · channel: **EMAIL** · language: Swedish · contact
 
 ### St Lucy's Day, Sun 13 Dec 2026
 
-- Google shows: 10:00–17:00 (regular hours) · about 43 searches expected that day
+- Google shows: 10:00–17:00 (regular hours) · seen 43 times on Google on the same day last year
 - Proposal: **07:00–18:00**, from the owner's own hours for this day in an earlier season, confidence **medium**
 - Written by: template · Validation: passed
 
-> Hi Maria, St Lucy's Day is on Sunday 13 Dec and Google now shows your regular hours, open 10:00–17:00. In 2024 you were open 07:00–18:00, but no special hours are set for this year. We suggest: St Lucy's Day 13 Dec open 07:00–18:00.
+> Hi Maria, St Lucy's Day is on Sunday 13 Dec and Google now shows your regular hours, open 10:00–17:00 (on the same day last year, your listing was seen 43 times on Google). In 2024 you were open 07:00–18:00, but no special hours are set for this year. We suggest: St Lucy's Day 13 Dec open 07:00–18:00.
 
 <details><summary>Swedish</summary>
 
-> Hej Maria, luciadagen infaller söndag 13/12 och Google visar nu era vanliga öppettider: öppet 10–17. År 2024 hade ni öppet 7–18, men inga avvikande tider är inlagda i år. Vi föreslår: luciadagen 13/12 öppet 7–18.
+> Hej Maria, luciadagen infaller söndag 13/12 och Google visar nu era vanliga öppettider: öppet 10–17 (samma dag förra året visades ni 43 gånger på Google). År 2024 hade ni öppet 7–18, men inga avvikande tider är inlagda i år. Vi föreslår: luciadagen 13/12 öppet 7–18.
 
 </details>
 
 ### Christmas Eve, Thu 24 Dec 2026
 
-- Google shows: 08:00–18:00 (regular hours) · about 118 searches expected that day
+- Google shows: 08:00–18:00 (regular hours) · seen 118 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Maria, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 08:00–18:00. Last year you were closed, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec closed.
+> Hi Maria, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 08:00–18:00 (on the same day last year, your listing was seen 118 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec closed.
 
 <details><summary>Swedish</summary>
 
-> Hej Maria, julafton infaller torsdag 24/12 och Google visar nu era vanliga öppettider: öppet 8–18. Förra året hade ni stängt, men inga avvikande tider är inlagda i år. Vi föreslår: julafton 24/12 stängt.
+> Hej Maria, julafton infaller torsdag 24/12 och Google visar nu era vanliga öppettider: öppet 8–18 (samma dag förra året visades ni 118 gånger på Google). Förra året hade ni stängt, men inga avvikande tider är inlagda i år. Vi föreslår: julafton 24/12 stängt.
 
 </details>
 
 ### Christmas Day, Fri 25 Dec 2026
 
-- Google shows: 08:00–18:00 (regular hours) · about 69 searches expected that day
+- Google shows: 08:00–18:00 (regular hours) · seen 69 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **medium**
 - Written by: template · Validation: passed
 
-> Hi Maria, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 08:00–18:00. In 2024 you were closed, but no special hours are set for this year. We suggest: Christmas Day 25 Dec closed.
+> Hi Maria, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 08:00–18:00 (on the same day last year, your listing was seen 69 times on Google). In 2024 you were closed, but no special hours are set for this year. We suggest: Christmas Day 25 Dec closed.
 
 <details><summary>Swedish</summary>
 
-> Hej Maria, juldagen infaller fredag 25/12 och Google visar nu era vanliga öppettider: öppet 8–18. År 2024 hade ni stängt, men inga avvikande tider är inlagda i år. Vi föreslår: juldagen 25/12 stängt.
+> Hej Maria, juldagen infaller fredag 25/12 och Google visar nu era vanliga öppettider: öppet 8–18 (samma dag förra året visades ni 69 gånger på Google). År 2024 hade ni stängt, men inga avvikande tider är inlagda i år. Vi föreslår: juldagen 25/12 stängt.
 
 </details>
 
 ### New Year's Day, Fri 1 Jan 2027
 
-- Google shows: 08:00–18:00 (regular hours) · about 43 searches expected that day
+- Google shows: 08:00–18:00 (regular hours) · seen 43 times on Google on the same day last year
 - Proposal: **closed**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Maria, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 08:00–18:00. Last year you were closed, but no special hours are set for this year. We suggest: New Year's Day 1 Jan closed.
+> Hi Maria, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 08:00–18:00 (on the same day last year, your listing was seen 43 times on Google). Last year you were closed, but no special hours are set for this year. We suggest: New Year's Day 1 Jan closed.
 
 <details><summary>Swedish</summary>
 
-> Hej Maria, nyårsdagen infaller fredag 1/1 och Google visar nu era vanliga öppettider: öppet 8–18. Förra året hade ni stängt, men inga avvikande tider är inlagda i år. Vi föreslår: nyårsdagen 1/1 stängt.
+> Hej Maria, nyårsdagen infaller fredag 1/1 och Google visar nu era vanliga öppettider: öppet 8–18 (samma dag förra året visades ni 43 gånger på Google). Förra året hade ni stängt, men inga avvikande tider är inlagda i år. Vi föreslår: nyårsdagen 1/1 stängt.
 
 </details>
 
 ### Epiphany, Wed 6 Jan 2027
 
-- Google shows: 08:00–18:00 (regular hours) · about 85 searches expected that day
+- Google shows: 08:00–18:00 (regular hours) · seen 85 times on Google on the same day last year
 - Proposal: **10:00–16:00**, from the owner's own hours for this day in an earlier season, confidence **high**
 - Written by: template · Validation: passed
 
-> Hi Maria, Epiphany is on Wednesday 6 Jan and Google now shows your regular hours, open 08:00–18:00. Last year you were open 10:00–16:00, but no special hours are set for this year. We suggest: Epiphany 6 Jan open 10:00–16:00.
+> Hi Maria, Epiphany is on Wednesday 6 Jan and Google now shows your regular hours, open 08:00–18:00 (on the same day last year, your listing was seen 85 times on Google). Last year you were open 10:00–16:00, but no special hours are set for this year. We suggest: Epiphany 6 Jan open 10:00–16:00.
 
 <details><summary>Swedish</summary>
 
-> Hej Maria, trettondedag jul infaller onsdag 6/1 och Google visar nu era vanliga öppettider: öppet 8–18. Förra året hade ni öppet 10–16, men inga avvikande tider är inlagda i år. Vi föreslår: trettondedag jul 6/1 öppet 10–16.
+> Hej Maria, trettondedag jul infaller onsdag 6/1 och Google visar nu era vanliga öppettider: öppet 8–18 (samma dag förra året visades ni 85 gånger på Google). Förra året hade ni öppet 10–16, men inga avvikande tider är inlagda i år. Vi föreslår: trettondedag jul 6/1 öppet 10–16.
 
 </details>
 
@@ -824,29 +824,29 @@ Per · restaurant · Malmö · channel: **EMAIL** · language: Swedish · contac
 
 ### Christmas Eve, Thu 24 Dec 2026
 
-- Google shows: 11:00–23:00 (regular hours) · about 11 searches expected that day
+- Google shows: 11:00–23:00 (regular hours) · seen 11 times on Google on the same day last year
 - Proposal: **closed**, from similar businesses (no history of its own), confidence **low**
 - Written by: template · Validation: passed
 
-> Hi Per, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 11:00–23:00. Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: Christmas Eve 24 Dec closed.
+> Hi Per, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 11:00–23:00 (on the same day last year, your listing was seen 11 times on Google). Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: Christmas Eve 24 Dec closed.
 
 <details><summary>Swedish</summary>
 
-> Hej Per, julafton infaller torsdag 24/12 och Google visar nu era vanliga öppettider: öppet 11–23. De flesta liknande företag i området har stängt då och inga avvikande tider är inlagda för er, så stämmer det för er också? Vi föreslår: julafton 24/12 stängt.
+> Hej Per, julafton infaller torsdag 24/12 och Google visar nu era vanliga öppettider: öppet 11–23 (samma dag förra året visades ni 11 gånger på Google). De flesta liknande företag i området har stängt då och inga avvikande tider är inlagda för er, så stämmer det för er också? Vi föreslår: julafton 24/12 stängt.
 
 </details>
 
 ### New Year's Day, Fri 1 Jan 2027
 
-- Google shows: 11:00–23:00 (regular hours) · about 5 searches expected that day
+- Google shows: 11:00–23:00 (regular hours) · seen 5 times on Google on the same day last year
 - Proposal: **closed**, from similar businesses (no history of its own), confidence **low**
 - Written by: template · Validation: passed
 
-> Hi Per, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 11:00–23:00. Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: New Year's Day 1 Jan closed.
+> Hi Per, New Year's Day is on Friday 1 Jan and Google now shows your regular hours, open 11:00–23:00 (on the same day last year, your listing was seen 5 times on Google). Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: New Year's Day 1 Jan closed.
 
 <details><summary>Swedish</summary>
 
-> Hej Per, nyårsdagen infaller fredag 1/1 och Google visar nu era vanliga öppettider: öppet 11–23. De flesta liknande företag i området har stängt då och inga avvikande tider är inlagda för er, så stämmer det för er också? Vi föreslår: nyårsdagen 1/1 stängt.
+> Hej Per, nyårsdagen infaller fredag 1/1 och Google visar nu era vanliga öppettider: öppet 11–23 (samma dag förra året visades ni 5 gånger på Google). De flesta liknande företag i området har stängt då och inga avvikande tider är inlagda för er, så stämmer det för er också? Vi föreslår: nyårsdagen 1/1 stängt.
 
 </details>
 
