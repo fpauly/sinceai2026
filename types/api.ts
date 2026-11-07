@@ -185,7 +185,7 @@ export interface RuleContext {
 /** What a rule returns. runDetection adds _id, status "open" and created_at. */
 export type DraftIssue = Omit<Issue, "_id" | "status" | "created_at">;
 
-export type Rule = (ctx: RuleContext) => DraftIssue[];
+export type Rule = (ctx: RuleContext) => DraftIssue[] | Promise<DraftIssue[]>;
 
 // POST /api/detect[?businessId=]
 export interface DetectResponse {
