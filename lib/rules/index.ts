@@ -88,7 +88,8 @@ export async function runDetection(businessId?: string): Promise<Issue[]> {
     for (const rule of ruleSet) {
       let drafts: DraftIssue[];
       try {
-        drafts = rule(ctx);
+        // Async rules are allowed too (C9 classifies review text with Gemini).
+        drafts = await rule(ctx);
       } catch (err) {
         // One broken rule must not break the daily check for every business.
         console.error(`[detect] ${rule.name || "rule"} failed on ${business._id}`, err);
