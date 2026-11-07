@@ -51,6 +51,10 @@ export async function parseIntent(
   const text = transcript.trim();
   if (!text) return unclear();
 
+  // A short typed edit ("24.12 8-12", "8.30–13", "closed") is read by code first: fast, no LLM needed.
+  const typed = typedEdit(text, suggestion);
+  if (typed) return toResult(typed, suggestion, openingHours);
+
   if (geminiConfigured()) {
     try {
       const extracted = await generateJson({
@@ -141,6 +145,42 @@ function usualHours(key: string, week?: Partial<OpeningHours>): Hours | undefine
   if ((DAYS as readonly string[]).includes(key)) return week[key as Day];
   if (/^\d{4}-\d{2}-\d{2}$/.test(key)) return week[DAYS[(new Date(`${key}T00:00:00Z`).getUTCDay() + 6) % 7]];
   return undefined;
+}
+
+// ---------- typed edits, read by code ----------
+
+const CLOSED_WORDS = /^(closed|kiinni|suljettu|stängt|stengt)$/i;
+const TIME = String.raw`(\d{1,2})(?:[:.](\d{2}))?`;
+const RANGE = new RegExp(`^${TIME}\\s*-\\s*${TIME}$`);
+const DATE = /^(\d{1,2})[./](\d{1,2})\.?$/;
+
+/** "24.12 8-12", "8.30–13", "24/12 closed", "kiinni": one hours change for an hours suggestion with
+ *  ONE key (the v2 special day). A date, if written, must be that key's day and month. Anything else
+ *  (other words, several days, a question) -> null, and Gemini or the keywords take over. */
+function typedEdit(text: string, suggestion: Pick<Suggestion, "proposed_change">): Extracted | null {
+  const { field, value } = suggestion.proposed_change;
+  if ((field !== "holiday_hours" && field !== "opening_hours") || !isRecord(value)) return null;
+  const keys = Object.keys(value);
+  if (keys.length !== 1) return null;
+  const key = keys[0];
+  const tokens = text.replace(/[–—]/g, "-").replace(/\s*-\s*/g, "-").replace(/[.!]+$/, "").trim().split(/\s+/);
+  if (tokens.length > 2) return null;
+  let rest = tokens;
+  const d = DATE.exec(tokens[0]);
+  if (tokens.length === 2) {
+    if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(key)) return null;
+    if (Number(d[1]) !== Number(key.slice(8, 10)) || Number(d[2]) !== Number(key.slice(5, 7))) return null;
+    rest = tokens.slice(1);
+  }
+  const word = rest[0];
+  if (CLOSED_WORDS.test(word)) return { intent: "edit", changes: [{ key, closed: true, open: null, close: null }], new_text: null };
+  const r = RANGE.exec(word);
+  if (!r) return null;
+  const hhmm = (h: string, m?: string) => (Number(h) <= 23 ? `${h.padStart(2, "0")}:${m ?? "00"}` : null);
+  const open = hhmm(r[1], r[2]);
+  const close = hhmm(r[3], r[4]);
+  if (!open || !close) return null;
+  return { intent: "edit", changes: [{ key, closed: false, open, close }], new_text: null };
 }
 
 // ---------- keyword fallback (no Gemini) ----------
