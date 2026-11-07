@@ -85,6 +85,21 @@ Our own seed answered a challenge we imagined. The judges score **their** data, 
 | `FI-D0012` Tilitoimisto Otso | Standing permission: applied without asking, then informed |
 | `FI-D0011` Pizzeria Torni | Closed for good: flagged for a human, no suggestion |
 | `FI-D0013` Hammasklinikka Kallio | Already correct: stays quiet (empty state) |
+| `FI-D0010` Pub Kulma, Helsinki | One unusual signal: open later on arena nights (event days, from the owner's earlier event-night entries) |
+
+**Stand-out extras (agreed 2026-11-07, after the v2 chain works)**
+In this order. The values and numbers always come from code, never from the LLM.
+
+1. **What customers will see** (D11): a small Google-style card before Approve: "Today Google says: open 07:30–18:00" next to "After your OK: Christmas Eve 07:30–13:00".
+2. **What's at stake** (C14 + A13): code takes the business's Google search views on the same special day last year from `analytics_daily.parquet`. The importer computes them for the demo cast, and they are stored as `expected_search_views` in the issue evidence. The message says it honestly, for example "last Christmas Eve about 40 people found you on Google". This matches Fonecta's findability focus and the scorer's "search views protected".
+3. **Standing permission as a highlight** (A11, video): the dataset's `standing_permission_holidays` (customer_contacts) counts as a standing permission for `special_day_hours`, so `FI-D0012` is applied and then informed. It gets its own moment in the video ("handle public holidays from now on").
+4. **Where it shows, live** (D6): publishers turn green on their typical update speed (Google about 2 minutes … Apple Maps about 2 days).
+5. **Reply by text** (D12): Aleksi prefers SMS, so in the simulated chat the owner can answer the message in plain words ("yes", "24.12 8–12", "no thanks"). `parseIntent` (A9) reads it, code builds the value, and the owner confirms with one tap. The message also carries an **Edit** link that opens the owner page (no login) for anything longer. The voice reply (B8) uses the same route.
+6. **Event nights in the app** (C15): event and school-break days for the demo cast are imported as special days, so `FI-D0010`'s arena nights show up (lib/predict already handles them, #49).
+7. **Send at the right moment** (D10, one line): "Sent at 12:10, inside Aleksi's 12–16 contact window", from `best_contact_window`.
+8. Then: **live holiday API** (C8, Fonecta's bonus), **"Connect calls you"** voice (B7/B8).
+
+Not built: a review-reply feature. Extensibility is shown with one slide or a 10-second clip in the video instead.
 
 The stages for this switch are in `TASKS.md` under "v2: dataset".
 
