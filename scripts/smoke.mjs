@@ -4,7 +4,8 @@
 //
 // Steps whose API route does not exist yet (404) are SKIPPED, so this works at every milestone.
 // Each lane extends this file with checks for its own routes (shared file: use a shared/* PR).
-// WARNING: it calls /api/seed, which wipes the database named in your .env.local.
+// WARNING: it calls /api/seed, which wipes the database named in your .env.local. The v2 block
+// runs last and re-seeds the v1 demo data, so it leaves the database in the demo state.
 
 const BASE = process.env.SMOKE_URL ?? "http://localhost:3000";
 let failed = 0;
@@ -94,6 +95,59 @@ async function dashboard() {
   );
 }
 
+// ---------- v2 (Fonecta dataset): seed the demo cast and check detection (C13) ----------
+async function v2() {
+  console.log("v2 seed + detect (Fonecta dataset)");
+  const r = await call("POST", "/api/seed?source=fonecta");
+  if (r.missing) return skip("/api/seed?source=fonecta not implemented yet");
+  check(r.status === 200 && r.json?.ok, `POST /api/seed?source=fonecta → 200 ok (got ${r.status})`);
+  const c = r.json?.counts ?? {};
+  check(
+    c.businesses === 32 && c.profiles === 32,
+    `v2 cast 32 businesses / 32 profiles (got ${c.businesses}/${c.profiles})`,
+  );
+  check(
+    c.holiday_history >= 1000 && c.special_days >= 240 && c.peers >= 400 &&
+      c.reviews >= 200 && c.publisher_suggestions >= 40,
+    `v2 extract has history/calendar/peers/reviews/publisher edits (got ${c.holiday_history}/${c.special_days}/${c.peers}/${c.reviews}/${c.publisher_suggestions})`,
+  );
+
+  const d = await call("POST", "/api/detect");
+  if (d.missing) return skip("/api/detect not implemented yet");
+  check(d.status === 200 && d.json?.ok, `v2 POST /api/detect → 200 ok (got ${d.status})`);
+  const issues = d.json?.created ?? [];
+  const types = [...new Set(issues.map((i) => i.type))];
+  check(issues.length > 0, `v2 detection creates issues (got ${issues.length})`);
+  check(
+    types.every((t) => t === "special_day_hours" || t === "needs_human"),
+    `v2 issue types are special_day_hours / needs_human (got ${types.join(", ") || "none"})`,
+  );
+
+  const per = (id, type) => issues.filter((i) => i.business_id === id && i.type === type);
+  const torni = per("FI-D0011", "needs_human");
+  check(
+    torni.length === 1 && torni[0]?.evidence?.reason === "closed_for_good",
+    "FI-D0011 is flagged closed_for_good",
+  );
+  check(per("FI-D0011", "special_day_hours").length === 0, "FI-D0011 gets no owner suggestion");
+  check(
+    per("FI-D0013", "special_day_hours").length === 0 && per("FI-D0013", "needs_human").length === 0,
+    "FI-D0013 (already entered) gets 0 issues",
+  );
+  check(
+    per("NO-D0015", "special_day_hours").length === 0 && per("NO-D0015", "needs_human").length === 0,
+    "NO-D0015 (24/7 gym) gets 0 issues",
+  );
+  check(per("FI-D0001", "special_day_hours").length > 0, "FI-D0001 gets special-day suggestions");
+  check(per("FI-D0017", "special_day_hours").length > 0, "FI-D0017 (no history) gets special-day suggestions");
+
+  const again = await call("POST", "/api/detect");
+  check((again.json?.created ?? []).length === 0, "second v2 /api/detect creates 0 new issues");
+
+  // Leave the database on the v1 demo data (DESIGN 0 "v2": the seed is still the demo until V2).
+  await call("POST", "/api/seed");
+}
+
 // ---------- add later milestones below (suggest, owner view, decide) ----------
 
 async function main() {
@@ -107,6 +161,7 @@ async function main() {
   await seed();
   await detect();
   await dashboard();
+  await v2();
   console.log(`\n${passed} passed, ${failed} failed, ${skipped} skipped`);
   process.exit(failed ? 1 : 0);
 }
