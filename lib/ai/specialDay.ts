@@ -47,6 +47,12 @@ function nordicHours(h: Hours, and: string): string {
   return parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(", ")} ${and} ${parts[parts.length - 1]}`;
 }
 
+/** Clock times in a Finnish / Swedish / Norwegian text in Nordic style: "07:30" -> "7.30", "18:00" -> "18".
+ *  Only the notation changes, never the value (Gemini sometimes copies "07:30–18:00" from the evidence). */
+export function nordicTimes(text: string): string {
+  return text.replace(/(?<![\d.:])([01]?\d|2[0-4]):([0-5]\d)(?![\d:])/g, (_, hh: string, mm: string) => `${Number(hh)}${mm === "00" ? "" : `.${mm}`}`);
+}
+
 function englishHours(h: Hours): string {
   const p = parseHours(h);
   if (!p || !p.length) return h;

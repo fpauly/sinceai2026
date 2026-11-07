@@ -5,7 +5,7 @@ import type { SuggestionDraft } from "@/types/api";
 import { fallbackSuggestion } from "@/lib/ai/fallback";
 import { generateJson, geminiConfigured } from "@/lib/ai/gemini";
 import { validateSuggestion } from "@/lib/validate";
-import { ownerLanguage } from "@/lib/ai/specialDay";
+import { nordicTimes, ownerLanguage } from "@/lib/ai/specialDay";
 
 // Step 2 (Suggest), DESIGN 9.1 + 9.4: one suggestion for one issue.
 //
@@ -142,7 +142,7 @@ async function specialDay(
         proposed_change: base.proposed_change,
         confidence: base.confidence,
         reason: words.reason.trim(),
-        message: { en: words.message.en.trim(), [lang]: words.message.local.trim() },
+        message: { en: words.message.en.trim(), [lang]: nordicTimes(words.message.local.trim()) },
       };
       const validation = validateSuggestion(draft, issue, listings);
       if (validation.ok) return { draft, source: "gemini", validation };
