@@ -50,6 +50,7 @@ try {
   })));
 
   const accepted = await fixture("accepted");
+  assert.equal((await fetch(`${base}/api/suggestions/${encodeURIComponent(accepted)}/decide`)).status, 204);
   const result = await decide(accepted, { decision: "accepted", via: "tap" });
   assert.equal(result.status, 200);
   assert.equal(result.body.suggestion.decision, "accepted");
@@ -65,6 +66,12 @@ try {
   assert.equal((await db.collection("issues").findOne({ _id: accepted })).status, "resolved");
   assert.equal((await db.collection("suggestions").findOne({ _id: accepted })).decided_via, "tap");
   assert.equal((await decide(accepted, { decision: "ignored", via: "tap" })).status, 409);
+  let prefs = await db.collection("preferences").findOne({ _id: businessId });
+  assert.equal(prefs.learned.length, 1);
+  assert.equal(prefs.learned[0].decision, "accepted");
+  assert.deepEqual(prefs.learned[0].proposed, { "2026-12-24": "09:00-13:00" });
+  assert.deepEqual(prefs.learned[0].final, prefs.learned[0].proposed);
+  assert.equal(prefs.standing_permissions?.length ?? 0, 0);
   console.log("PASS accept: all channels merged, existing data preserved, issue resolved, Yext fallback, replay blocked");
 
   const ignored = await fixture("ignored");
@@ -76,6 +83,10 @@ try {
   assert.equal((await db.collection("issues").findOne({ _id: ignored })).status, "ignored");
   assert.ok((await db.collection("preferences").findOne({ _id: businessId })).ignored_fingerprints.includes(`${ignored}:fingerprint`));
   assert.deepEqual(await db.collection("listings").find({ business_id: businessId }).toArray(), beforeIgnore);
+  prefs = await db.collection("preferences").findOne({ _id: businessId });
+  assert.equal(prefs.learned.length, 2);
+  assert.equal(prefs.learned.find((item) => item.decision === "ignored").final, null);
+  assert.equal(prefs.standing_permissions?.length ?? 0, 0);
   const owner = await (await fetch(`${base}/api/businesses/${businessId}`)).json();
   assert.equal(owner.suggestions.length, 0);
   console.log("PASS ignore: fingerprint stored, listings unchanged, decided cards removed from owner API");
@@ -95,13 +106,45 @@ try {
   assert.equal((await decide(invalid, { decision: "accepted", via: "tap", standing_permission: true })).status, 400);
   assert.equal((await decide(invalid, "{", true)).status, 400);
   assert.equal((await decide(`${businessId}:missing`, { decision: "accepted", via: "tap" })).status, 404);
-  console.log("PASS malformed JSON, invalid proposals/requests, unavailable automatic permission and missing suggestions");
+  assert.equal((await decide(invalid, { decision: "ignored", via: "tap", standing_permission: true })).status, 400);
+  console.log("PASS malformed JSON, invalid proposals/requests, permission on ignore rejected and missing suggestions");
 
   const edited = await fixture("edited");
-  const edit = await decide(edited, { decision: "edited", via: "tap", edited_value: { "2026-12-24": "11:00-15:00" } });
+  const edit = await decide(edited, { decision: "edited", via: "tap", edited_value: { "2026-12-24": "11:00-15:00" }, standing_permission: true });
   assert.equal(edit.status, 200);
   assert.equal(edit.body.suggestion.proposed_change.value["2026-12-24"], "11:00-15:00");
-  console.log("PASS edited decision API validates and stores the final hours (edit UI comes in D5)");
+  prefs = await db.collection("preferences").findOne({ _id: businessId });
+  const editLearning = prefs.learned.find((item) => item.decision === "edited");
+  assert.deepEqual(editLearning.proposed, { "2026-12-24": "09:00-13:00" });
+  assert.deepEqual(editLearning.final, { "2026-12-24": "11:00-15:00" });
+  assert.deepEqual(prefs.standing_permissions, [{ issue_type: "missing_holiday_hours", field: "holiday_hours" }]);
+  for (const listing of await db.collection("listings").find({ business_id: businessId }).toArray()) {
+    assert.equal(listing.holiday_hours["2026-12-24"], "11:00-15:00");
+  }
+  const permitted = await fixture("repeat-permission");
+  assert.equal((await decide(permitted, { decision: "accepted", via: "tap", standing_permission: true })).status, 200);
+  prefs = await db.collection("preferences").findOne({ _id: businessId });
+  assert.equal(prefs.standing_permissions.length, 1);
+  console.log("PASS edits preserve original/final learning, update listings, opt-in permission stored once");
+
+  // A reload must recover the exact confirmed edit and opt-in flag after a failed save.
+  const reloadEdit = await fixture("reload-edit");
+  const originalPrefs = await db.collection("preferences").findOne({ _id: businessId });
+  await db.collection("preferences").updateOne({ _id: businessId }, { $set: { learned: "broken test data" } });
+  const submitted = { decision: "edited", via: "tap", edited_value: { "2026-12-24": "12:00-16:00" }, standing_permission: true };
+  assert.equal((await decide(reloadEdit, submitted)).status, 500);
+  const pendingResponse = await fetch(`${base}/api/suggestions/${encodeURIComponent(reloadEdit)}/decide`);
+  assert.equal(pendingResponse.status, 200);
+  assert.equal(pendingResponse.headers.get("cache-control"), "no-store");
+  const recoveredRequest = await pendingResponse.json();
+  assert.deepEqual(recoveredRequest, submitted); // No lease token or internal state exposed.
+  await db.collection("preferences").updateOne({ _id: businessId }, { $set: { learned: originalPrefs.learned } });
+  assert.equal((await decide(reloadEdit, recoveredRequest)).status, 200);
+  assert.equal((await fetch(`${base}/api/suggestions/${encodeURIComponent(reloadEdit)}/decide`)).status, 204);
+  const learnedReload = (await db.collection("preferences").findOne({ _id: businessId })).learned.filter((item) => item.final?.["2026-12-24"] === "12:00-16:00");
+  assert.equal(learnedReload.length, 1);
+  assert.deepEqual(learnedReload[0].proposed, { "2026-12-24": "09:00-13:00" });
+  console.log("PASS failed edit recovered after reload with exact values and permission; no duplicate learning");
 
   // A real DB write failure must release its lease and permit the same decision to resume.
   const failedIgnore = await fixture("failed-ignore");
@@ -136,11 +179,17 @@ try {
   assert.ok(!("_decision" in recovered.body.suggestion));
   const published = { yext: true, published_to: ["Test publisher"], at: "2026-11-07T09:00:00.000Z" };
   const persisted = await interrupted("persisted-publication", { publishing: true, publication: published });
+  // Simulate a crash after the learning write but before finalizing the suggestion.
+  const retryAt = (await db.collection("suggestions").findOne({ _id: persisted }))._decision.at;
+  const alreadyLearned = { issue_type: "missing_holiday_hours", field: "holiday_hours", proposed: { "2026-12-24": "09:00-13:00" }, final: { "2026-12-24": "09:00-13:00" }, decision: "accepted", at: retryAt };
+  await db.collection("preferences").updateOne({ _id: businessId }, { $addToSet: { learned: alreadyLearned } });
   await db.collection("issues").updateOne({ _id: persisted }, { $set: { status: "resolved" } });
   const finalized = await decide(persisted, { decision: "accepted", via: "tap" });
   assert.equal(finalized.status, 200);
   assert.deepEqual(finalized.body.suggestion.applied, published);
-  console.log("PASS expired crash lease, original decision pinned, uncertain publication not retried, saved result reused");
+  prefs = await db.collection("preferences").findOne({ _id: businessId });
+  assert.equal(prefs.learned.filter((item) => item.at === retryAt).length, 1);
+  console.log("PASS expired crash lease, original decision pinned, publication result reused and learning not duplicated on recovery");
 
   const invented = await fixture("invented-dates", { field: "holiday_hours", value: { "2026-12-31": "closed" } });
   assert.equal((await decide(invented, { decision: "edited", via: "tap", edited_value: { "2026-12-31": "10:00-14:00" } })).status, 400);
