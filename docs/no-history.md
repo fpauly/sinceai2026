@@ -40,15 +40,15 @@ In the demo:
 
 **Parturi Kampaamo Linnankatu**, no history at all. Proposed: Christmas Eve 09:00–14:00 (the salon opens at 09:00 on Thursdays), closed on the other four holidays. Confidence: **low**.
 
-> Hi Sanna, your holiday hours aren't set anywhere yet and I can't find last year's hours. Shall I use what most hair salons do, which is 09:00–14:00 on Christmas Eve and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany?
+> Hi Sanna, your holiday hours are not set yet and I do not have last year's hours to copy, so would you like to use what most hair salons do, which is being open on Christmas Eve from 09:00–14:00 and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany?
 
 **Kuntosali Itäharju**, no history for New Year's Day. Proposed: closed on 1 Jan. Confidence: **low**.
 
-> Hi Tomi, your hours for New Year's Day are missing, and since I cannot find last year's hours, would you like me to set it as closed since that is what most gyms do?
+> Hi Tomi, your hours for New Year's Day are not set anywhere yet and I could not find them from last year. Would you like me to set them as closed on New Year's Day, which is what most gyms do?
 
 For comparison, **Rye & Shine Bakery** (has history), confidence **high**:
 
-> Hi Liisa, your holiday hours for the upcoming Christmas and New Year period are not set yet. Shall I publish the same hours as last year, meaning 10:00–14:00 on Christmas Eve and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany?
+> Hi Liisa, your holiday hours for Christmas and New Year are not set yet so I can copy them from the same days last year, meaning Christmas Eve 10:00–14:00 and closed on Christmas Day, Boxing Day, New Year's Day and Epiphany. Shall I publish this everywhere?
 
 Template version (used when Gemini is not available) for Parturi:
 
