@@ -83,7 +83,7 @@ function BusinessView({ businessId }: { businessId: string }) {
       {notice && <p role="status" className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm leading-6 text-emerald-900">{notice}</p>}
       {data.suggestions.length ? (
         <section aria-label="Suggestions to review" className="space-y-4">
-          {data.suggestions.map((suggestion) => <NotificationCard key={suggestion._id} suggestion={suggestion} listings={data.listings} profile={data.profile} language={contactLanguage(data.business)} onDecidedAction={decided} />)}
+          {data.suggestions.map((suggestion) => <NotificationCard key={suggestion._id} suggestion={suggestion} listings={data.listings} profile={data.profile} businessName={data.business.name} language={contactLanguage(data.business)} onDecidedAction={decided} />)}
         </section>
       ) : (
         <section className="rounded-2xl border border-emerald-200 bg-white px-4 py-10 text-center"><h2 className="text-xl font-semibold">Nothing waiting for review</h2><p className="mt-2 text-sm leading-6 text-zinc-600">There is nothing to review right now.</p></section>
