@@ -57,10 +57,14 @@ What made the difference:
   About +0.66 on both seasons (2026: 179 new suggestions, 73 of them harmful; 2025: 109 new, 37 harmful), so harmful 263 → about 336 on 2026.
   These edits were never confirmed: all of them are EXPIRED (nobody handled them) or REJECTED (the owner or Google turned them down).
   A small gain is not worth telling owners to set hours that someone already rejected, so we kept them out. No demo business was affected either way.
+- **Customer reviews saying the business was closed on a special day** (`reviews.json`, matched by code on words like *kiinni*, *suljettu*, *stängt*, *stengt*, *closed*): where we say nothing and a review posted on that day in one of the last two seasons says the door was locked, propose closed.
+  It lost points on both seasons: 2026 −1.1 (129 new suggestions, 95 harmful), 2025 −0.5 (68 new, 48 harmful); counting reviews posted the day after too made it worse (−2.1 / −0.9).
+  A business that disappointed customers last year has often fixed its hours since, so a complaint tells us about last year, not this one.
+  The review signal rule (`lib/rules/reviewSignal.ts`) reads reviews for a different purpose, recent facts that contradict the listing; it is in the v1 rule set and does not change predictions.
 
 ### Where the remaining points are
 About 1,600 dev rows still need a change we don't suggest, and almost all of them have no usable history.
-Next candidates: complaint reviews about specific dates, the 2025 pilot log (owner edits and rejections), and events or school breaks for restaurants and family venues.
+Next candidates: the 2025 pilot log (owner edits and rejections), and events or school breaks for restaurants and family venues.
 
 ## Run it
 
