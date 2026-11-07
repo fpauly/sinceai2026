@@ -189,3 +189,33 @@ deterministic because the **window** still comes from `DEMO_DATE`; only the list
 When C8 lands, this doc gets a short "what we learned" section: whether the API was reachable from
 the venue, response shape, licence, and whether it matched the official Finnish calendar (it should
 include Christmas Eve, which is a de facto holiday but not an official public holiday).
+
+---
+
+## 9. Update: the dataset arrived (2026-11-07)
+
+Fonecta's challenge package is now in the working tree at
+`FONECTA/FONECTA_CONNECT_SUGGESTS_2026/` (kept out of git, see `.gitignore`; the brief PDF sits next
+to it). What it changes for us:
+
+- **The sources above become real.** `data/entities.json` (3,032 entities, FI/SE/NO, with holiday
+  hours and a `closed` flag), `holiday_hours_history.jsonl` / `regular_hours_history.jsonl` (2023 →
+  Nov 2026, including *how* each entry was made: `OWNER_UI`, `CONNECT_SUGGESTION` from the 2025
+  pilot, `FONECTA_SUPPORT`, `API_INTEGRATION`), `reviews.json`, `publisher_suggestions.json` (about
+  half noise), `analytics_daily.parquet`, `peer_benchmarks.csv`, `calendar_special_days.csv`,
+  weather and local events, plus `labels/` with the dev truth.
+- **The scoring format is known.** `evaluation/evaluate.py` scores a predictions CSV with
+  `entity_id,date,action,hours[,confidence]`, `action ∈ SUGGEST | NO_ACTION | FLAG`, missing rows
+  counted as `NO_ACTION`; it also reports `search_views_protected_pct` and
+  `closed_door_views_prevented_pct`. `evaluation/targets_2026.csv` has 41,755 rows (dev/test/demo
+  splits; only test is scored by the organisers).
+- **Two stages unblock:** C6 (importer: dataset → our collections, `data/seed.ts` stays the
+  fallback) and A6 (scoring adapter: our detect + suggest → that CSV).
+- **One blocker to agree on first:** the dataset does not fit `types/index.ts` as it stands — 33
+  `c_segment` values vs our 8 categories, hours with several intervals
+  (`10:00-14:00,17:00-22:00`) and past midnight (`18:00-02:00`), and publisher rows that carry a
+  status but no per-channel hours. Importing it needs a shared type/data-model change (CONTRIBUTING
+  §5: lane A or B), so C6 starts only after that design update.
+- **What does not change:** the mock Turku businesses stay the scripted demo (`DESIGN.md` §13), and
+  `DEMO_DATE` still drives detection, so the demo remains deterministic while the importer and the
+  scoring adapter work off the real files.
