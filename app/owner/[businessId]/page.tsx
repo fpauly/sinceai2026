@@ -25,12 +25,12 @@ function BusinessView({ businessId }: { businessId: string }) {
   const [attempt, setAttempt] = useState(0);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const [publication, setPublication] = useState<{ id: string; applied: AppliedResult | null | undefined } | null>(null);
+  const [publication, setPublication] = useState<{ id: string; applied: AppliedResult | null | undefined; receivedAt: number } | null>(null);
 
   function decided(result: DecideResponse) {
     const ignored = result.suggestion.decision === "ignored";
     setNotice(ignored ? "Suggestion ignored. We will remember your choice." : null);
-    setPublication(ignored ? null : { id: result.suggestion._id, applied: result.suggestion.applied });
+    setPublication(ignored ? null : { id: result.suggestion._id, applied: result.suggestion.applied, receivedAt: Date.now() });
     setState((current) => current.status === "ready" ? {
       status: "ready", data: { ...current.data, suggestions: current.data.suggestions.filter((item) => item._id !== result.suggestion._id) },
     } : current);
@@ -82,7 +82,7 @@ function BusinessView({ businessId }: { businessId: string }) {
       {data.business.contact?.opted_out && <p className="mb-4 rounded-xl bg-zinc-100 p-3 text-sm">Not contacted. You have opted out of suggestion messages.</p>}
       <div className="mb-4"><AutomaticallyApplied suggestions={data.automatically_applied ?? []} language={contactLanguage(data.business)} /></div>
       {notice && <p role="status" className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm leading-6 text-emerald-900">{notice}</p>}
-      {publication && <ChannelSyncRow key={publication.id} applied={publication.applied} business={data.business} />}
+      {publication && <ChannelSyncRow key={publication.id} applied={publication.applied} receivedAt={publication.receivedAt} business={data.business} />}
       {data.suggestions.length ? (
         <section aria-label="Suggestions to review" className="space-y-4">
           {data.suggestions.map((suggestion) => <NotificationCard key={suggestion._id} suggestion={suggestion} listings={data.listings} profile={data.profile} businessName={data.business.name} language={contactLanguage(data.business)} onDecidedAction={decided} />)}
