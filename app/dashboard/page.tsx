@@ -163,7 +163,9 @@ export default function DashboardPage() {
                       </div>
                     </td>
                     <td className="p-3">
-                      {open === 0 ? (
+                      {open === 0 && row.needs_human ? (
+                        <span className="text-zinc-500">Staff review needed</span>
+                      ) : open === 0 ? (
                         <span className="text-emerald-600">Up to date ✓</span>
                       ) : (
                         <span className="flex flex-wrap gap-1">
