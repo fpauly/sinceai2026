@@ -10,7 +10,7 @@ Built in 48 hours at Since AI Hackathon 2026 (Turku) for Fonecta's challenge *Co
 
 ## Run it
 
-You need Node 20+ and MongoDB (Atlas, or local Docker: `docker run -d -p 27017:27017 mongo:7`).
+You need Node 22.18+ (we use 24; scripts run `lib/` TypeScript directly) and MongoDB (Atlas, or local Docker: `docker run -d -p 27017:27017 mongo:7`).
 
 ```bash
 npm install
@@ -43,7 +43,7 @@ Pages: `/dashboard` (Fonecta's view, "Run daily check"), `/contact/FI-D0001` (th
 
 ```bash
 node scripts/predict.mjs                                    # writes predictions_2026.csv
-python FONECTA/FONECTA_CONNECT_SUGGESTS_2026/evaluation/evaluate.py --predictions predictions_2026.csv
+python3 FONECTA/FONECTA_CONNECT_SUGGESTS_2026/evaluation/evaluate.py --predictions predictions_2026.csv
 ```
 
 **Checks:** `npm run check` (types, lint, build; also runs on `git push`) and `npm run smoke` (end to end against the running app).
@@ -52,7 +52,7 @@ python FONECTA/FONECTA_CONNECT_SUGGESTS_2026/evaluation/evaluate.py --prediction
 
 1. **Detect.** For each business and each special day from 7 Nov 2026 to 6 Jan 2027, `lib/predict` (plain code, no LLM) works out the likely real hours and compares them with what Google shows now: the entered exception, otherwise the regular hours. A difference becomes an issue; a business that looks closed for good is flagged for a person instead.
 2. **Suggest.** The proposal comes from evidence, strongest first: the owner's own earlier edit, the shopping centre's hours, last season's exception (or the season before), event nights and school breaks, then peers. Each basis has a confidence. Gemini only writes the message; code validates every draft and falls back to a template.
-3. **Contact.** One short message on the owner's preferred channel (SMS, WhatsApp, e-mail or app), in English and the owner's language (fi, sv or nb), in the style of Fonecta's example: the day, what Google shows now, why, and "We suggest …". Delivery is simulated. Opted-out owners get nothing.
+3. **Contact.** One short message on the owner's preferred channel (SMS, WhatsApp, e-mail or app), in English and the owner's language (fi, sv or nb), in the style of Fonecta's example: the day, what Google shows now and how often the listing was seen on Google that day last year, why, and "We suggest …". Delivery is simulated. Opted-out owners get nothing.
 4. **Decide.** A no-login link opens the owner view: approve, edit (with a confirm step) or decline, with a preview of what customers will see. Optional "Do this automatically next time". Owners with standing permission get the change applied, then a "for your information" note.
 5. **Apply.** The change is written to the Yext sandbox entity and to our profile. The owner sees where it shows: their live publishers, fastest first, with the typical update speed (Google about 2 minutes, Apple Maps about 2 days). Opted-out publishers are never claimed.
 
@@ -85,7 +85,6 @@ We make more suggestions than the baseline, so the number of harmful ones (wrong
 
 - **Our own invented seed first.** Before the dataset arrived we built rules for disagreeing channels and stale fields on 8 made-up Turku businesses. Fonecta's data has one published profile per business, so those rules were retired and detection was rebuilt around special days.
 - **A table of what each business type usually does** (learned from the dev truth): 60.5–61.2 with up to twice the harmful suggestions. Each owner's own habit matters more than the group average.
-- **Peer medians and typical time shifts as open-hours guesses** lost points: most of those messages went to businesses that were already right.
 - **Last year's drop in customer actions** (`analytics_daily.parquet`) as a sign the business was closed: real, but too weak on its own.
 - **Other peer thresholds:** either more harmful suggestions or fewer changes found; we kept the baseline's 0.7 / 0.15.
 - **Yext sandbox limits:** it has no live listings, so "where it shows" comes from the dataset's publishers; it rejects the dataset's fake phone numbers; and a slow write once made us report a saved change as failed, so we now read Yext back after a timeout.
@@ -95,7 +94,7 @@ We make more suggestions than the baseline, so the number of harmful ones (wrong
 
 `FI-D0017` Kahvila Kipinä joined in October 2026 and has no exception history and no earlier decisions. Connect still notices the problem (Google shows regular hours on Christmas Day), does not pretend to know the answer, and asks. Most similar cafés nearby are closed, so it proposes closed with **low confidence** and phrases it as a question:
 
-> Hi Aino, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 08:00–17:00. Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: Christmas Day 25 Dec closed.
+> Hi Aino, Christmas Day is on Friday 25 Dec and Google now shows your regular hours, open 08:00–17:00 (on the same day last year, your listing was seen 33 times on Google). Most similar businesses nearby are closed that day and nothing is set for you, so is that right for you too? We suggest: Christmas Day 25 Dec closed.
 
 When there is no history and no clear peer pattern, Connect stays quiet. Whatever the owner answers becomes history for next season. More in [`docs/no-history.md`](docs/no-history.md).
 
@@ -104,15 +103,15 @@ When there is no history and no clear peer pattern, Connect stays quiet. Whateve
 Exported from the app on 7 Nov 2026 (`DEMO_DATE` 2026-11-06): 52 messages for 13 businesses, all 52 validated by code. English is the demo language; every message is also stored in the owner's language. The full export, with each message's data, is [`docs/customer-messages.md`](docs/customer-messages.md) (`node scripts/export-messages.mjs --fresh`).
 
 **Kahvila Aurora, Helsinki (`FI-D0001`, SMS), English and Finnish**
-> Hi Aleksi, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 07:30–18:00. Last year you were open 07:30–13:00, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec open 07:30–13:00.
+> Hi Aleksi, Christmas Eve is on Thursday 24 Dec and Google now shows your regular hours, open 07:30–18:00 (on the same day last year, your listing was seen 29 times on Google). Last year you were open 07:30–13:00, but no special hours are set for this year. We suggest: Christmas Eve 24 Dec open 07:30–13:00.
 
-> Hei Aleksi, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 7.30–18. Viime vuonna olitte auki klo 7.30–13, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: jouluaatto 24.12 auki klo 7.30–13.
+> Hei Aleksi, jouluaatto on torstaina 24.12 ja Google näyttää nyt tavalliset aukioloaikanne: auki klo 7.30–18 (viime vuonna samana päivänä tietonne nähtiin Googlessa 29 kertaa). Viime vuonna olitte auki klo 7.30–13, mutta tälle vuodelle poikkeusaikoja ei ole vielä merkitty. Ehdotamme: jouluaatto 24.12 auki klo 7.30–13.
 
 **Kafé Linnea, Stockholm (`SE-D0008`, e-mail), Swedish: an early opening on St Lucy's Day**
-> Hej Maria, luciadagen infaller söndag 13/12 och Google visar nu era vanliga öppettider: öppet 10–17. År 2024 hade ni öppet 7–18, men inga avvikande tider är inlagda i år. Vi föreslår: luciadagen 13/12 öppet 7–18.
+> Hej Maria, luciadagen infaller söndag 13/12 och Google visar nu era vanliga öppettider: öppet 10–17 (samma dag förra året visades ni 43 gånger på Google). År 2024 hade ni öppet 7–18, men inga avvikande tider är inlagda i år. Vi föreslår: luciadagen 13/12 öppet 7–18.
 
 **Bakeri Fjord, Bergen (`NO-D0009`), Norwegian**
-> Hei Marte, første juledag er fredag 25.12 og Google viser nå de vanlige åpningstidene deres: åpent 7–18. I fjor hadde dere stengt, men ingen avvikende åpningstider er lagt inn i år. Vi foreslår: første juledag 25.12 stengt.
+> Hei Marte, første juledag er fredag 25.12 og Google viser nå de vanlige åpningstidene deres: åpent 7–18 (samme dag i fjor ble dere vist 13 ganger på Google). I fjor hadde dere stengt, men ingen avvikende åpningstider er lagt inn i år. Vi foreslår: første juledag 25.12 stengt.
 
 **Follow-ups after the owner answers** (fixed texts, no LLM; Kahvila Aurora)
 
@@ -122,8 +121,10 @@ Exported from the app on 7 Nov 2026 (`DEMO_DATE` 2026-11-06): 52 messages for 13
 | edits to 09:00–12:00, 13:00–15:00 | Thanks Aleksi, your change is saved: Christmas Eve 24 Dec open 09:00–12:00 and 13:00–15:00. It now shows on Google and your other listings. |
 | declines | OK Aleksi, we won't change your hours for Christmas Eve 24 Dec and won't ask about it again. |
 
-**Standing permission** ("handle public holidays from now on", Kukkakauppa Kide `FI-D0003`):
-> Hi Anna, as you asked, we set Independence Day 6 Dec open 10:00–14:00. It now shows on Google and your other listings; reply if it should be different.
+**Standing permission** ("handle public holidays from now on", Tilitoimisto Otso `FI-D0012`):
+> Hi Laura, as you asked, we set Christmas Eve 24 Dec closed. It now shows on Google and your other listings; reply if it should be different.
+
+> Hei Laura, kuten pyysitte, merkitsimme: jouluaatto 24.12 kiinni. Se näkyy nyt Googlessa ja muissa palveluissa; vastaa tähän, jos haluatte muuttaa sitä.
 
 ## Bonus: live source
 
