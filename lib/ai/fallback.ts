@@ -21,11 +21,13 @@ import type {
   SuggestionDraft,
   TypedProposedChange,
 } from "@/types/api";
+import { ownerHolidayHours, ownerOpeningHours } from "@/lib/ai/learning";
 
 // Step 2 (Suggest) without an LLM: one template per issue type, EN + FI, in Fonecta Connect's voice.
 // Used when Gemini is off, fails, or produces an invalid suggestion (DESIGN 9, 9.4).
 //
 // Every proposed value comes from the issue evidence or the listings, never invented:
+//  - learning (A5): the owner's own earlier edit for the same day comes first, before any other data
 //  - missing holiday hours: copy last year's hours for the same day; with no history, the
 //    category's common pattern (confidence low, message phrased as a question)
 //  - conflict: the most recently updated source (majority value for phone)
@@ -174,7 +176,7 @@ function describeHolidays(value: HolidayHours, names: (d: string) => string, lan
   return parts.join("; ");
 }
 
-function missingHolidayHours(business: Business, issue: Issue, listings: Listing[]): SuggestionDraft {
+function missingHolidayHours(business: Business, issue: Issue, listings: Listing[], prefs: Preferences | null): SuggestionDraft {
   const ev = issue.evidence as unknown as MissingHolidayHoursEvidence;
   const dates = [...ev.dates].sort();
   const lastYear = ev.last_year ?? {};
@@ -182,9 +184,14 @@ function missingHolidayHours(business: Business, issue: Issue, listings: Listing
 
   const value: HolidayHours = {};
   let fromHistory = 0;
+  let fromOwner = 0;
   for (const d of dates) {
     const prev = `${Number(d.slice(0, 4)) - 1}${d.slice(4)}`;
-    if (lastYear[prev]) {
+    const own = ownerHolidayHours(prefs, d);
+    if (own) {
+      value[d] = own.hours;
+      fromOwner++;
+    } else if (lastYear[prev]) {
       value[d] = lastYear[prev];
       fromHistory++;
     } else {
@@ -212,7 +219,20 @@ function missingHolidayHours(business: Business, issue: Issue, listings: Listing
   let reason: string;
   let en: string;
   let fi: string;
-  if (fromHistory === dates.length) {
+  const fromPattern = dates.length - fromHistory - fromOwner;
+  if (fromOwner > 0 && fromPattern === 0) {
+    confidence = "high";
+    reason = fromOwner === dates.length
+      ? "No hours are set for the coming holidays on any channel, so this uses the hours you set yourself last time."
+      : "No hours are set for the coming holidays on any channel, so this uses the hours you set yourself last time and last year's hours for the rest.";
+    en = `${enIntro}. Shall I publish these, using the hours you chose last time: ${enList}?`;
+    fi = `${fiIntro}. Julkaisenko nämä ajat viimeksi tekemäsi muutoksen mukaan: ${fiList}?`;
+  } else if (fromOwner > 0) {
+    confidence = "medium";
+    reason = `No hours are set for the coming holidays; this uses the hours you set yourself last time where you did, and what most ${cat.en} do for the rest.`;
+    en = `${enIntro}. Shall I publish these, using the hours you chose last time where I have them: ${enList}?`;
+    fi = `${fiIntro}. Julkaisenko nämä, osin viimeksi tekemäsi muutoksen mukaan: ${fiList}?`;
+  } else if (fromHistory === dates.length) {
     confidence = "high";
     reason = "No hours are set for the coming holidays on any channel, so this copies your own hours from the same days last year.";
     en = `${enIntro}. Shall I publish the same hours as last year: ${enList}?`;
@@ -251,7 +271,7 @@ function groupValues(values: CrossPlatformConflictEvidence["values"]): ValueGrou
   return [...groups.values()];
 }
 
-function crossPlatformConflict(business: Business, issue: Issue): SuggestionDraft {
+function crossPlatformConflict(business: Business, issue: Issue, prefs: Preferences | null): SuggestionDraft {
   const ev = issue.evidence as unknown as CrossPlatformConflictEvidence;
   const groups = groupValues(ev.values);
   const isPhone = ev.field === "phone";
@@ -263,14 +283,17 @@ function crossPlatformConflict(business: Business, issue: Issue): SuggestionDraf
   const newestWins = !isPhone && dated.length > 0 && (dated.length === 1 || dated[0].updated_at! > dated[1].updated_at!);
   const bySize = [...groups].sort((a, b) => b.sources.length - a.sources.length);
   const majorityWins = bySize.length === 1 || bySize[0].sources.length > bySize[1].sources.length;
-  const pick = newestWins ? dated[0] : bySize[0];
+  // Learning: if the owner set this day themselves before and a source still shows that value, it wins.
+  const own = day ? ownerOpeningHours(prefs, day) : null;
+  const ownGroup = own ? groups.find((g) => g.value === own) : undefined;
+  const pick = ownGroup ?? (newestWins ? dated[0] : bySize[0]);
   const others = groups.filter((g) => g !== pick);
 
   const proposed_change: TypedProposedChange = isPhone
     ? { field: "phone", value: pick.value }
     : { field: "opening_hours", value: { [day!]: pick.value } };
 
-  const confidence: Confidence = newestWins ? "high" : majorityWins ? "medium" : "low";
+  const confidence: Confidence = ownGroup || newestWins ? "high" : majorityWins ? "medium" : "low";
 
   // "your website says 10:00–14:00 but Finder and Google say 10:00–18:00"
   const sayEn = (g: ValueGroup) => {
@@ -290,7 +313,11 @@ function crossPlatformConflict(business: Business, issue: Issue): SuggestionDraf
   let reason: string;
   let en2: string;
   let fi2: string;
-  if (newestWins) {
+  if (ownGroup) {
+    reason = `You set ${DAY_EN_LONG[day!]} to ${show(pick.value, "en")} yourself last time, and ${pickWhoEn} still ${pick.sources.length > 1 ? "show" : "shows"} it.`;
+    en2 = `You chose ${show(pick.value, "en")} yourself last time, so shall I use it everywhere?`;
+    fi2 = `Valitsit viimeksi itse ${show(pick.value, "fi")}, joten päivitänkö sen kaikkialle?`;
+  } else if (newestWins) {
     reason = `${capitalize(pickWhoEn)} ${pick.sources.length > 1 ? "were" : "was"} updated most recently (${dateEn(pick.updated_at!)}), so ${pick.sources.length > 1 ? "their" : "its"} value is most likely the current one.`;
     en2 = `${capitalize(pickWhoEn)} ${pick.sources.length > 1 ? "were" : "was"} updated most recently (${monthEn(pick.updated_at!)}), so shall I use ${show(pick.value, "en")} everywhere?`;
     fi2 = `${capitalize(pickWhoFi)} on päivitetty viimeksi (${monthFiIn(pick.updated_at!)}), joten päivitänkö kaikkialle ${show(pick.value, "fi")}?`;
@@ -382,12 +409,11 @@ export function fallbackSuggestion(
   listings: Listing[],
   prefs: Preferences | null,
 ): SuggestionDraft {
-  void prefs; // learned decisions and standing permissions are used from stage A5
   switch (issue.type) {
     case "missing_holiday_hours":
-      return missingHolidayHours(business, issue, listings);
+      return missingHolidayHours(business, issue, listings, prefs);
     case "cross_platform_conflict":
-      return crossPlatformConflict(business, issue);
+      return crossPlatformConflict(business, issue, prefs);
     case "stale_field":
       return staleField(business, issue, listings);
     case "review_signal":

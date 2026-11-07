@@ -38,6 +38,7 @@ Write JSON with:
 
 Rules:
 - Plain, warm language, no jargon, no emojis.
+- If why_this_proposal says the hours come from the owner's own earlier change, say so (for example "the hours you chose last time").
 - If confidence is "low", phrase the message as a question and make clear it is a common pattern, not the owner's own data.
 - Otherwise end with a short yes/no question such as "Shall I publish this everywhere?"
 - For a conflict between listings, say what each listing shows (for example: your website says 10:00–14:00 but Google says 10:00–18:00).
